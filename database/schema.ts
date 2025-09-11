@@ -7,7 +7,8 @@ export const usersTable = pgTable("users", {
     .notNull()
     .unique()
     .$default(() => nanoid(12)),
-  email: text().notNull().unique(),
+  email: text().notNull(),
+  passwordSalt: text().notNull(),
   passwordHash: text().notNull(),
   nickname: text().notNull(),
   createdAt: timestamp({ withTimezone: true }).notNull().defaultNow(),

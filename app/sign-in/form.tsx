@@ -6,6 +6,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import * as v from "valibot";
+import { signIn } from "@/actions/auth";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -16,9 +17,8 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { login } from "./actions";
 
-const loginFormSchema = v.object({
+const signInFormSchema = v.object({
   email: v.pipe(v.string(), v.email("格式错误")),
   password: v.pipe(
     v.string(),
@@ -27,9 +27,9 @@ const loginFormSchema = v.object({
   ),
 });
 
-export function LoginForm() {
+export const SignInForm = () => {
   const form = useForm({
-    resolver: valibotResolver(loginFormSchema),
+    resolver: valibotResolver(signInFormSchema),
     defaultValues: {
       email: "",
       password: "",
@@ -39,9 +39,9 @@ export function LoginForm() {
   const [pending, setPending] = useState(false);
 
   const handleSubmit = form.handleSubmit(
-    async (values: v.InferOutput<typeof loginFormSchema>) => {
+    async (values: v.InferOutput<typeof signInFormSchema>) => {
       setPending(true);
-      const res = await login(values);
+      const res = await signIn(values);
       if (res.error) {
         setPending(false);
         toast.error(res.error);
@@ -72,7 +72,7 @@ export function LoginForm() {
             <FormItem>
               <FormLabel required>密码</FormLabel>
               <FormControl>
-                <Input {...field} type="password" />
+                <Input {...field} type="password" placeholder="请输入" />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -85,4 +85,4 @@ export function LoginForm() {
       </form>
     </Form>
   );
-}
+};

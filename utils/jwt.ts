@@ -3,7 +3,7 @@ import type { User } from "./types";
 
 const JWT_SECRET = process.env.JWT_SECRET ?? "";
 
-export async function signJwt(payload: User) {
+export const signJwt = async (payload: User) => {
   return new Promise<string>((resolve, reject) => {
     sign(payload, JWT_SECRET, (error, jwt) => {
       if (error) {
@@ -15,18 +15,18 @@ export async function signJwt(payload: User) {
       return resolve(jwt);
     });
   });
-}
+};
 
-export async function verifyJwt(jwt: string) {
+export const verifyJwt = async (jwt: string) => {
   return new Promise<User>((resolve, reject) => {
     verify(jwt, JWT_SECRET, (error, payload) => {
       if (error) {
         return reject(error);
       }
-      if (!payload || typeof payload !== "object") {
+      if (!payload) {
         return reject(new Error(""));
       }
       return resolve(payload as User);
     });
   });
-}
+};

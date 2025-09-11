@@ -1,10 +1,10 @@
 import { randomBytes, scrypt } from "node:crypto";
 
-export function generateSalt() {
+export const generateSalt = () => {
   return randomBytes(16).toString("hex");
-}
+};
 
-export async function hashPassword(password: string, salt: string) {
+export const hashPassword = async (password: string, salt: string) => {
   return new Promise<string>((resolve, reject) => {
     scrypt(password, salt, 64, (error, derivedKey) => {
       if (error) {
@@ -13,13 +13,4 @@ export async function hashPassword(password: string, salt: string) {
       return resolve(derivedKey.toString("hex"));
     });
   });
-}
-
-export async function verifyPassword(
-  attempt: string,
-  salt: string,
-  hash: string,
-) {
-  const attemptHash = await hashPassword(attempt, salt);
-  return attemptHash === hash;
-}
+};

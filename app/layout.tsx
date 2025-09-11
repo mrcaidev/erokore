@@ -3,7 +3,7 @@ import "./global.css";
 import { ThemeProvider } from "next-themes";
 import { Toaster } from "@/components/ui/sonner";
 
-export default function RootLayout({ children }: PropsWithChildren) {
+const RootLayout = ({ children }: PropsWithChildren) => {
   return (
     <html lang="zh" suppressHydrationWarning>
       <head>
@@ -17,4 +17,6 @@ export default function RootLayout({ children }: PropsWithChildren) {
       </body>
     </html>
   );
-}
+};
+
+export default RootLayout;

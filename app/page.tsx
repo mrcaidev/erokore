@@ -1,5 +1,13 @@
-import { Button } from "@/components/ui/button";
+import { UserMenu } from "@/components/user-menu";
 
-export default function HomePage() {
-  return <Button>点我</Button>;
-}
+const HomePage = () => {
+  return (
+    <main>
+      <div className="fixed top-6 right-8">
+        <UserMenu />
+      </div>
+    </main>
+  );
+};
+
+export default HomePage;

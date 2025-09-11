@@ -6,6 +6,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import * as v from "valibot";
+import { signUp } from "@/actions/auth";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -16,9 +17,8 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { register } from "./actions";
 
-const registerFormSchema = v.pipe(
+const signUpFormSchema = v.pipe(
   v.object({
     email: v.pipe(v.string(), v.email("格式错误")),
     password: v.pipe(
@@ -43,9 +43,9 @@ const registerFormSchema = v.pipe(
   ),
 );
 
-export function RegisterForm() {
+export const SignUpForm = () => {
   const form = useForm({
-    resolver: valibotResolver(registerFormSchema),
+    resolver: valibotResolver(signUpFormSchema),
     defaultValues: {
       email: "",
       password: "",
@@ -57,9 +57,9 @@ export function RegisterForm() {
   const [pending, setPending] = useState(false);
 
   const handleSubmit = form.handleSubmit(
-    async (values: v.InferOutput<typeof registerFormSchema>) => {
+    async (values: v.InferOutput<typeof signUpFormSchema>) => {
       setPending(true);
-      const res = await register(values);
+      const res = await signUp(values);
       if (res.error) {
         setPending(false);
         toast.error(res.error);
@@ -133,4 +133,4 @@ export function RegisterForm() {
       </form>
     </Form>
   );
-}
+};

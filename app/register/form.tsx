@@ -2,7 +2,6 @@
 
 import { valibotResolver } from "@hookform/resolvers/valibot";
 import { Loader2Icon, UserRoundPlusIcon } from "lucide-react";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -17,7 +16,6 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { useUser } from "@/stores/user";
 import { register } from "./actions";
 
 const registerFormSchema = v.pipe(
@@ -58,25 +56,14 @@ export function RegisterForm() {
 
   const [pending, setPending] = useState(false);
 
-  const setUser = useUser((store) => store.setUser);
-
-  const router = useRouter();
-
   const handleSubmit = form.handleSubmit(
     async (values: v.InferOutput<typeof registerFormSchema>) => {
       setPending(true);
       const res = await register(values);
-      setPending(false);
-
-      if (!res.ok) {
+      if (res.error) {
+        setPending(false);
         toast.error(res.error);
-        return;
       }
-
-      toast.success(`欢迎，${res.user.nickname}！`);
-      setUser(res.user);
-      localStorage.setItem("token", res.jwt);
-      router.push("/");
     },
   );
 

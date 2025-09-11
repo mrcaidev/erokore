@@ -1,6 +1,8 @@
 "use server";
 
 import { and, eq, isNull } from "drizzle-orm";
+import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 import { db } from "@/database/client";
 import { usersTable } from "@/database/schema";
 import { signJwt } from "@/utils/jwt";
@@ -18,7 +20,7 @@ export async function login({ email, password }: LoginRequest) {
     .where(and(eq(usersTable.email, email), isNull(usersTable.deletedAt)));
 
   if (!user) {
-    return { ok: false, error: "邮箱未注册" } as const;
+    return { error: "邮箱未注册" };
   }
 
   const passed = await verifyPassword(
@@ -28,19 +30,13 @@ export async function login({ email, password }: LoginRequest) {
   );
 
   if (!passed) {
-    return { ok: false, error: "密码错误" } as const;
+    return { error: "密码错误" };
   }
 
   const jwt = await signJwt({ id: user.id });
 
-  return {
-    ok: true,
-    user: {
-      id: user.id,
-      slug: user.slug,
-      email: user.email,
-      nickname: user.nickname,
-    },
-    jwt,
-  } as const;
+  const cookieStore = await cookies();
+  cookieStore.set("token", jwt, { httpOnly: true, secure: true });
+
+  return redirect("/");
 }

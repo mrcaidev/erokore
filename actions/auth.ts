@@ -15,8 +15,12 @@ export const getCurrentUser = cache(async () => {
   if (!jwt) {
     return undefined;
   }
-  const user = await verifyJwt(jwt);
-  return user;
+  try {
+    const user = await verifyJwt(jwt);
+    return user;
+  } catch {
+    return redirect("/sign-in");
+  }
 });
 
 type SignUpRequest = {

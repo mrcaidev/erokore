@@ -1,12 +1,11 @@
 "use server";
 
 import { and, eq, isNull } from "drizzle-orm";
-import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { db } from "@/database/client";
 import { usersTable } from "@/database/schema";
-import { signJwt } from "@/utils/jwt";
 import { generateSalt, hashPassword } from "@/utils/password";
+import { setSession } from "@/utils/session";
 
 type RegisterRequest = {
   email: string;
@@ -21,7 +20,7 @@ export async function register({ email, password, nickname }: RegisterRequest) {
     .where(and(eq(usersTable.email, email), isNull(usersTable.deletedAt)));
 
   if (emailConflictedUser) {
-    return { error: "邮箱已被注册" };
+    return { error: "邮箱已注册" };
   }
 
   const passwordSalt = generateSalt();
@@ -41,10 +40,6 @@ export async function register({ email, password, nickname }: RegisterRequest) {
     return { error: "注册失败，请重试" };
   }
 
-  const jwt = await signJwt({ id: user.id });
-
-  const cookieStore = await cookies();
-  cookieStore.set("token", jwt, { httpOnly: true, secure: true });
-
+  await setSession(user);
   return redirect("/");
 }

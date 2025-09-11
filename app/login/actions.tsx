@@ -1,12 +1,11 @@
 "use server";
 
 import { and, eq, isNull } from "drizzle-orm";
-import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { db } from "@/database/client";
 import { usersTable } from "@/database/schema";
-import { signJwt } from "@/utils/jwt";
 import { verifyPassword } from "@/utils/password";
+import { setSession } from "@/utils/session";
 
 type LoginRequest = {
   email: string;
@@ -33,10 +32,6 @@ export async function login({ email, password }: LoginRequest) {
     return { error: "密码错误" };
   }
 
-  const jwt = await signJwt({ id: user.id });
-
-  const cookieStore = await cookies();
-  cookieStore.set("token", jwt, { httpOnly: true, secure: true });
-
+  await setSession(user);
   return redirect("/");
 }

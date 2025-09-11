@@ -1,9 +1,11 @@
 import { sign, verify } from "jsonwebtoken";
-import type { User } from "./types";
+import type { FullUser } from "./types";
 
 const JWT_SECRET = process.env.JWT_SECRET ?? "";
 
-export const signJwt = async (payload: User) => {
+type Payload = Pick<FullUser, "id">;
+
+export const signJwt = async (payload: Payload) => {
   return new Promise<string>((resolve, reject) => {
     sign(payload, JWT_SECRET, (error, jwt) => {
       if (error) {
@@ -18,15 +20,15 @@ export const signJwt = async (payload: User) => {
 };
 
 export const verifyJwt = async (jwt: string) => {
-  return new Promise<User>((resolve, reject) => {
+  return new Promise<Payload>((resolve, reject) => {
     verify(jwt, JWT_SECRET, (error, payload) => {
       if (error) {
         return reject(error);
       }
-      if (!payload) {
+      if (!payload || typeof payload !== "object") {
         return reject(new Error(""));
       }
-      return resolve(payload as User);
+      return resolve({ id: payload.id });
     });
   });
 };

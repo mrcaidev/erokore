@@ -1,19 +1,6 @@
-# Dependencies
-node_modules
-
-# TypeScript
-*.tsbuildinfo
-
-# Next.js
 .next
-next-env.d.ts
-
-# Environment variables
+node_modules
 .env*
 !.env.example
-
-# Test
-coverage
-
-# Misc
-.DS_Store
+next-env.d.ts
+*.tsbuildinfo

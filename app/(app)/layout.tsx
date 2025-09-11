@@ -1,7 +1,7 @@
 import type { PropsWithChildren } from "react";
-import { UserMenu } from "@/components/user-menu";
+import { UserMenu } from "./user-menu";
 
-const HasUserMenuLayout = ({ children }: PropsWithChildren) => {
+const AppLayout = ({ children }: PropsWithChildren) => {
   return (
     <>
       {children}
@@ -12,4 +12,4 @@ const HasUserMenuLayout = ({ children }: PropsWithChildren) => {
   );
 };
 
-export default HasUserMenuLayout;
+export default AppLayout;

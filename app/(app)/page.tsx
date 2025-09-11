@@ -1,7 +1,7 @@
 import { PlusIcon, RssIcon } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { RecentFolderList } from "./recent-folder-list";
+import { RecentCollectionList } from "./recent-collection-list";
 
 const HomePage = () => {
   return (
@@ -9,19 +9,19 @@ const HomePage = () => {
       <div className="space-y-4 w-fit mx-auto">
         <div className="grid grid-cols-2 gap-2">
           <Button asChild>
-            <Link href="/folders/new">
+            <Link href="/collections/create">
               <PlusIcon />
-              创建清单
+              创建作品集
             </Link>
           </Button>
           <Button variant="secondary" asChild>
-            <Link href="/folders/following">
+            <Link href="/collections/subscribed">
               <RssIcon />
               我关注的
             </Link>
           </Button>
         </div>
-        <RecentFolderList />
+        <RecentCollectionList />
       </div>
     </main>
   );

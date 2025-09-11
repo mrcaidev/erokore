@@ -5,19 +5,19 @@ import Link from "next/link";
 import { useState } from "react";
 import { cn } from "@/components/ui/utils";
 
-export const RecentFolderCard = () => {
+export const RecentCollectionCard = () => {
   return (
     <Link
       href="#"
       className="flex items-center gap-2 p-3 hover:bg-accent text-muted-foreground hover:text-foreground transition-colors"
     >
       <FolderIcon className="size-4" />
-      <div className="max-w-56 text-sm truncate">清单名称</div>
+      <div className="max-w-56 text-sm truncate">作品集名称</div>
     </Link>
   );
 };
 
-export const RecentFolderList = () => {
+export const RecentCollectionList = () => {
   const [expanded, setExpanded] = useState(true);
 
   return (
@@ -38,13 +38,13 @@ export const RecentFolderList = () => {
       {expanded && (
         <ul className="divide-y-1">
           <li>
-            <RecentFolderCard />
+            <RecentCollectionCard />
           </li>
           <li>
-            <RecentFolderCard />
+            <RecentCollectionCard />
           </li>
           <li>
-            <RecentFolderCard />
+            <RecentCollectionCard />
           </li>
         </ul>
       )}

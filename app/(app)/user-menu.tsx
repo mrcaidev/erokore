@@ -1,35 +1,26 @@
-import { LogInIcon, LogOutIcon, UserRoundPlusIcon } from "lucide-react";
+import { LogInIcon, LogOutIcon } from "lucide-react";
 import Link from "next/link";
-import { getCurrentUser, signOut } from "@/server/auth";
-import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
-import { Button } from "./ui/button";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuTrigger,
-} from "./ui/dropdown-menu";
+} from "@/components/ui/dropdown-menu";
+import { getCurrentUser, signOut } from "@/server/user";
 
 export const UserMenu = async () => {
   const user = await getCurrentUser();
 
   if (!user) {
     return (
-      <div className="flex items-center gap-2">
-        <Button variant="outline" asChild>
-          <Link href="/sign-up">
-            <UserRoundPlusIcon />
-            注册
-          </Link>
-        </Button>
-        <Button asChild>
-          <Link href="/sign-in">
-            <LogInIcon />
-            登录
-          </Link>
-        </Button>
-      </div>
+      <Button variant="ghost" size="icon" asChild>
+        <Link href="/sign-in" aria-label="登录">
+          <LogInIcon />
+        </Link>
+      </Button>
     );
   }
 
@@ -37,7 +28,7 @@ export const UserMenu = async () => {
     <DropdownMenu>
       <DropdownMenuTrigger>
         <Avatar className="size-10">
-          <AvatarImage src={undefined} alt="你的头像" />
+          <AvatarImage src={user.avatarUrl} alt="你的头像" />
           <AvatarFallback className="text-muted-foreground uppercase">
             {user.nickname[0]}
           </AvatarFallback>

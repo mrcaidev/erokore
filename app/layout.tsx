@@ -8,7 +8,7 @@ const RootLayout = ({ children }: PropsWithChildren) => {
   return (
     <html lang="zh" suppressHydrationWarning>
       <head>
-        <title>Pornmate</title>
+        <title>Erokore</title>
       </head>
       <body>
         <ThemeProvider attribute="class" disableTransitionOnChange>

@@ -16,7 +16,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { signIn } from "@/server/auth";
+import { signIn } from "@/server/user";
 
 const signInFormSchema = v.object({
   email: v.pipe(v.string(), v.email("格式错误")),

@@ -1,6 +1,6 @@
 import { LogInIcon, LogOutIcon, UserRoundPlusIcon } from "lucide-react";
 import Link from "next/link";
-import { getCurrentUser, signOut } from "@/actions/auth";
+import { getCurrentUser, signOut } from "@/server/auth";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Button } from "./ui/button";
 import {

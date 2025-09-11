@@ -9,6 +9,13 @@
     "useIgnoreFile": true,
     "defaultBranch": "main"
   },
+  "linter": {
+    "rules": {
+      "suspicious": {
+        "noUnknownAtRules": "off"
+      }
+    }
+  },
   "formatter": {
     "indentStyle": "space"
   }

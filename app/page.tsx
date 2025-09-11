@@ -1,3 +1,5 @@
+import { Button } from "@/components/ui/button";
+
 export default function HomePage() {
-  return <h1>Hello world!</h1>;
+  return <Button disabled>点我</Button>;
 }

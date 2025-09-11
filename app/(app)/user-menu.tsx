@@ -26,7 +26,7 @@ export const UserMenu = async () => {
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger>
+      <DropdownMenuTrigger className="cursor-pointer">
         <Avatar className="size-10">
           <AvatarImage src={user.avatarUrl} alt="你的头像" />
           <AvatarFallback className="text-muted-foreground uppercase">

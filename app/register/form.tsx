@@ -17,6 +17,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { useUser } from "@/stores/user";
 import { register } from "./actions";
 
 const registerFormSchema = v.pipe(
@@ -57,6 +58,8 @@ export function RegisterForm() {
 
   const [pending, setPending] = useState(false);
 
+  const setUser = useUser((store) => store.setUser);
+
   const router = useRouter();
 
   const handleSubmit = form.handleSubmit(
@@ -71,6 +74,7 @@ export function RegisterForm() {
       }
 
       toast.success(`欢迎，${res.user.nickname}！`);
+      setUser(res.user);
       localStorage.setItem("token", res.jwt);
       router.push("/");
     },

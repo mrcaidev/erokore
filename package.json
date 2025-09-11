@@ -10,6 +10,7 @@
     "check:write": "biome check --write"
   },
   "dependencies": {
+    "@fontsource/noto-sans-sc": "^5.2.6",
     "@hookform/resolvers": "^5.2.1",
     "@neondatabase/serverless": "^1.0.1",
     "@radix-ui/react-avatar": "^1.1.10",

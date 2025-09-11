@@ -1,6 +1,6 @@
 import type { PropsWithChildren } from "react";
 import "./global.css";
-import { ThemeProvider } from "@/components/theme-provider";
+import { ThemeProvider } from "next-themes";
 import { Toaster } from "@/components/ui/sonner";
 
 export default function RootLayout({ children }: PropsWithChildren) {
@@ -10,7 +10,7 @@ export default function RootLayout({ children }: PropsWithChildren) {
         <title>Pornmate</title>
       </head>
       <body>
-        <ThemeProvider>
+        <ThemeProvider attribute="class" disableTransitionOnChange>
           {children}
           <Toaster richColors />
         </ThemeProvider>

@@ -139,7 +139,7 @@ export const collectionItemsTable = pgTable("collectionItems", {
   ...timestamptzs,
 });
 
-export const collaboratorsTable = pgTable("collaborators", {
+export const collaborationsTable = pgTable("collaborations", {
   // 物理 ID
   id: integer().primaryKey().generatedAlwaysAsIdentity(),
   // 用户 ID

@@ -1,4 +1,4 @@
-import { sql } from "drizzle-orm";
+import { relations, sql } from "drizzle-orm";
 import {
   integer,
   pgEnum,
@@ -51,6 +51,10 @@ export const usersTable = pgTable(
       .where(sql`${table.deletedAt} is null`),
   ],
 );
+
+export const usersRelations = relations(usersTable, ({ many }) => ({
+  ownedCollections: many(collectionsTable),
+}));
 
 const permissionLevels = [
   // 不可见：用户没有任何权限
@@ -105,6 +109,13 @@ export const collectionsTable = pgTable("collections", {
   // 审计时间
   ...timestamptzs,
 });
+
+export const collectionsRelations = relations(collectionsTable, ({ one }) => ({
+  owner: one(usersTable, {
+    fields: [collectionsTable.ownerId],
+    references: [usersTable.id],
+  }),
+}));
 
 export const collectionItemsTable = pgTable("collectionItems", {
   // 物理 ID

@@ -3,6 +3,17 @@ import { collectionsTable } from "./schema";
 
 export const findOneCollectionBySlug = async (slug: string) => {
   const collection = await db.query.collectionsTable.findFirst({
+    with: {
+      owner: {
+        columns: {
+          id: true,
+          slug: true,
+          email: true,
+          nickname: true,
+          avatarUrl: true,
+        },
+      },
+    },
     where: (collectionsTable, { and, eq, isNull }) =>
       and(eq(collectionsTable.slug, slug), isNull(collectionsTable.deletedAt)),
   });

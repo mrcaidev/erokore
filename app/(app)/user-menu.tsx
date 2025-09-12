@@ -16,9 +16,10 @@ export const UserMenu = async () => {
 
   if (!user) {
     return (
-      <Button variant="ghost" size="icon" asChild>
-        <Link href="/sign-in" aria-label="登录">
+      <Button variant="ghost" asChild>
+        <Link href="/sign-in">
           <LogInIcon />
+          登录
         </Link>
       </Button>
     );

@@ -1,75 +1,24 @@
-import type { FullUser, PrivateUser, PublicUser } from "@/utils/types";
 import { db } from "./client";
+import { usersTable } from "./schema";
 
-const usersCollection = db.collection<FullUser>("users");
-
-export const findOneFullUserById = async (id: string) => {
-  const user = await usersCollection.findOne(
-    { id, deletedAt: null },
-    {
-      projection: {
-        id: 1,
-        email: 1,
-        nickname: 1,
-        avatarUrl: 1,
-        createdAt: 1,
-        updatedAt: 1,
-        deletedAt: 1,
-        passwordSalt: 1,
-        passwordHash: 1,
-      },
-    },
-  );
-  return user as FullUser | null;
-};
-
-export const findOnePrivateUserById = async (id: string) => {
-  const user = await usersCollection.findOne(
-    { id, deletedAt: null },
-    {
-      projection: {
-        id: 1,
-        email: 1,
-        nickname: 1,
-        avatarUrl: 1,
-        createdAt: 1,
-        updatedAt: 1,
-        deletedAt: 1,
-      },
-    },
-  );
-  return user as PrivateUser | null;
-};
-
-export const findOnePublicUserById = async (id: string) => {
-  const user = await usersCollection.findOne(
-    { id, deletedAt: null },
-    { projection: { id: 1, email: 1, nickname: 1, avatarUrl: 1 } },
-  );
-  return user as PublicUser | null;
+export const findOnePrivateUserById = async (id: number) => {
+  const user = await db.query.usersTable.findFirst({
+    columns: { passwordSalt: false, passwordHash: false },
+    where: (usersTable, { and, eq, isNull }) =>
+      and(eq(usersTable.id, id), isNull(usersTable.deletedAt)),
+  });
+  return user;
 };
 
 export const findOneFullUserByEmail = async (email: string) => {
-  const user = await usersCollection.findOne(
-    { email, deletedAt: null },
-    {
-      projection: {
-        id: 1,
-        email: 1,
-        nickname: 1,
-        avatarUrl: 1,
-        createdAt: 1,
-        updatedAt: 1,
-        deletedAt: 1,
-        passwordSalt: 1,
-        passwordHash: 1,
-      },
-    },
-  );
-  return user as FullUser | null;
+  const user = await db.query.usersTable.findFirst({
+    where: (usersTable, { and, eq, isNull }) =>
+      and(eq(usersTable.email, email), isNull(usersTable.deletedAt)),
+  });
+  return user;
 };
 
-export const insertOneUser = async (user: FullUser) => {
-  const result = await usersCollection.insertOne(user);
-  return result;
+export const insertOneUser = async (value: typeof usersTable.$inferInsert) => {
+  const [user] = await db.insert(usersTable).values(value).returning();
+  return user;
 };

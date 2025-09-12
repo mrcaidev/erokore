@@ -5,6 +5,7 @@ import { ChevronLeftIcon, Loader2Icon, PlusIcon } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 import * as v from "valibot";
 import { Button } from "@/components/ui/button";
 import {
@@ -46,7 +47,11 @@ export const CreateCollectionForm = () => {
   const handleSubmit = form.handleSubmit(
     async (values: v.InferOutput<typeof createCollectionFormSchema>) => {
       setPending(true);
-      await createCollection(values);
+      const res = await createCollection(values);
+      if (res.error) {
+        setPending(false);
+        toast.error(res.error);
+      }
     },
   );
 
@@ -60,7 +65,7 @@ export const CreateCollectionForm = () => {
             <FormItem>
               <FormLabel required>标题</FormLabel>
               <FormControl>
-                <Input {...field} placeholder="请输入" />
+                <Input {...field} placeholder="1-20 个字符" />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -73,7 +78,7 @@ export const CreateCollectionForm = () => {
             <FormItem>
               <FormLabel>描述</FormLabel>
               <FormControl>
-                <Textarea {...field} placeholder="请输入" />
+                <Textarea {...field} placeholder="0-200 个字符" />
               </FormControl>
               <FormMessage />
             </FormItem>

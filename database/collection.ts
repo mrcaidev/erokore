@@ -1,17 +1,20 @@
-import type { Collection } from "@/utils/types";
 import { db } from "./client";
+import { collectionsTable } from "./schema";
 
-const collectionsCollection = db.collection<Collection>("collections");
-
-export const findOneCollectionById = async (id: string) => {
-  const collection = await collectionsCollection.findOne(
-    { id, deletedAt: null },
-    { projection: { _id: 0 } },
-  );
+export const findOneCollectionBySlug = async (slug: string) => {
+  const collection = await db.query.collectionsTable.findFirst({
+    where: (collectionsTable, { and, eq, isNull }) =>
+      and(eq(collectionsTable.slug, slug), isNull(collectionsTable.deletedAt)),
+  });
   return collection;
 };
 
-export const insertOneCollection = async (collection: Collection) => {
-  const result = await collectionsCollection.insertOne(collection);
-  return result;
+export const insertOneCollection = async (
+  value: typeof collectionsTable.$inferInsert,
+) => {
+  const [collection] = await db
+    .insert(collectionsTable)
+    .values(value)
+    .returning();
+  return collection;
 };

@@ -1,6 +1,5 @@
 "use server";
 
-import { nanoid } from "nanoid";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { cache } from "react";
@@ -11,32 +10,30 @@ import {
 } from "@/database/user";
 import { signJwt, verifyJwt } from "@/utils/jwt";
 import { generateSalt, hashPassword } from "@/utils/password";
-import type { FullUser } from "@/utils/types";
 
 export const getCurrentUser = cache(async () => {
   const cookieStore = await cookies();
   const jwt = cookieStore.get("session")?.value;
 
-  // 如果 cookie 里没有 session，说明用户还没有登录。
-  // 不用强制重定向，因为部分页面无需登录也能访问。
+  // 未登录
   if (!jwt) {
     return undefined;
   }
 
   try {
-    const { id } = await verifyJwt(jwt);
+    const { id } = await verifyJwt<{ id: number }>(jwt);
 
     const user = await findOnePrivateUserById(id);
 
-    // 如果找不到用户，说明用户被删除了，强制重定向到登录页。
+    // 用户不存在
     if (!user) {
-      return redirect("/sign-in");
+      return undefined;
     }
 
     return user;
   } catch {
-    // 如果验证 JWT 失败，说明用户的登录状态已经过期，强制重定向到登录页。
-    return redirect("/sign-in");
+    // JWT 验证失败
+    return undefined;
   }
 });
 
@@ -56,19 +53,16 @@ export const signUp = async ({ email, password, nickname }: SignUpRequest) => {
   const passwordSalt = generateSalt();
   const passwordHash = await hashPassword(password, passwordSalt);
 
-  const user: FullUser = {
-    id: nanoid(8),
+  const user = await insertOneUser({
     email,
     nickname,
-    avatarUrl: "",
     passwordSalt,
     passwordHash,
-    createdAt: new Date(),
-    updatedAt: new Date(),
-    deletedAt: null,
-  };
+  });
 
-  await insertOneUser(user);
+  if (!user) {
+    return { error: "注册失败，请稍后重试" };
+  }
 
   const jwt = await signJwt({ id: user.id });
   const cookieStore = await cookies();
@@ -90,9 +84,8 @@ export const signIn = async ({ email, password }: SignInRequest) => {
   }
 
   const passwordHash = await hashPassword(password, user.passwordSalt);
-  const verified = passwordHash === user.passwordHash;
 
-  if (!verified) {
+  if (passwordHash !== user.passwordHash) {
     return { error: "密码错误" };
   }
 

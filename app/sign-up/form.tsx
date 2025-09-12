@@ -69,7 +69,7 @@ export const SignUpForm = () => {
 
   return (
     <Form {...form}>
-      <form onSubmit={handleSubmit} className="space-y-4 min-w-xs">
+      <form onSubmit={handleSubmit} className="space-y-4 w-xs">
         <FormField
           control={form.control}
           name="email"

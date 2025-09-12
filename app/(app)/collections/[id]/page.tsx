@@ -1,9 +1,23 @@
-import { useParams } from "next/navigation";
+import { notFound } from "next/navigation";
+import { findOneCollectionById } from "@/database/collection";
 
-const CollectionPage = () => {
-  const { id } = useParams<{ id: string }>();
+export type CollectionPageParams = {
+  id: string;
+};
 
-  return <div>作品集 {id}</div>;
+export type CollectionPageProps = {
+  params: Promise<CollectionPageParams>;
+};
+
+const CollectionPage = async ({ params }: CollectionPageProps) => {
+  const { id } = await params;
+  const collection = await findOneCollectionById(id);
+
+  if (!collection) {
+    return notFound();
+  }
+
+  return <div>作品集 {collection.title}</div>;
 };
 
 export default CollectionPage;

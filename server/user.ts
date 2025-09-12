@@ -13,40 +13,32 @@ import { signJwt, verifyJwt } from "@/utils/jwt";
 import { generateSalt, hashPassword } from "@/utils/password";
 import type { FullUser } from "@/utils/types";
 
-export type GetCurrentUserOptions = {
-  redirectOnUnauth?: boolean;
-};
+export const getCurrentUser = cache(async () => {
+  const cookieStore = await cookies();
+  const jwt = cookieStore.get("session")?.value;
 
-export const getCurrentUser = cache(
-  async ({ redirectOnUnauth = false }: GetCurrentUserOptions = {}) => {
-    const cookieStore = await cookies();
-    const jwt = cookieStore.get("session")?.value;
+  // 如果 cookie 里没有 session，说明用户还没有登录。
+  // 不用强制重定向，因为部分页面无需登录也能访问。
+  if (!jwt) {
+    return undefined;
+  }
 
-    // 如果 cookie 里没有 session，说明用户还没有登录。
-    if (!jwt) {
-      if (redirectOnUnauth) {
-        return redirect("/sign-in");
-      }
-      return undefined;
-    }
+  try {
+    const { id } = await verifyJwt(jwt);
 
-    try {
-      const { id } = await verifyJwt(jwt);
+    const user = await findOnePrivateUserById(id);
 
-      const user = await findOnePrivateUserById(id);
-
-      // 如果找不到用户，说明用户被删除了，强制重定向到登录页。
-      if (!user) {
-        return redirect("/sign-in");
-      }
-
-      return user;
-    } catch {
-      // 如果验证 JWT 失败，说明用户的登录状态已经过期，强制重定向到登录页。
+    // 如果找不到用户，说明用户被删除了，强制重定向到登录页。
+    if (!user) {
       return redirect("/sign-in");
     }
-  },
-);
+
+    return user;
+  } catch {
+    // 如果验证 JWT 失败，说明用户的登录状态已经过期，强制重定向到登录页。
+    return redirect("/sign-in");
+  }
+});
 
 type SignUpRequest = {
   email: string;

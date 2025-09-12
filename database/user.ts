@@ -1,10 +1,10 @@
 import type { FullUser, PrivateUser, PublicUser } from "@/utils/types";
 import { db } from "./client";
 
-const collection = db.collection<FullUser>("users");
+const usersCollection = db.collection<FullUser>("users");
 
 export const findOneFullUserById = async (id: string) => {
-  const user = await collection.findOne(
+  const user = await usersCollection.findOne(
     { id, deletedAt: null },
     {
       projection: {
@@ -24,7 +24,7 @@ export const findOneFullUserById = async (id: string) => {
 };
 
 export const findOnePrivateUserById = async (id: string) => {
-  const user = await collection.findOne(
+  const user = await usersCollection.findOne(
     { id, deletedAt: null },
     {
       projection: {
@@ -42,7 +42,7 @@ export const findOnePrivateUserById = async (id: string) => {
 };
 
 export const findOnePublicUserById = async (id: string) => {
-  const user = await collection.findOne(
+  const user = await usersCollection.findOne(
     { id, deletedAt: null },
     { projection: { id: 1, email: 1, nickname: 1, avatarUrl: 1 } },
   );
@@ -50,7 +50,7 @@ export const findOnePublicUserById = async (id: string) => {
 };
 
 export const findOneFullUserByEmail = async (email: string) => {
-  const user = await collection.findOne(
+  const user = await usersCollection.findOne(
     { email, deletedAt: null },
     {
       projection: {
@@ -70,6 +70,6 @@ export const findOneFullUserByEmail = async (email: string) => {
 };
 
 export const insertOneUser = async (user: FullUser) => {
-  const result = await collection.insertOne(user);
+  const result = await usersCollection.insertOne(user);
   return result;
 };

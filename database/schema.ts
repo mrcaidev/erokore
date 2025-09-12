@@ -67,7 +67,7 @@ const permissionLevels = [
   "owner",
 ] as const;
 
-export const permissionLevelEnum = pgEnum("permission_level", permissionLevels);
+export const permissionLevelEnum = pgEnum("permissionLevel", permissionLevels);
 
 const defaultablePermissionLevels = [
   ...permissionLevels,
@@ -76,7 +76,7 @@ const defaultablePermissionLevels = [
 ] as const;
 
 export const defaultablePermissionLevelEnum = pgEnum(
-  "defaultable_permission_level",
+  "defaultablePermissionLevel",
   defaultablePermissionLevels,
 );
 
@@ -106,7 +106,7 @@ export const collectionsTable = pgTable("collections", {
   ...timestamptzs,
 });
 
-export const collectionItemsTable = pgTable("collection_items", {
+export const collectionItemsTable = pgTable("collectionItems", {
   // 物理 ID
   id: integer().primaryKey().generatedAlwaysAsIdentity(),
   // 业务 ID

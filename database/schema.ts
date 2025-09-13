@@ -84,15 +84,15 @@ export const usersRelations = relations(usersTable, ({ many }) => ({
 
 const auditUsers = {
   // 创建者 ID
-  createdBy: integer()
+  creatorId: integer()
     .notNull()
     .references(() => usersTable.id),
   // 最后更新者 ID
-  updatedBy: integer()
+  updaterId: integer()
     .notNull()
     .references(() => usersTable.id),
   // 删除者 ID
-  deletedBy: integer().references(() => usersTable.id),
+  deleterId: integer().references(() => usersTable.id),
 };
 
 export const permissionLevels = [
@@ -163,17 +163,17 @@ export const collectionsRelations = relations(
       relationName: "collection_have_invitations",
     }),
     creator: one(usersTable, {
-      fields: [collectionsTable.createdBy],
+      fields: [collectionsTable.creatorId],
       references: [usersTable.id],
       relationName: "user_create_collections",
     }),
     updater: one(usersTable, {
-      fields: [collectionsTable.updatedBy],
+      fields: [collectionsTable.updaterId],
       references: [usersTable.id],
       relationName: "user_update_collections",
     }),
     deleter: one(usersTable, {
-      fields: [collectionsTable.deletedBy],
+      fields: [collectionsTable.deleterId],
       references: [usersTable.id],
       relationName: "user_delete_collections",
     }),
@@ -217,17 +217,17 @@ export const collectionItemsRelations = relations(
       relationName: "collection_comprise_items",
     }),
     creator: one(usersTable, {
-      fields: [collectionItemsTable.createdBy],
+      fields: [collectionItemsTable.creatorId],
       references: [usersTable.id],
       relationName: "user_create_collectionItems",
     }),
     updater: one(usersTable, {
-      fields: [collectionItemsTable.updatedBy],
+      fields: [collectionItemsTable.updaterId],
       references: [usersTable.id],
       relationName: "user_update_collectionItems",
     }),
     deleter: one(usersTable, {
-      fields: [collectionItemsTable.deletedBy],
+      fields: [collectionItemsTable.deleterId],
       references: [usersTable.id],
       relationName: "user_delete_collectionItems",
     }),
@@ -239,8 +239,8 @@ export const collaborationsTable = pgTable(
   {
     // 物理 ID
     id: integer().primaryKey().generatedAlwaysAsIdentity(),
-    // 用户 ID
-    userId: integer()
+    // 协作者 ID
+    collaboratorId: integer()
       .notNull()
       .references(() => usersTable.id),
     // 作品集 ID
@@ -254,15 +254,15 @@ export const collaborationsTable = pgTable(
   },
   (table) => [
     // 用户-作品集对唯一
-    uniqueIndex().on(table.userId, table.collectionId),
+    uniqueIndex().on(table.collaboratorId, table.collectionId),
   ],
 );
 
 export const collaborationsRelations = relations(
   collaborationsTable,
   ({ one }) => ({
-    user: one(usersTable, {
-      fields: [collaborationsTable.userId],
+    collaborator: one(usersTable, {
+      fields: [collaborationsTable.collaboratorId],
       references: [usersTable.id],
       relationName: "user_have_collaborations",
     }),
@@ -279,8 +279,8 @@ export const subscriptionsTable = pgTable(
   {
     // 物理 ID
     id: integer().primaryKey().generatedAlwaysAsIdentity(),
-    // 用户 ID
-    userId: integer()
+    // 订阅者 ID
+    subscriberId: integer()
       .notNull()
       .references(() => usersTable.id),
     // 作品集 ID
@@ -292,15 +292,15 @@ export const subscriptionsTable = pgTable(
   },
   (table) => [
     // 用户-作品集对唯一
-    uniqueIndex().on(table.userId, table.collectionId),
+    uniqueIndex().on(table.subscriberId, table.collectionId),
   ],
 );
 
 export const subscriptionsRelations = relations(
   subscriptionsTable,
   ({ one }) => ({
-    user: one(usersTable, {
-      fields: [subscriptionsTable.userId],
+    subscriber: one(usersTable, {
+      fields: [subscriptionsTable.subscriberId],
       references: [usersTable.id],
       relationName: "user_have_subscriptions",
     }),

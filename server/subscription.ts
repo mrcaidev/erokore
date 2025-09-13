@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { forbidden, notFound, redirect } from "next/navigation";
 import { selectOnePersonalizedCollectionById } from "@/database/collection";
 import {
-  deleteOneSubscriptionByUserIdAndCollectionId,
+  deleteOneSubscriptionBySubscriberIdAndCollectionId,
   insertOneSubscription,
 } from "@/database/subscription";
 import { hasPermission } from "@/utils/permission";
@@ -27,7 +27,7 @@ export const subscribeToCollection = async (id: number) => {
     return forbidden();
   }
 
-  await insertOneSubscription({ userId: user.id, collectionId: id });
+  await insertOneSubscription({ subscriberId: user.id, collectionId: id });
 
   revalidatePath(`/collections/${collection.slug}`);
 };
@@ -49,7 +49,7 @@ export const unsubscribeFromCollection = async (id: number) => {
     return forbidden();
   }
 
-  await deleteOneSubscriptionByUserIdAndCollectionId(user.id, id);
+  await deleteOneSubscriptionBySubscriberIdAndCollectionId(user.id, id);
 
   revalidatePath(`/collections/${collection.slug}`);
 };

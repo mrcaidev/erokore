@@ -11,11 +11,11 @@ export const selectOnePersonalizedCollectionById = async (
     with: {
       collaborations: {
         where: (collaborationsTable, { eq }) =>
-          eq(collaborationsTable.userId, userId ?? -1),
+          eq(collaborationsTable.collaboratorId, userId ?? -1),
       },
       subscriptions: {
         where: (subscriptionsTable, { eq }) =>
-          eq(subscriptionsTable.userId, userId ?? -1),
+          eq(subscriptionsTable.subscriberId, userId ?? -1),
       },
       creator: {
         columns: {
@@ -63,11 +63,11 @@ export const selectOnePersonalizedCollectionBySlug = async (
     with: {
       collaborations: {
         where: (collaborationsTable, { eq }) =>
-          eq(collaborationsTable.userId, userId ?? -1),
+          eq(collaborationsTable.collaboratorId, userId ?? -1),
       },
       subscriptions: {
         where: (subscriptionsTable, { eq }) =>
-          eq(subscriptionsTable.userId, userId ?? -1),
+          eq(subscriptionsTable.subscriberId, userId ?? -1),
       },
       creator: {
         columns: {

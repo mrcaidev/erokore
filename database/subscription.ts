@@ -13,15 +13,15 @@ export const insertOneSubscription = async (
   return subscription;
 };
 
-export const deleteOneSubscriptionByUserIdAndCollectionId = async (
-  userId: number,
+export const deleteOneSubscriptionBySubscriberIdAndCollectionId = async (
+  subscriberId: number,
   collectionId: number,
 ) => {
   await db
     .delete(subscriptionsTable)
     .where(
       and(
-        eq(subscriptionsTable.userId, userId),
+        eq(subscriptionsTable.subscriberId, subscriberId),
         eq(subscriptionsTable.collectionId, collectionId),
       ),
     );

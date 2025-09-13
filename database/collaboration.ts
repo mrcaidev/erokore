@@ -1,10 +1,12 @@
 import { db } from "./client";
 import { collaborationsTable } from "./schema";
 
-export const listCollaborators = async (collectionId: number) => {
+export const listCollaborationsByCollectionId = async (
+  collectionId: number,
+) => {
   const collaborators = await db.query.collaborationsTable.findMany({
     with: {
-      user: {
+      collaborator: {
         columns: {
           id: true,
           slug: true,

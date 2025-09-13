@@ -58,8 +58,8 @@ export const createCollection = async ({
     description,
     collaboratorPermissionLevel,
     anyonePermissionLevel,
-    createdBy: user.id,
-    updatedBy: user.id,
+    creatorId: user.id,
+    updaterId: user.id,
   });
 
   if (!collection) {
@@ -69,13 +69,13 @@ export const createCollection = async ({
   await Promise.all([
     // 自动将创建者加入协作者列表
     insertOneCollaboration({
-      userId: user.id,
+      collaboratorId: user.id,
       collectionId: collection.id,
       permissionLevel: "owner",
     }),
     // 自动为创建者关注作品集
     insertOneSubscription({
-      userId: user.id,
+      subscriberId: user.id,
       collectionId: collection.id,
     }),
   ]);
@@ -115,7 +115,7 @@ export const editCollection = async ({
     description,
     collaboratorPermissionLevel,
     anyonePermissionLevel,
-    updatedBy: user.id,
+    updaterId: user.id,
   });
 
   revalidatePath(`/collections/${collection.slug}`);
@@ -142,7 +142,7 @@ export const deleteCollection = async (id: number) => {
 
   await updateOneCollectionById(id, {
     deletedAt: new Date(),
-    deletedBy: user.id,
+    deleterId: user.id,
   });
 
   revalidatePath(`/collections/${collection.slug}`);

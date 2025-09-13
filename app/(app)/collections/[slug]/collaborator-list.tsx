@@ -2,7 +2,7 @@ import Link from "next/link";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { UserAvatar } from "@/components/user-avatar";
-import { listCollaborators } from "@/database/collaboration";
+import { listCollaborationsByCollectionId } from "@/database/collaboration";
 import type { PersonalizedCollection } from "@/utils/types";
 
 export type CollaboratorListProps = {
@@ -14,25 +14,25 @@ export const CollaboratorList = async ({
   collection,
   limit = 5,
 }: CollaboratorListProps) => {
-  const collaborators = await listCollaborators(collection.id);
+  const collaborations = await listCollaborationsByCollectionId(collection.id);
 
   return (
     <div className="flex justify-between items-center">
       <ul className="flex items-center gap-1">
-        {collaborators.slice(0, limit).map((collaborator) => (
-          <li key={collaborator.id}>
+        {collaborations.slice(0, limit).map((collaboration) => (
+          <li key={collaboration.id}>
             <UserAvatar
-              user={collaborator.user}
+              user={collaboration.collaborator}
               hoverable
               className="size-10"
             />
           </li>
         ))}
-        {collaborators.length > limit && (
+        {collaborations.length > limit && (
           <li>
             <Avatar className="size-10">
               <AvatarFallback className="text-muted-foreground">
-                +{collaborators.length - limit}
+                +{collaborations.length - limit}
               </AvatarFallback>
             </Avatar>
           </li>

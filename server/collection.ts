@@ -12,7 +12,28 @@ import { findCurrentUser } from "./user";
 
 export const findCollectionBySlug = cache(async (slug: string) => {
   const collection = await db.query.collectionsTable.findFirst({
+    columns: {
+      createdBy: false,
+      updatedBy: false,
+      deletedBy: false,
+    },
     with: {
+      collaborations: {
+        columns: {
+          permissionLevel: true,
+        },
+        with: {
+          user: {
+            columns: {
+              id: true,
+              slug: true,
+              email: true,
+              nickname: true,
+              avatarUrl: true,
+            },
+          },
+        },
+      },
       creator: {
         columns: {
           id: true,

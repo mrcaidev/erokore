@@ -1,8 +1,10 @@
 import type {
+  collaborationsTable,
   collectionItemsTable,
   collectionsTable,
   defaultablePermissionLevelEnum,
   permissionLevelEnum,
+  subscriptionsTable,
   usersTable,
 } from "@/database/schema";
 
@@ -44,3 +46,27 @@ export type Collection = typeof collectionsTable.$inferSelect;
  * 作品
  */
 export type CollectionItem = typeof collectionItemsTable.$inferSelect;
+
+/**
+ * 协作
+ */
+export type Collaboration = typeof collaborationsTable.$inferSelect;
+
+/**
+ * 关注
+ */
+export type Subscription = typeof subscriptionsTable.$inferSelect;
+
+/**
+ * 填充了协作者的作品集
+ */
+export type CollectionWithCollaborators = Omit<
+  Collection,
+  "createdBy" | "updatedBy" | "deletedBy"
+> & {
+  collaborations: (Pick<Collaboration, "permissionLevel"> & {
+    user: PublicUser;
+  })[];
+  creator: PublicUser;
+  updater: PublicUser;
+};

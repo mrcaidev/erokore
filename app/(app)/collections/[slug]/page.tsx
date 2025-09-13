@@ -1,5 +1,7 @@
-import { notFound } from "next/navigation";
+import { forbidden, notFound } from "next/navigation";
 import { findCollectionBySlug } from "@/server/collection";
+import { findCurrentUser } from "@/server/user";
+import { hasPermission } from "@/utils/permission";
 
 export type CollectionPageProps = {
   params: Promise<{ slug: string }>;
@@ -7,10 +9,17 @@ export type CollectionPageProps = {
 
 const CollectionPage = async ({ params }: CollectionPageProps) => {
   const { slug } = await params;
-  const collection = await findCollectionBySlug(slug);
+  const [user, collection] = await Promise.all([
+    findCurrentUser(),
+    findCollectionBySlug(slug),
+  ]);
 
   if (!collection) {
     return notFound();
+  }
+
+  if (!hasPermission({ collection, user, permissionLevel: "viewer" })) {
+    return forbidden();
   }
 
   return <div>作品集 {collection.title}</div>;

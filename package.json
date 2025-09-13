@@ -41,7 +41,6 @@
     "@types/jsonwebtoken": "^9.0.10",
     "@types/react": "^19.1.12",
     "@types/react-dom": "^19.1.9",
-    "dotenv": "^17.2.2",
     "drizzle-kit": "^0.31.4",
     "typescript": "^5.9.2"
   }

@@ -22,7 +22,7 @@
     "jsx": "preserve",
     "lib": ["ESNext", "DOM", "DOM.Iterable"],
     "moduleDetection": "force",
-    "target": "ESNext",
+    "target": "esnext",
     "incremental": true,
     "skipLibCheck": true
   },

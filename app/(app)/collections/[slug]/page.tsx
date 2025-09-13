@@ -1,6 +1,5 @@
 import { forbidden, notFound } from "next/navigation";
 import { findPersonalizedCollectionBySlug } from "@/server/collection";
-import { findCurrentUser } from "@/server/user";
 import { hasPermission } from "@/utils/permission";
 
 export type CollectionPageProps = {
@@ -9,16 +8,13 @@ export type CollectionPageProps = {
 
 const CollectionPage = async ({ params }: CollectionPageProps) => {
   const { slug } = await params;
-  const [user, collection] = await Promise.all([
-    findCurrentUser(),
-    findPersonalizedCollectionBySlug(slug),
-  ]);
+  const collection = await findPersonalizedCollectionBySlug(slug);
 
   if (!collection) {
     return notFound();
   }
 
-  if (!hasPermission({ collection, user, permissionLevel: "viewer" })) {
+  if (!hasPermission(collection, "viewer")) {
     return forbidden();
   }
 

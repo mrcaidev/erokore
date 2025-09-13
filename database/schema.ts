@@ -118,8 +118,8 @@ export const collectionsTable = pgTable("collections", {
   collaboratorPermissionLevel: permissionLevelEnum()
     .notNull()
     .default("contributor"),
-  // 互联网上获得链接的所有人的权限等级
-  everyonePermissionLevel: permissionLevelEnum().notNull().default("none"),
+  // 互联网上获得链接的任何人的权限等级
+  anyonePermissionLevel: permissionLevelEnum().notNull().default("none"),
   // 审计时间
   ...auditTimestamps,
   // 审计用户

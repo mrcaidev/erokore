@@ -1,8 +1,4 @@
-import type {
-  FullUser,
-  PermissionLevel,
-  PersonalizedCollection,
-} from "./types";
+import type { PermissionLevel, PersonalizedCollection } from "./types";
 
 const PERMISSION_LEVEL_WEIGHT: Record<PermissionLevel, number> = {
   none: 0,
@@ -20,32 +16,15 @@ export const comparePermissionLevels = (
   return PERMISSION_LEVEL_WEIGHT[a] - PERMISSION_LEVEL_WEIGHT[b];
 };
 
-export type HasPermissionOptions = {
-  collection: PersonalizedCollection;
-  user: Pick<FullUser, "id"> | undefined;
-  permissionLevel: PermissionLevel;
-};
-
-export const hasPermission = ({
-  collection,
-  user,
-  permissionLevel,
-}: HasPermissionOptions) => {
-  // 未登录
-  if (!user) {
+export const hasPermission = (
+  collection: PersonalizedCollection,
+  permissionLevel: PermissionLevel,
+) => {
+  // 未登录 / 互联网上获得链接的任何人
+  if (collection.my.permissionLevel === null) {
     return (
       comparePermissionLevels(
-        collection.everyonePermissionLevel,
-        permissionLevel,
-      ) >= 0
-    );
-  }
-
-  // 非协作者
-  if (!collection.my.permissionLevel) {
-    return (
-      comparePermissionLevels(
-        collection.everyonePermissionLevel,
+        collection.anyonePermissionLevel,
         permissionLevel,
       ) >= 0
     );

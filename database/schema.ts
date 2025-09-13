@@ -180,6 +180,16 @@ export const collectionsRelations = relations(
   }),
 );
 
+export const sources = [
+  "custom",
+  "missav",
+  "picacg",
+  "ehentai",
+  "jmcomic",
+] as const;
+
+export const sourceEnum = pgEnum("source", sources);
+
 export const collectionItemsTable = pgTable("collectionItems", {
   // 物理 ID
   id: integer().primaryKey().generatedAlwaysAsIdentity(),
@@ -189,7 +199,7 @@ export const collectionItemsTable = pgTable("collectionItems", {
     .unique()
     .$default(() => nanoid(10)),
   // 来源
-  source: text().notNull(),
+  source: sourceEnum().notNull(),
   // 标题
   title: text().notNull(),
   // 描述

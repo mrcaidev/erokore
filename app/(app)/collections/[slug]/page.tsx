@@ -9,6 +9,7 @@ import { UserAvatar } from "@/components/user-avatar";
 import { findCollection } from "@/server/collection";
 import { hasPermission } from "@/utils/permission";
 import { CollaboratorList } from "./collaborator-list";
+import { CollectionItemList } from "./collection-item-list";
 import { Operations } from "./operations";
 
 export type CollectionPageProps = {
@@ -34,12 +35,9 @@ const CollectionPage = async ({ params }: CollectionPageProps) => {
         <Operations collection={collection} />
       </div>
       <div className="grid grid-cols-1 md:grid-cols-[1fr_280px] gap-8">
-        <p className="order-2 md:order-1">
-          Lorem ipsum dolor sit amet consectetur adipisicing elit. Odio repellat
-          dignissimos quaerat explicabo corporis eveniet tempora quibusdam autem
-          aperiam, sunt doloribus quo labore asperiores minus ipsam praesentium
-          vero consequuntur. Distinctio.
-        </p>
+        <div className="order-2 md:order-1">
+          <CollectionItemList collection={collection} />
+        </div>
         <Accordion
           type="multiple"
           defaultValue={["description"]}

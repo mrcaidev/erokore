@@ -5,6 +5,7 @@ import type {
   defaultablePermissionLevelEnum,
   invitationsTable,
   permissionLevelEnum,
+  sourceEnum,
   subscriptionsTable,
   usersTable,
 } from "@/database/schema";
@@ -62,9 +63,22 @@ export type PersonalizedCollection = EnrichedCollection & {
 };
 
 /**
+ * 作品来源
+ */
+export type Source = (typeof sourceEnum.enumValues)[number];
+
+/**
  * 作品
  */
 export type CollectionItem = typeof collectionItemsTable.$inferSelect;
+
+/**
+ * 填充过的作品
+ */
+export type EnrichedCollectionItem = CollectionItem & {
+  creator: PublicUser;
+  updater: PublicUser;
+};
 
 /**
  * 协作

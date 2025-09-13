@@ -4,7 +4,6 @@ import type { PermissionLevel } from "@/utils/types";
 import {
   Select,
   SelectContent,
-  SelectGroup,
   SelectItem,
   SelectTrigger,
   SelectValue,
@@ -36,20 +35,16 @@ export const PermissionLevelSelect = ({
         <SelectValue placeholder="请选择" />
       </SelectTrigger>
       <SelectContent>
-        <SelectGroup>
-          {defaultable && (
-            <SelectItem value="default">{defaultLabel}</SelectItem>
-          )}
-          {options.map((option) => (
-            <SelectItem
-              key={option.value}
-              value={option.value}
-              disabled={option.disabled}
-            >
-              {option.label || PERMISSION_LEVEL_LABEL_MAP[option.value]}
-            </SelectItem>
-          ))}
-        </SelectGroup>
+        {defaultable && <SelectItem value="default">{defaultLabel}</SelectItem>}
+        {options.map((option) => (
+          <SelectItem
+            key={option.value}
+            value={option.value}
+            disabled={option.disabled}
+          >
+            {option.label || PERMISSION_LEVEL_LABEL_MAP[option.value]}
+          </SelectItem>
+        ))}
       </SelectContent>
     </Select>
   );

@@ -52,19 +52,17 @@ export const CollectionForm = ({ mode, collection }: CollectionFormProps) => {
 
   const [pending, setPending] = useState(false);
 
-  const handleSubmit = form.handleSubmit(
-    async (values: v.InferOutput<typeof collectionFormSchema>) => {
-      setPending(true);
-      const res =
-        mode === "create"
-          ? await createCollection(values)
-          : mode === "edit" && collection?.id
-            ? await editCollection({ id: collection.id, ...values })
-            : { error: "编辑失败，请稍后重试" };
-      setPending(false);
-      toast.error(res.error);
-    },
-  );
+  const handleSubmit = form.handleSubmit(async (values) => {
+    setPending(true);
+    const res =
+      mode === "create"
+        ? await createCollection(values)
+        : mode === "edit" && collection?.id
+          ? await editCollection({ id: collection.id, ...values })
+          : { error: "编辑失败，请稍后重试" };
+    setPending(false);
+    toast.error(res.error);
+  });
 
   return (
     <Form {...form}>

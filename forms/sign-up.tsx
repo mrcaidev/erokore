@@ -56,14 +56,12 @@ export const SignUpForm = () => {
 
   const [pending, setPending] = useState(false);
 
-  const handleSubmit = form.handleSubmit(
-    async (values: v.InferOutput<typeof signUpFormSchema>) => {
-      setPending(true);
-      const res = await signUp(values);
-      setPending(false);
-      toast.error(res.error);
-    },
-  );
+  const handleSubmit = form.handleSubmit(async (values) => {
+    setPending(true);
+    const res = await signUp(values);
+    setPending(false);
+    toast.error(res.error);
+  });
 
   return (
     <Form {...form}>

@@ -13,7 +13,7 @@ const RootLayout = ({ children }: PropsWithChildren) => {
       <body>
         <ThemeProvider attribute="class" disableTransitionOnChange>
           {children}
-          <Toaster richColors />
+          <Toaster position="top-center" richColors />
         </ThemeProvider>
       </body>
     </html>

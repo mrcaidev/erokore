@@ -1,0 +1,28 @@
+import { and, eq } from "drizzle-orm";
+import { db } from "./client";
+import { subscriptionsTable } from "./schema";
+
+export const insertOneSubscription = async (
+  value: typeof subscriptionsTable.$inferInsert,
+) => {
+  const [subscription] = await db
+    .insert(subscriptionsTable)
+    .values(value)
+    .onConflictDoNothing()
+    .returning();
+  return subscription;
+};
+
+export const deleteOneSubscriptionByUserIdAndCollectionId = async (
+  userId: number,
+  collectionId: number,
+) => {
+  await db
+    .delete(subscriptionsTable)
+    .where(
+      and(
+        eq(subscriptionsTable.userId, userId),
+        eq(subscriptionsTable.collectionId, collectionId),
+      ),
+    );
+};

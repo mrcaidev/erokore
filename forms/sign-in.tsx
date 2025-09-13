@@ -16,14 +16,14 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { signIn } from "@/server/user";
+import { signIn } from "@/server/auth";
 
 const signInFormSchema = v.object({
   email: v.pipe(v.string(), v.email("格式错误")),
   password: v.pipe(
     v.string(),
-    v.minLength(8, "需要 8-20 个字符"),
-    v.maxLength(20, "需要 8-20 个字符"),
+    v.minLength(8, "最短 8 个字符"),
+    v.maxLength(20, "最长 20 个字符"),
   ),
 });
 
@@ -42,10 +42,8 @@ export const SignInForm = () => {
     async (values: v.InferOutput<typeof signInFormSchema>) => {
       setPending(true);
       const res = await signIn(values);
-      if (res.error) {
-        setPending(false);
-        toast.error(res.error);
-      }
+      setPending(false);
+      toast.error(res.error);
     },
   );
 

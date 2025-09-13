@@ -16,21 +16,21 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { signUp } from "@/server/user";
+import { signUp } from "@/server/auth";
 
 const signUpFormSchema = v.pipe(
   v.object({
     email: v.pipe(v.string(), v.email("格式错误")),
     password: v.pipe(
       v.string(),
-      v.minLength(8, "需要 8-20 个字符"),
-      v.maxLength(20, "需要 8-20 个字符"),
+      v.minLength(8, "最短 8 个字符"),
+      v.maxLength(20, "最长 20 个字符"),
     ),
     confirmPassword: v.string(),
     nickname: v.pipe(
       v.string(),
-      v.minLength(2, "需要 2-20 个字符"),
-      v.maxLength(20, "需要 2-20 个字符"),
+      v.minLength(2, "最短 2 个字符"),
+      v.maxLength(20, "最长 20 个字符"),
     ),
   }),
   v.forward(
@@ -60,10 +60,8 @@ export const SignUpForm = () => {
     async (values: v.InferOutput<typeof signUpFormSchema>) => {
       setPending(true);
       const res = await signUp(values);
-      if (res.error) {
-        setPending(false);
-        toast.error(res.error);
-      }
+      setPending(false);
+      toast.error(res.error);
     },
   );
 

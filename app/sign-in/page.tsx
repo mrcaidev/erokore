@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { SignInForm } from "./form";
+import { SignInForm } from "@/forms/sign-in";
 
 const SignInPage = () => {
   return (

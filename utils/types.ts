@@ -11,12 +11,12 @@ import type {
 /**
  * 完整的用户信息，仅服务端可见
  */
-export type FullUser = typeof usersTable.$inferSelect;
+export type User = typeof usersTable.$inferSelect;
 
 /**
  * 私密的用户信息，仅用户本人可见
  */
-export type PrivateUser = Omit<FullUser, "passwordSalt" | "passwordHash">;
+export type PrivateUser = Omit<User, "passwordSalt" | "passwordHash">;
 
 /**
  * 公开的用户信息，所有人可见
@@ -43,6 +43,24 @@ export type DefaultablePermissionLevel =
 export type Collection = typeof collectionsTable.$inferSelect;
 
 /**
+ * 填充过的作品集
+ */
+export type EnrichedCollection = Collection & {
+  creator: PublicUser;
+  updater: PublicUser;
+};
+
+/**
+ * 个性化的作品集
+ */
+export type PersonalizedCollection = EnrichedCollection & {
+  my: {
+    permissionLevel: DefaultablePermissionLevel | null;
+    subscribed: boolean;
+  };
+};
+
+/**
  * 作品
  */
 export type CollectionItem = typeof collectionItemsTable.$inferSelect;
@@ -56,18 +74,3 @@ export type Collaboration = typeof collaborationsTable.$inferSelect;
  * 关注
  */
 export type Subscription = typeof subscriptionsTable.$inferSelect;
-
-/**
- * 填充了协作者的作品集
- */
-export type PersonalizedCollection = Omit<
-  Collection,
-  "createdBy" | "updatedBy" | "deletedBy"
-> & {
-  creator: PublicUser;
-  updater: PublicUser;
-  my: {
-    permissionLevel: DefaultablePermissionLevel | null;
-    subscribed: boolean;
-  };
-};

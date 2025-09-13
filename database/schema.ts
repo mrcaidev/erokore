@@ -53,11 +53,29 @@ export const usersTable = pgTable(
 );
 
 export const usersRelations = relations(usersTable, ({ many }) => ({
+  createdCollections: many(collectionsTable, {
+    relationName: "user_create_collections",
+  }),
+  updatedCollections: many(collectionsTable, {
+    relationName: "user_update_collections",
+  }),
+  deletedCollections: many(collectionsTable, {
+    relationName: "user_delete_collections",
+  }),
+  createdCollectionItems: many(collectionItemsTable, {
+    relationName: "user_create_collectionItems",
+  }),
+  updatedCollectionItems: many(collectionItemsTable, {
+    relationName: "user_update_collectionItems",
+  }),
+  deletedCollectionItems: many(collectionItemsTable, {
+    relationName: "user_delete_collectionItems",
+  }),
   collaborations: many(collaborationsTable, {
-    relationName: "user_has_collaborations",
+    relationName: "user_have_collaborations",
   }),
   subscriptions: many(subscriptionsTable, {
-    relationName: "user_has_subscriptions",
+    relationName: "user_have_subscriptions",
   }),
 }));
 
@@ -77,13 +95,13 @@ const auditUsers = {
 const permissionLevels = [
   // 不可见：用户没有任何权限
   "none",
-  // 可查看：用户可以查看、关注作品集
+  // 可查看：用户可以查看、关注作品集，查看作品集中的作品，查看协作者
   "viewer",
   // 可评价：在可查看的基础上，用户还可以点赞、点踩、评论作品集中的作品
   "rater",
   // 可贡献：在可评价的基础上，用户还可以添加、编辑、删除作品集中的作品
   "contributor",
-  // 可管理：在可贡献的基础上，用户还可以编辑作品集、邀请协作者、调整权限等级低于自己的协作者的权限等级
+  // 可管理：在可贡献的基础上，用户还可以编辑作品集，邀请协作者，调整、移除权限等级低于自己的协作者
   "admin",
   // 创建者：在可管理的基础上，用户还可以删除作品集
   "owner",
@@ -130,13 +148,13 @@ export const collectionsRelations = relations(
   collectionsTable,
   ({ one, many }) => ({
     items: many(collectionItemsTable, {
-      relationName: "collection_has_items",
+      relationName: "collection_comprise_items",
     }),
     collaborations: many(collaborationsTable, {
-      relationName: "collection_has_collaborations",
+      relationName: "collection_have_collaborations",
     }),
     subscriptions: many(subscriptionsTable, {
-      relationName: "collection_has_subscriptions",
+      relationName: "collection_have_subscriptions",
     }),
     creator: one(usersTable, {
       fields: [collectionsTable.createdBy],
@@ -190,7 +208,7 @@ export const collectionItemsRelations = relations(
     collection: one(collectionsTable, {
       fields: [collectionItemsTable.collectionId],
       references: [collectionsTable.id],
-      relationName: "collection_has_items",
+      relationName: "collection_comprise_items",
     }),
     creator: one(usersTable, {
       fields: [collectionItemsTable.createdBy],
@@ -210,22 +228,29 @@ export const collectionItemsRelations = relations(
   }),
 );
 
-export const collaborationsTable = pgTable("collaborations", {
-  // 物理 ID
-  id: integer().primaryKey().generatedAlwaysAsIdentity(),
-  // 用户 ID
-  userId: integer()
-    .notNull()
-    .references(() => usersTable.id),
-  // 作品集 ID
-  collectionId: integer()
-    .notNull()
-    .references(() => collectionsTable.id),
-  // 权限等级
-  permissionLevel: defaultablePermissionLevelEnum().notNull(),
-  // 审计时间
-  ...auditTimestamps,
-});
+export const collaborationsTable = pgTable(
+  "collaborations",
+  {
+    // 物理 ID
+    id: integer().primaryKey().generatedAlwaysAsIdentity(),
+    // 用户 ID
+    userId: integer()
+      .notNull()
+      .references(() => usersTable.id),
+    // 作品集 ID
+    collectionId: integer()
+      .notNull()
+      .references(() => collectionsTable.id),
+    // 权限等级
+    permissionLevel: defaultablePermissionLevelEnum().notNull(),
+    // 审计时间
+    ...auditTimestamps,
+  },
+  (table) => [
+    // 用户-作品集对唯一
+    uniqueIndex().on(table.userId, table.collectionId),
+  ],
+);
 
 export const collaborationsRelations = relations(
   collaborationsTable,
@@ -233,30 +258,37 @@ export const collaborationsRelations = relations(
     user: one(usersTable, {
       fields: [collaborationsTable.userId],
       references: [usersTable.id],
-      relationName: "user_has_collaborations",
+      relationName: "user_have_collaborations",
     }),
     collection: one(collectionsTable, {
       fields: [collaborationsTable.collectionId],
       references: [collectionsTable.id],
-      relationName: "collection_has_collaborations",
+      relationName: "collection_have_collaborations",
     }),
   }),
 );
 
-export const subscriptionsTable = pgTable("subscriptions", {
-  // 物理 ID
-  id: integer().primaryKey().generatedAlwaysAsIdentity(),
-  // 用户 ID
-  userId: integer()
-    .notNull()
-    .references(() => usersTable.id),
-  // 作品集 ID
-  collectionId: integer()
-    .notNull()
-    .references(() => collectionsTable.id),
-  // 审计时间
-  ...auditTimestamps,
-});
+export const subscriptionsTable = pgTable(
+  "subscriptions",
+  {
+    // 物理 ID
+    id: integer().primaryKey().generatedAlwaysAsIdentity(),
+    // 用户 ID
+    userId: integer()
+      .notNull()
+      .references(() => usersTable.id),
+    // 作品集 ID
+    collectionId: integer()
+      .notNull()
+      .references(() => collectionsTable.id),
+    // 审计时间
+    ...auditTimestamps,
+  },
+  (table) => [
+    // 用户-作品集对唯一
+    uniqueIndex().on(table.userId, table.collectionId),
+  ],
+);
 
 export const subscriptionsRelations = relations(
   subscriptionsTable,
@@ -264,12 +296,12 @@ export const subscriptionsRelations = relations(
     user: one(usersTable, {
       fields: [subscriptionsTable.userId],
       references: [usersTable.id],
-      relationName: "user_has_subscriptions",
+      relationName: "user_have_subscriptions",
     }),
     collection: one(collectionsTable, {
       fields: [subscriptionsTable.collectionId],
       references: [collectionsTable.id],
-      relationName: "collection_has_subscriptions",
+      relationName: "collection_have_subscriptions",
     }),
   }),
 );

@@ -1,7 +1,7 @@
 import { UnderConstructionScreen } from "@/components/under-construction-screen";
 
-const CollectionCollaboratorsPage = () => {
+const CollectionCollaboratorInvitationPage = () => {
   return <UnderConstructionScreen />;
 };
 
-export default CollectionCollaboratorsPage;
+export default CollectionCollaboratorInvitationPage;

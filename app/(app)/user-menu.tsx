@@ -9,10 +9,10 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { getCurrentUser, signOut } from "@/server/user";
+import { findCurrentUser, signOut } from "@/server/user";
 
 export const UserMenu = async () => {
-  const user = await getCurrentUser();
+  const user = await findCurrentUser();
 
   if (!user) {
     return (

@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { getCollectionBySlug } from "@/server/collection";
+import { findCollectionBySlug } from "@/server/collection";
 
 export type CollectionPageProps = {
   params: Promise<{ slug: string }>;
@@ -7,7 +7,7 @@ export type CollectionPageProps = {
 
 const CollectionPage = async ({ params }: CollectionPageProps) => {
   const { slug } = await params;
-  const collection = await getCollectionBySlug(slug);
+  const collection = await findCollectionBySlug(slug);
 
   if (!collection) {
     return notFound();

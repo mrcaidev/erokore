@@ -1,9 +1,9 @@
 import { redirect } from "next/navigation";
-import { getCurrentUser } from "@/server/user";
+import { findCurrentUser } from "@/server/user";
 import { CreateCollectionForm } from "./form";
 
 const CreateCollectionPage = async () => {
-  const user = await getCurrentUser();
+  const user = await findCurrentUser();
 
   if (!user) {
     return redirect("/sign-in");

@@ -3,15 +3,12 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { cache } from "react";
-import {
-  findOneFullUserByEmail,
-  findOnePrivateUserById,
-  insertOneUser,
-} from "@/database/user";
+import { db } from "@/database/client";
+import { usersTable } from "@/database/schema";
 import { signJwt, verifyJwt } from "@/utils/jwt";
 import { generateSalt, hashPassword } from "@/utils/password";
 
-export const getCurrentUser = cache(async () => {
+export const findCurrentUser = cache(async () => {
   const cookieStore = await cookies();
   const jwt = cookieStore.get("session")?.value;
 
@@ -23,13 +20,11 @@ export const getCurrentUser = cache(async () => {
   try {
     const { id } = await verifyJwt<{ id: number }>(jwt);
 
-    const user = await findOnePrivateUserById(id);
-
-    // 用户不存在
-    if (!user) {
-      return undefined;
-    }
-
+    const user = await db.query.usersTable.findFirst({
+      columns: { passwordSalt: false, passwordHash: false },
+      where: (usersTable, { and, eq, isNull }) =>
+        and(eq(usersTable.id, id), isNull(usersTable.deletedAt)),
+    });
     return user;
   } catch {
     // JWT 验证失败
@@ -44,7 +39,10 @@ type SignUpRequest = {
 };
 
 export const signUp = async ({ email, password, nickname }: SignUpRequest) => {
-  const emailConflictedUser = await findOneFullUserByEmail(email);
+  const emailConflictedUser = await db.query.usersTable.findFirst({
+    where: (usersTable, { and, eq, isNull }) =>
+      and(eq(usersTable.email, email), isNull(usersTable.deletedAt)),
+  });
 
   if (emailConflictedUser) {
     return { error: "邮箱已注册" };
@@ -53,12 +51,15 @@ export const signUp = async ({ email, password, nickname }: SignUpRequest) => {
   const passwordSalt = generateSalt();
   const passwordHash = await hashPassword(password, passwordSalt);
 
-  const user = await insertOneUser({
-    email,
-    nickname,
-    passwordSalt,
-    passwordHash,
-  });
+  const [user] = await db
+    .insert(usersTable)
+    .values({
+      email,
+      nickname,
+      passwordSalt,
+      passwordHash,
+    })
+    .returning();
 
   if (!user) {
     return { error: "注册失败，请稍后重试" };
@@ -77,7 +78,10 @@ type SignInRequest = {
 };
 
 export const signIn = async ({ email, password }: SignInRequest) => {
-  const user = await findOneFullUserByEmail(email);
+  const user = await db.query.usersTable.findFirst({
+    where: (usersTable, { and, eq, isNull }) =>
+      and(eq(usersTable.email, email), isNull(usersTable.deletedAt)),
+  });
 
   if (!user) {
     return { error: "邮箱未注册" };

@@ -9,7 +9,7 @@ import {
 } from "drizzle-orm/pg-core";
 import { nanoid } from "nanoid";
 
-const timestamptzs = {
+const auditTimestamps = {
   // 创建时间
   createdAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
   // 最后更新时间
@@ -42,7 +42,7 @@ export const usersTable = pgTable(
     // 密码加盐哈希
     passwordHash: text().notNull(),
     // 审计时间
-    ...timestamptzs,
+    ...auditTimestamps,
   },
   (table) => [
     // 对于未删除的用户，邮箱唯一
@@ -53,8 +53,26 @@ export const usersTable = pgTable(
 );
 
 export const usersRelations = relations(usersTable, ({ many }) => ({
-  ownedCollections: many(collectionsTable),
+  collaborations: many(collaborationsTable, {
+    relationName: "user_has_collaborations",
+  }),
+  subscriptions: many(subscriptionsTable, {
+    relationName: "user_has_subscriptions",
+  }),
 }));
+
+const auditUsers = {
+  // 创建者 ID
+  createdBy: integer()
+    .notNull()
+    .references(() => usersTable.id),
+  // 最后更新者 ID
+  updatedBy: integer()
+    .notNull()
+    .references(() => usersTable.id),
+  // 删除者 ID
+  deletedBy: integer().references(() => usersTable.id),
+};
 
 const permissionLevels = [
   // 不可见：用户没有任何权限
@@ -96,10 +114,6 @@ export const collectionsTable = pgTable("collections", {
   title: text().notNull(),
   // 描述
   description: text().notNull(),
-  // 创建者
-  ownerId: integer()
-    .notNull()
-    .references(() => usersTable.id),
   // 协作者的默认权限等级
   collaboratorPermissionLevel: permissionLevelEnum()
     .notNull()
@@ -107,15 +121,40 @@ export const collectionsTable = pgTable("collections", {
   // 互联网上获得链接的所有人的权限等级
   everyonePermissionLevel: permissionLevelEnum().notNull().default("none"),
   // 审计时间
-  ...timestamptzs,
+  ...auditTimestamps,
+  // 审计用户
+  ...auditUsers,
 });
 
-export const collectionsRelations = relations(collectionsTable, ({ one }) => ({
-  owner: one(usersTable, {
-    fields: [collectionsTable.ownerId],
-    references: [usersTable.id],
+export const collectionsRelations = relations(
+  collectionsTable,
+  ({ one, many }) => ({
+    items: many(collectionItemsTable, {
+      relationName: "collection_has_items",
+    }),
+    collaborations: many(collaborationsTable, {
+      relationName: "collection_has_collaborations",
+    }),
+    subscriptions: many(subscriptionsTable, {
+      relationName: "collection_has_subscriptions",
+    }),
+    creator: one(usersTable, {
+      fields: [collectionsTable.createdBy],
+      references: [usersTable.id],
+      relationName: "user_create_collections",
+    }),
+    updater: one(usersTable, {
+      fields: [collectionsTable.updatedBy],
+      references: [usersTable.id],
+      relationName: "user_update_collections",
+    }),
+    deleter: one(usersTable, {
+      fields: [collectionsTable.deletedBy],
+      references: [usersTable.id],
+      relationName: "user_delete_collections",
+    }),
   }),
-}));
+);
 
 export const collectionItemsTable = pgTable("collectionItems", {
   // 物理 ID
@@ -135,9 +174,41 @@ export const collectionItemsTable = pgTable("collectionItems", {
   url: text().notNull(),
   // 封面 URL
   coverUrl: text().notNull(),
+  // 作品集 ID
+  collectionId: integer()
+    .notNull()
+    .references(() => collectionsTable.id),
   // 审计时间
-  ...timestamptzs,
+  ...auditTimestamps,
+  // 审计用户
+  ...auditUsers,
 });
+
+export const collectionItemsRelations = relations(
+  collectionItemsTable,
+  ({ one }) => ({
+    collection: one(collectionsTable, {
+      fields: [collectionItemsTable.collectionId],
+      references: [collectionsTable.id],
+      relationName: "collection_has_items",
+    }),
+    creator: one(usersTable, {
+      fields: [collectionItemsTable.createdBy],
+      references: [usersTable.id],
+      relationName: "user_create_collectionItems",
+    }),
+    updater: one(usersTable, {
+      fields: [collectionItemsTable.updatedBy],
+      references: [usersTable.id],
+      relationName: "user_update_collectionItems",
+    }),
+    deleter: one(usersTable, {
+      fields: [collectionItemsTable.deletedBy],
+      references: [usersTable.id],
+      relationName: "user_delete_collectionItems",
+    }),
+  }),
+);
 
 export const collaborationsTable = pgTable("collaborations", {
   // 物理 ID
@@ -153,8 +224,24 @@ export const collaborationsTable = pgTable("collaborations", {
   // 权限等级
   permissionLevel: defaultablePermissionLevelEnum().notNull(),
   // 审计时间
-  ...timestamptzs,
+  ...auditTimestamps,
 });
+
+export const collaborationsRelations = relations(
+  collaborationsTable,
+  ({ one }) => ({
+    user: one(usersTable, {
+      fields: [collaborationsTable.userId],
+      references: [usersTable.id],
+      relationName: "user_has_collaborations",
+    }),
+    collection: one(collectionsTable, {
+      fields: [collaborationsTable.collectionId],
+      references: [collectionsTable.id],
+      relationName: "collection_has_collaborations",
+    }),
+  }),
+);
 
 export const subscriptionsTable = pgTable("subscriptions", {
   // 物理 ID
@@ -168,5 +255,21 @@ export const subscriptionsTable = pgTable("subscriptions", {
     .notNull()
     .references(() => collectionsTable.id),
   // 审计时间
-  ...timestamptzs,
+  ...auditTimestamps,
 });
+
+export const subscriptionsRelations = relations(
+  subscriptionsTable,
+  ({ one }) => ({
+    user: one(usersTable, {
+      fields: [subscriptionsTable.userId],
+      references: [usersTable.id],
+      relationName: "user_has_subscriptions",
+    }),
+    collection: one(collectionsTable, {
+      fields: [subscriptionsTable.collectionId],
+      references: [collectionsTable.id],
+      relationName: "collection_has_subscriptions",
+    }),
+  }),
+);

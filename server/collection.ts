@@ -3,7 +3,11 @@
 import { redirect } from "next/navigation";
 import { cache } from "react";
 import { db } from "@/database/client";
-import { collectionsTable } from "@/database/schema";
+import {
+  collaborationsTable,
+  collectionsTable,
+  subscriptionsTable,
+} from "@/database/schema";
 import { findCurrentUser } from "./user";
 
 export const findCollectionBySlug = cache(async (slug: string) => {
@@ -62,6 +66,24 @@ export const createCollection = async ({
   if (!collection) {
     return { error: "创建失败，请稍后重试" };
   }
+
+  await Promise.all([
+    // 自动将创建者加入协作者列表
+    db
+      .insert(collaborationsTable)
+      .values({
+        userId: user.id,
+        collectionId: collection.id,
+        permissionLevel: "owner",
+      }),
+    // 自动为创建者关注作品集
+    db
+      .insert(subscriptionsTable)
+      .values({
+        userId: user.id,
+        collectionId: collection.id,
+      }),
+  ]);
 
   return redirect(`/collections/${collection.slug}`);
 };

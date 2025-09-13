@@ -7,6 +7,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import * as v from "valibot";
+import { PermissionLevelSelect } from "@/components/permission-level-select";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -18,6 +19,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { permissionLevels } from "@/database/schema";
 import { createCollection, editCollection } from "@/server/collection";
 import type { PersonalizedCollection } from "@/utils/types";
 
@@ -28,6 +30,8 @@ const collectionFormSchema = v.object({
     v.maxLength(20, "最长 20 个字符"),
   ),
   description: v.pipe(v.string(), v.maxLength(200, "最长 200 个字符")),
+  collaboratorPermissionLevel: v.picklist(permissionLevels, "权限等级无效"),
+  anyonePermissionLevel: v.picklist(permissionLevels, "权限等级无效"),
 });
 
 export type CollectionFormProps = {
@@ -41,6 +45,8 @@ export const CollectionForm = ({ mode, collection }: CollectionFormProps) => {
     defaultValues: collection ?? {
       title: "",
       description: "",
+      collaboratorPermissionLevel: "contributor" as const,
+      anyonePermissionLevel: "none" as const,
     },
   });
 
@@ -85,6 +91,54 @@ export const CollectionForm = ({ mode, collection }: CollectionFormProps) => {
               <FormControl>
                 <Textarea {...field} placeholder="0-200 个字符" />
               </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="collaboratorPermissionLevel"
+          render={({ field }) => (
+            <FormItem>
+              <div className="flex justify-between items-center gap-2">
+                <FormLabel>协作者的默认权限等级</FormLabel>
+                <FormControl>
+                  <PermissionLevelSelect
+                    options={[
+                      { value: "none", disabled: true },
+                      { value: "viewer" },
+                      { value: "rater" },
+                      { value: "contributor" },
+                      { value: "admin" },
+                    ]}
+                    {...field}
+                  />
+                </FormControl>
+              </div>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="anyonePermissionLevel"
+          render={({ field }) => (
+            <FormItem>
+              <div className="flex justify-between items-center gap-2">
+                <FormLabel>获得链接的任何人的权限等级</FormLabel>
+                <FormControl>
+                  <PermissionLevelSelect
+                    options={[
+                      { value: "none" },
+                      { value: "viewer" },
+                      { value: "rater" },
+                      { value: "contributor" },
+                      { value: "admin", disabled: true },
+                    ]}
+                    {...field}
+                  />
+                </FormControl>
+              </div>
               <FormMessage />
             </FormItem>
           )}

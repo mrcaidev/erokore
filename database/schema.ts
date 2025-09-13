@@ -92,7 +92,7 @@ const auditUsers = {
   deletedBy: integer().references(() => usersTable.id),
 };
 
-const permissionLevels = [
+export const permissionLevels = [
   // 不可见：用户没有任何权限
   "none",
   // 可查看：用户可以查看、关注作品集，查看作品集中的作品，查看协作者
@@ -109,7 +109,7 @@ const permissionLevels = [
 
 export const permissionLevelEnum = pgEnum("permissionLevel", permissionLevels);
 
-const defaultablePermissionLevels = [
+export const defaultablePermissionLevels = [
   ...permissionLevels,
   // 默认：跟随另外某处指定的默认值
   "default",
@@ -136,7 +136,7 @@ export const collectionsTable = pgTable("collections", {
   collaboratorPermissionLevel: permissionLevelEnum()
     .notNull()
     .default("contributor"),
-  // 互联网上获得链接的任何人的权限等级
+  // 获得链接的任何人的权限等级
   anyonePermissionLevel: permissionLevelEnum().notNull().default("none"),
   // 审计时间
   ...auditTimestamps,

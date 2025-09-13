@@ -12,6 +12,7 @@ import {
 } from "@/database/collection";
 import { insertOneSubscription } from "@/database/subscription";
 import { hasPermission } from "@/utils/permission";
+import type { PermissionLevel } from "@/utils/types";
 import { findCurrentUser } from "./auth";
 
 export const findCollection = cache(async (slug: string) => {
@@ -36,11 +37,15 @@ export const findCollection = cache(async (slug: string) => {
 type CreateCollectionRequest = {
   title: string;
   description: string;
+  collaboratorPermissionLevel: PermissionLevel;
+  anyonePermissionLevel: PermissionLevel;
 };
 
 export const createCollection = async ({
   title,
   description,
+  collaboratorPermissionLevel,
+  anyonePermissionLevel,
 }: CreateCollectionRequest) => {
   const user = await findCurrentUser();
 
@@ -51,6 +56,8 @@ export const createCollection = async ({
   const collection = await insertOneCollection({
     title,
     description,
+    collaboratorPermissionLevel,
+    anyonePermissionLevel,
     createdBy: user.id,
     updatedBy: user.id,
   });
@@ -76,16 +83,16 @@ export const createCollection = async ({
   return redirect(`/collections/${collection.slug}`);
 };
 
-export type EditCollectionRequest = {
+export type EditCollectionRequest = CreateCollectionRequest & {
   id: number;
-  title: string;
-  description: string;
 };
 
 export const editCollection = async ({
   id,
   title,
   description,
+  collaboratorPermissionLevel,
+  anyonePermissionLevel,
 }: EditCollectionRequest) => {
   const user = await findCurrentUser();
 
@@ -103,7 +110,13 @@ export const editCollection = async ({
     return forbidden();
   }
 
-  await updateOneCollectionById(id, { title, description, updatedBy: user.id });
+  await updateOneCollectionById(id, {
+    title,
+    description,
+    collaboratorPermissionLevel,
+    anyonePermissionLevel,
+    updatedBy: user.id,
+  });
 
   revalidatePath(`/collections/${collection.slug}`);
 

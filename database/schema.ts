@@ -77,6 +77,9 @@ export const usersRelations = relations(usersTable, ({ many }) => ({
   subscriptions: many(subscriptionsTable, {
     relationName: "user_have_subscriptions",
   }),
+  invitations: many(invitationsTable, {
+    relationName: "user_have_invitations",
+  }),
 }));
 
 const auditUsers = {
@@ -155,6 +158,9 @@ export const collectionsRelations = relations(
     }),
     subscriptions: many(subscriptionsTable, {
       relationName: "collection_have_subscriptions",
+    }),
+    invitations: many(invitationsTable, {
+      relationName: "collection_have_invitations",
     }),
     creator: one(usersTable, {
       fields: [collectionsTable.createdBy],
@@ -305,3 +311,46 @@ export const subscriptionsRelations = relations(
     }),
   }),
 );
+
+export const invitationsTable = pgTable(
+  "invitations",
+  {
+    // 物理 ID
+    id: integer().primaryKey().generatedAlwaysAsIdentity(),
+    // 邀请者 ID
+    inviterId: integer()
+      .notNull()
+      .references(() => usersTable.id),
+    // 作品集 ID
+    collectionId: integer()
+      .notNull()
+      .references(() => collectionsTable.id),
+    // 邀请码
+    code: text()
+      .notNull()
+      .$default(() => nanoid(8)),
+    // 权限等级
+    permissionLevel: defaultablePermissionLevelEnum().notNull(),
+    // 过期时间
+    expiresAt: timestamp({ withTimezone: true }).notNull(),
+    // 审计时间
+    ...auditTimestamps,
+  },
+  (table) => [
+    // 在一个作品集中，邀请码唯一
+    uniqueIndex().on(table.collectionId, table.code),
+  ],
+);
+
+export const invitationsRelations = relations(invitationsTable, ({ one }) => ({
+  inviter: one(usersTable, {
+    fields: [invitationsTable.inviterId],
+    references: [usersTable.id],
+    relationName: "user_have_invitations",
+  }),
+  collection: one(collectionsTable, {
+    fields: [invitationsTable.collectionId],
+    references: [collectionsTable.id],
+    relationName: "collection_have_invitations",
+  }),
+}));

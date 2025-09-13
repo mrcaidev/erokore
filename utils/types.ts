@@ -3,6 +3,7 @@ import type {
   collectionItemsTable,
   collectionsTable,
   defaultablePermissionLevelEnum,
+  invitationsTable,
   permissionLevelEnum,
   subscriptionsTable,
   usersTable,
@@ -81,3 +82,16 @@ export type Collaborator = Collaboration & {
  * 关注
  */
 export type Subscription = typeof subscriptionsTable.$inferSelect;
+
+/**
+ * 邀请
+ */
+export type Invitation = typeof invitationsTable.$inferSelect;
+
+/**
+ * 个性化的邀请
+ */
+export type PersonalizedInvitation = Invitation & {
+  inviter: PublicUser;
+  collection: PersonalizedCollection;
+};

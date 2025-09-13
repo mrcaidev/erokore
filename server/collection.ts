@@ -8,9 +8,12 @@ import {
   collectionsTable,
   subscriptionsTable,
 } from "@/database/schema";
+import type { PersonalizedCollection } from "@/utils/types";
 import { findCurrentUser } from "./user";
 
-export const findCollectionBySlug = cache(async (slug: string) => {
+export const findPersonalizedCollectionBySlug = cache(async (slug: string) => {
+  const user = await findCurrentUser();
+
   const collection = await db.query.collectionsTable.findFirst({
     columns: {
       createdBy: false,
@@ -21,18 +24,17 @@ export const findCollectionBySlug = cache(async (slug: string) => {
       collaborations: {
         columns: {
           permissionLevel: true,
+          createdAt: true,
         },
-        with: {
-          user: {
-            columns: {
-              id: true,
-              slug: true,
-              email: true,
-              nickname: true,
-              avatarUrl: true,
-            },
-          },
+        where: (collaborationsTable, { eq }) =>
+          eq(collaborationsTable.userId, user?.id ?? -1),
+      },
+      subscriptions: {
+        columns: {
+          createdAt: true,
         },
+        where: (subscriptionsTable, { eq }) =>
+          eq(subscriptionsTable.userId, user?.id ?? -1),
       },
       creator: {
         columns: {
@@ -56,7 +58,20 @@ export const findCollectionBySlug = cache(async (slug: string) => {
     where: (collectionsTable, { and, eq, isNull }) =>
       and(eq(collectionsTable.slug, slug), isNull(collectionsTable.deletedAt)),
   });
-  return collection;
+
+  if (!collection) {
+    return undefined;
+  }
+
+  const { collaborations, subscriptions, ...rest } = collection;
+  const personalizedCollection: PersonalizedCollection = {
+    ...rest,
+    my: {
+      permissionLevel: collaborations[0]?.permissionLevel ?? null,
+      subscribed: subscriptions.length > 0,
+    },
+  };
+  return personalizedCollection;
 });
 
 type CreateCollectionRequest = {

@@ -60,13 +60,14 @@ export type Subscription = typeof subscriptionsTable.$inferSelect;
 /**
  * 填充了协作者的作品集
  */
-export type CollectionWithCollaborators = Omit<
+export type PersonalizedCollection = Omit<
   Collection,
   "createdBy" | "updatedBy" | "deletedBy"
 > & {
-  collaborations: (Pick<Collaboration, "permissionLevel"> & {
-    user: PublicUser;
-  })[];
   creator: PublicUser;
   updater: PublicUser;
+  my: {
+    permissionLevel: DefaultablePermissionLevel | null;
+    subscribed: boolean;
+  };
 };

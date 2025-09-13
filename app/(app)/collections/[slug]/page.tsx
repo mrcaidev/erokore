@@ -1,5 +1,5 @@
 import { forbidden, notFound } from "next/navigation";
-import { findCollectionBySlug } from "@/server/collection";
+import { findPersonalizedCollectionBySlug } from "@/server/collection";
 import { findCurrentUser } from "@/server/user";
 import { hasPermission } from "@/utils/permission";
 
@@ -11,7 +11,7 @@ const CollectionPage = async ({ params }: CollectionPageProps) => {
   const { slug } = await params;
   const [user, collection] = await Promise.all([
     findCurrentUser(),
-    findCollectionBySlug(slug),
+    findPersonalizedCollectionBySlug(slug),
   ]);
 
   if (!collection) {
@@ -22,7 +22,7 @@ const CollectionPage = async ({ params }: CollectionPageProps) => {
     return forbidden();
   }
 
-  return <div>作品集 {collection.title}</div>;
+  return <div>作品集 {JSON.stringify(collection)}</div>;
 };
 
 export default CollectionPage;

@@ -1,7 +1,7 @@
 import type {
-  CollectionWithCollaborators,
   FullUser,
   PermissionLevel,
+  PersonalizedCollection,
 } from "./types";
 
 const PERMISSION_LEVEL_WEIGHT: Record<PermissionLevel, number> = {
@@ -21,7 +21,7 @@ export const comparePermissionLevels = (
 };
 
 export type HasPermissionOptions = {
-  collection: CollectionWithCollaborators;
+  collection: PersonalizedCollection;
   user: Pick<FullUser, "id"> | undefined;
   permissionLevel: PermissionLevel;
 };
@@ -41,12 +41,8 @@ export const hasPermission = ({
     );
   }
 
-  const collaboration = collection.collaborations.find(
-    (c) => c.user.id === user.id,
-  );
-
   // 非协作者
-  if (!collaboration) {
+  if (!collection.my.permissionLevel) {
     return (
       comparePermissionLevels(
         collection.everyonePermissionLevel,
@@ -56,7 +52,7 @@ export const hasPermission = ({
   }
 
   // 默认权限等级的协作者
-  if (collaboration.permissionLevel === "default") {
+  if (collection.my.permissionLevel === "default") {
     return (
       comparePermissionLevels(
         collection.collaboratorPermissionLevel,
@@ -67,6 +63,6 @@ export const hasPermission = ({
 
   // 明确权限等级的协作者
   return (
-    comparePermissionLevels(collaboration.permissionLevel, permissionLevel) >= 0
+    comparePermissionLevels(collection.my.permissionLevel, permissionLevel) >= 0
   );
 };

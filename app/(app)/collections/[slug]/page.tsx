@@ -1,7 +1,14 @@
 import { forbidden, notFound } from "next/navigation";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { findCollection } from "@/server/collection";
 import { hasPermission } from "@/utils/permission";
+import { CollaboratorList } from "./collaborator-list";
 import { Operations } from "./operations";
 
 export type CollectionPageProps = {
@@ -26,19 +33,64 @@ const CollectionPage = async ({ params }: CollectionPageProps) => {
         <h1 className="text-3xl font-bold">{collection.title}</h1>
         <Operations collection={collection} />
       </div>
-      <div className="flex items-center gap-2 text-sm">
-        <Avatar className="size-8">
-          <AvatarImage
-            src={collection.updater.avatarUrl}
-            alt={`${collection.updater.nickname}的头像`}
-          />
-          <AvatarFallback className="text-muted-foreground uppercase">
-            {collection.updater.nickname[0]}
-          </AvatarFallback>
-        </Avatar>
-        <div className="text-muted-foreground">
-          最后更新于 {collection.updatedAt.toLocaleString("zh")}
-        </div>
+      <div className="grid grid-cols-1 md:grid-cols-[1fr_280px] gap-8">
+        <p className="order-2 md:order-1">
+          Lorem ipsum dolor sit amet consectetur adipisicing elit. Odio repellat
+          dignissimos quaerat explicabo corporis eveniet tempora quibusdam autem
+          aperiam, sunt doloribus quo labore asperiores minus ipsam praesentium
+          vero consequuntur. Distinctio.
+        </p>
+        <Accordion
+          type="multiple"
+          defaultValue={["description"]}
+          className="order-1 md:order-2"
+        >
+          <AccordionItem value="description">
+            <AccordionTrigger>描述</AccordionTrigger>
+            <AccordionContent className="text-muted-foreground">
+              {collection.description || "暂无描述"}
+            </AccordionContent>
+          </AccordionItem>
+          <AccordionItem value="collaborator">
+            <AccordionTrigger>协作者</AccordionTrigger>
+            <AccordionContent>
+              <CollaboratorList collection={collection} />
+            </AccordionContent>
+          </AccordionItem>
+          <AccordionItem value="activity">
+            <AccordionTrigger>活动记录</AccordionTrigger>
+            <AccordionContent className="space-y-3">
+              <div className="flex items-center gap-2">
+                <Avatar>
+                  <AvatarImage
+                    src={collection.updater.avatarUrl}
+                    alt={`${collection.updater.nickname}的头像`}
+                  />
+                  <AvatarFallback className="text-muted-foreground uppercase">
+                    {collection.updater.nickname[0]}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="text-muted-foreground">
+                  最后更新于 {collection.updatedAt.toLocaleString("zh")}
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <Avatar>
+                  <AvatarImage
+                    src={collection.creator.avatarUrl}
+                    alt={`${collection.creator.nickname}的头像`}
+                  />
+                  <AvatarFallback className="text-muted-foreground uppercase">
+                    {collection.creator.nickname[0]}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="text-muted-foreground">
+                  创建于 {collection.createdAt.toLocaleString("zh")}
+                </div>
+              </div>
+            </AccordionContent>
+          </AccordionItem>
+        </Accordion>
       </div>
     </main>
   );

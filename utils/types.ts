@@ -71,6 +71,13 @@ export type CollectionItem = typeof collectionItemsTable.$inferSelect;
 export type Collaboration = typeof collaborationsTable.$inferSelect;
 
 /**
+ * 协作者
+ */
+export type Collaborator = Collaboration & {
+  user: PublicUser;
+};
+
+/**
  * 关注
  */
 export type Subscription = typeof subscriptionsTable.$inferSelect;

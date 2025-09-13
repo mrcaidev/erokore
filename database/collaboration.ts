@@ -1,6 +1,28 @@
 import { db } from "./client";
 import { collaborationsTable } from "./schema";
 
+export const listCollaborators = async (collectionId: number) => {
+  const collaborators = await db.query.collaborationsTable.findMany({
+    with: {
+      user: {
+        columns: {
+          id: true,
+          slug: true,
+          email: true,
+          nickname: true,
+          avatarUrl: true,
+        },
+      },
+    },
+    where: (collaborationsTable, { eq }) =>
+      eq(collaborationsTable.collectionId, collectionId),
+    orderBy: (collaborationsTable, { asc }) => [
+      asc(collaborationsTable.createdAt),
+    ],
+  });
+  return collaborators;
+};
+
 export const insertOneCollaboration = async (
   value: typeof collaborationsTable.$inferInsert,
 ) => {

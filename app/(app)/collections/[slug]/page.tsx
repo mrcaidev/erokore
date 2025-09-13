@@ -5,7 +5,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { UserAvatar } from "@/components/user-avatar";
 import { findCollection } from "@/server/collection";
 import { hasPermission } from "@/utils/permission";
 import { CollaboratorList } from "./collaborator-list";
@@ -61,29 +61,13 @@ const CollectionPage = async ({ params }: CollectionPageProps) => {
             <AccordionTrigger>活动记录</AccordionTrigger>
             <AccordionContent className="space-y-3">
               <div className="flex items-center gap-2">
-                <Avatar>
-                  <AvatarImage
-                    src={collection.updater.avatarUrl}
-                    alt={`${collection.updater.nickname}的头像`}
-                  />
-                  <AvatarFallback className="text-muted-foreground uppercase">
-                    {collection.updater.nickname[0]}
-                  </AvatarFallback>
-                </Avatar>
+                <UserAvatar user={collection.updater} hoverable />
                 <div className="text-muted-foreground">
                   最后更新于 {collection.updatedAt.toLocaleString("zh")}
                 </div>
               </div>
               <div className="flex items-center gap-2">
-                <Avatar>
-                  <AvatarImage
-                    src={collection.creator.avatarUrl}
-                    alt={`${collection.creator.nickname}的头像`}
-                  />
-                  <AvatarFallback className="text-muted-foreground uppercase">
-                    {collection.creator.nickname[0]}
-                  </AvatarFallback>
-                </Avatar>
+                <UserAvatar user={collection.creator} hoverable />
                 <div className="text-muted-foreground">
                   创建于 {collection.createdAt.toLocaleString("zh")}
                 </div>

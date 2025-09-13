@@ -1,6 +1,7 @@
 import Link from "next/link";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import { UserAvatar } from "@/components/user-avatar";
 import { listCollaborators } from "@/database/collaboration";
 import type { PersonalizedCollection } from "@/utils/types";
 
@@ -20,21 +21,17 @@ export const CollaboratorList = async ({
       <ul className="flex items-center gap-1">
         {collaborators.slice(0, limit).map((collaborator) => (
           <li key={collaborator.id}>
-            <Avatar className="size-10">
-              <AvatarImage
-                src={collaborator.user.avatarUrl}
-                alt={`${collaborator.user.nickname}的头像`}
-              />
-              <AvatarFallback className="text-muted-foreground uppercase">
-                {collaborator.user.nickname[0]}
-              </AvatarFallback>
-            </Avatar>
+            <UserAvatar
+              user={collaborator.user}
+              hoverable
+              className="size-10"
+            />
           </li>
         ))}
         {collaborators.length > limit && (
           <li>
             <Avatar className="size-10">
-              <AvatarFallback className="text-muted-foreground uppercase">
+              <AvatarFallback className="text-muted-foreground">
                 +{collaborators.length - limit}
               </AvatarFallback>
             </Avatar>

@@ -1,6 +1,5 @@
 import { LogInIcon, LogOutIcon } from "lucide-react";
 import Link from "next/link";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -9,6 +8,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { UserAvatar } from "@/components/user-avatar";
 import { findCurrentUser, signOut } from "@/server/auth";
 
 export const UserMenu = async () => {
@@ -28,12 +28,7 @@ export const UserMenu = async () => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger className="cursor-pointer">
-        <Avatar className="size-10">
-          <AvatarImage src={user.avatarUrl} alt="你的头像" />
-          <AvatarFallback className="text-muted-foreground uppercase">
-            {user.nickname[0]}
-          </AvatarFallback>
-        </Avatar>
+        <UserAvatar user={user} className="size-10" />
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="min-w-48">
         <DropdownMenuLabel className="space-y-1">

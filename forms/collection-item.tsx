@@ -21,7 +21,10 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { sources } from "@/database/schema";
-import { createCollectionItem } from "@/server/collection-item";
+import {
+  createCollectionItem,
+  editCollectionItem,
+} from "@/server/collection-item";
 import { SOURCE_LABEL_MAP } from "@/utils/source";
 import type { CollectionItem } from "@/utils/types";
 
@@ -45,6 +48,7 @@ export type CollectionFormProps = {
   collectionItem?: CollectionItem;
   beforeSubmit?: () => void;
   afterSubmit?: () => void;
+  id?: string;
 };
 
 export const CollectionItemForm = ({
@@ -53,6 +57,7 @@ export const CollectionItemForm = ({
   collectionItem,
   beforeSubmit,
   afterSubmit,
+  id,
 }: CollectionFormProps) => {
   const form = useForm({
     resolver: valibotResolver(collectionItemFormSchema),
@@ -69,7 +74,9 @@ export const CollectionItemForm = ({
     const res =
       mode === "create"
         ? await createCollectionItem({ ...values, collectionId, coverUrl: "" })
-        : { error: "not implemented" };
+        : mode === "edit" && collectionItem
+          ? await editCollectionItem({ ...collectionItem, ...values })
+          : { error: "操作失败，请稍后重试" };
     if (res?.error) {
       toast.error(res.error);
     }
@@ -78,12 +85,7 @@ export const CollectionItemForm = ({
 
   return (
     <Form {...form}>
-      {/** biome-ignore lint/correctness/useUniqueElementIds: 跨组件引用 */}
-      <form
-        onSubmit={handleSubmit}
-        className="space-y-4"
-        id="addCollectionItem"
-      >
+      <form onSubmit={handleSubmit} className="space-y-4" id={id}>
         <FormField
           control={form.control}
           name="title"

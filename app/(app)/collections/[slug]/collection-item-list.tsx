@@ -1,3 +1,4 @@
+import { CollectionItemCard } from "@/components/collection-item-card";
 import { listEnrichedCollectionItemsByCollectionId } from "@/server/collection-item";
 import type { PersonalizedCollection } from "@/utils/types";
 
@@ -12,5 +13,13 @@ export const CollectionItemList = async ({
     collection.id,
   );
 
-  return <div>{JSON.stringify(collectionItems)}</div>;
+  return (
+    <ul className="grid grid-cols-[repeat(auto-fit,minmax(320px,1fr))] gap-4 py-4">
+      {collectionItems.map((item) => (
+        <li key={item.id}>
+          <CollectionItemCard item={item} />
+        </li>
+      ))}
+    </ul>
+  );
 };

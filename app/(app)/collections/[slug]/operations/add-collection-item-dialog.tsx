@@ -1,7 +1,7 @@
 "use client";
 
 import { CheckIcon, Loader2Icon, PlusIcon, XIcon } from "lucide-react";
-import { useState } from "react";
+import { useId, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -25,6 +25,7 @@ export const AddCollectionItemDialog = ({
   collection,
 }: AddCollectionItemDialogProps) => {
   const [open, setOpen] = useState(false);
+  const formId = useId();
   const [pending, setPending] = useState(false);
 
   return (
@@ -61,6 +62,7 @@ export const AddCollectionItemDialog = ({
                 setPending(false);
                 setOpen(false);
               }}
+              id={formId}
             />
           </TabsContent>
         </Tabs>
@@ -71,7 +73,7 @@ export const AddCollectionItemDialog = ({
               取消
             </Button>
           </DialogClose>
-          <Button type="submit" form="addCollectionItem" disabled={pending}>
+          <Button type="submit" form={formId} disabled={pending}>
             {pending ? <Loader2Icon className="animate-spin" /> : <CheckIcon />}
             确定
           </Button>

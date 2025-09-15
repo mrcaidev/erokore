@@ -59,7 +59,7 @@ export const CollectionForm = ({ mode, collection }: CollectionFormProps) => {
         ? await createCollection(values)
         : mode === "edit" && collection?.id
           ? await editCollection({ id: collection.id, ...values })
-          : { error: "编辑失败，请稍后重试" };
+          : { error: "操作失败，请稍后重试" };
     setPending(false);
     toast.error(res.error);
   });

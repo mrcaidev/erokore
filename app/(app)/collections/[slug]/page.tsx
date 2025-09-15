@@ -34,7 +34,7 @@ const CollectionPage = async ({ params }: CollectionPageProps) => {
         <h1 className="text-3xl font-bold">{collection.title}</h1>
         <Operations collection={collection} />
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-[1fr_280px] gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-[1fr_280px] lg:grid-cols-[1fr_360px] gap-x-8">
         <div className="order-2 md:order-1">
           <CollectionItemList collection={collection} />
         </div>

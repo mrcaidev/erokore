@@ -1,6 +1,6 @@
-import { CollectionItemCard } from "@/components/collection-item-card";
 import { listEnrichedCollectionItemsByCollectionId } from "@/server/collection-item";
 import type { PersonalizedCollection } from "@/utils/types";
+import { CollectionItemCard } from "./collection-item-card";
 
 export type CollectionItemList = {
   collection: PersonalizedCollection;

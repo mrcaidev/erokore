@@ -1,9 +1,9 @@
 import { GlobeIcon, ImageIcon, VideoIcon } from "lucide-react";
 import type { ComponentProps, ReactNode } from "react";
+import { Badge } from "@/components/ui/badge";
+import { cn } from "@/components/ui/utils";
 import { SOURCE_LABEL_MAP } from "@/utils/source";
 import type { Source } from "@/utils/types";
-import { Badge } from "../ui/badge";
-import { cn } from "../ui/utils";
 
 const SOURCE_BADGE_PROPS_MAP: Record<
   Source,

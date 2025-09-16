@@ -1,8 +1,7 @@
 import { ImageOffIcon } from "lucide-react";
 import Image from "next/image";
+import { UserAvatar } from "@/components/user-avatar";
 import type { EnrichedCollectionItem } from "@/utils/types";
-import { Separator } from "../ui/separator";
-import { UserAvatar } from "../user-avatar";
 import { CollectionItemCardMenu } from "./menu";
 import { SourceBadge } from "./source-badge";
 
@@ -32,18 +31,19 @@ export const CollectionItemCard = ({ item }: CollectionItemCardProps) => {
           {item.description || "暂无描述"}
         </p>
         <div className="flex justify-between items-center gap-3">
-          <SourceBadge source={item.source} />
-          <Separator orientation="vertical" className="!h-4" />
           <div className="flex items-center gap-1.5 text-xs">
             <UserAvatar user={item.creator} hoverable className="size-7" />
             <div className="text-muted-foreground">
               添加于&nbsp;{item.createdAt.toLocaleDateString("zh")}
             </div>
           </div>
-          <div className="ml-auto">
-            <CollectionItemCardMenu item={item} />
-          </div>
         </div>
+      </div>
+      <div className="absolute top-2 left-2">
+        <SourceBadge source={item.source} />
+      </div>
+      <div className="absolute top-2 right-2">
+        <CollectionItemCardMenu item={item} />
       </div>
     </div>
   );

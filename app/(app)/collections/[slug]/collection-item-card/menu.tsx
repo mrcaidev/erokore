@@ -9,10 +9,7 @@ import {
   XIcon,
 } from "lucide-react";
 import { useId, useState } from "react";
-import { CollectionItemForm } from "@/forms/collection-item";
-import { deleteCollectionItem } from "@/server/collection-item";
-import type { EnrichedCollectionItem } from "@/utils/types";
-import { Button } from "../ui/button";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogClose,
@@ -22,13 +19,16 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "../ui/dialog";
+} from "@/components/ui/dialog";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "../ui/dropdown-menu";
+} from "@/components/ui/dropdown-menu";
+import { CollectionItemForm } from "@/forms/collection-item";
+import { deleteCollectionItem } from "@/server/collection-item";
+import type { EnrichedCollectionItem } from "@/utils/types";
 
 export type EditCollectionItemDialogContentProps = {
   item: EnrichedCollectionItem;
@@ -132,11 +132,15 @@ export const CollectionItemCardMenu = ({
     <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="ghost" size="icon" className="text-muted-foreground">
+          <Button
+            variant="secondary"
+            size="icon"
+            className="opacity-50 hover:opacity-100"
+          >
             <EllipsisIcon />
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent side="top" align="end">
+        <DropdownMenuContent align="end">
           <DialogTrigger asChild>
             <DropdownMenuItem onClick={() => setDialogType("edit")}>
               <SquarePenIcon />

@@ -7,7 +7,7 @@ import {
 } from "@/components/ui/accordion";
 import { UserAvatar } from "@/components/user-avatar";
 import { findCollection } from "@/server/collection";
-import { hasPermission } from "@/utils/permission";
+import { evaluatePermissionLevel, hasPermission } from "@/utils/permission";
 import { CollaboratorList } from "./collaborator-list";
 import { CollectionItemList } from "./collection-item-list";
 import { Operations } from "./operations";
@@ -36,7 +36,10 @@ const CollectionPage = async ({ params }: CollectionPageProps) => {
       </div>
       <div className="grid grid-cols-1 md:grid-cols-[1fr_280px] lg:grid-cols-[1fr_360px] gap-x-8">
         <div className="order-2 md:order-1">
-          <CollectionItemList collection={collection} />
+          <CollectionItemList
+            collection={collection}
+            permissionLevel={evaluatePermissionLevel(collection)}
+          />
         </div>
         <Accordion
           type="multiple"

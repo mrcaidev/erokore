@@ -1,4 +1,5 @@
 import type {
+  attitudeEnum,
   collaborationsTable,
   collectionItemsTable,
   collectionsTable,
@@ -73,11 +74,26 @@ export type Source = (typeof sourceEnum.enumValues)[number];
 export type CollectionItem = typeof collectionItemsTable.$inferSelect;
 
 /**
+ * 态度
+ */
+export type Attitude = (typeof attitudeEnum.enumValues)[number];
+
+/**
  * 填充过的作品
  */
 export type EnrichedCollectionItem = CollectionItem & {
   creator: PublicUser;
   updater: PublicUser;
+};
+
+/**
+ * 个性化的作品
+ */
+export type PersonalizedCollectionItem = EnrichedCollectionItem & {
+  my: {
+    attitude: Attitude | null;
+    comment: string;
+  };
 };
 
 /**

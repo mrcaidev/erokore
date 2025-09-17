@@ -1,15 +1,24 @@
 import { ImageOffIcon } from "lucide-react";
 import Image from "next/image";
 import { UserAvatar } from "@/components/user-avatar";
-import type { EnrichedCollectionItem } from "@/utils/types";
+import { comparePermissionLevels } from "@/utils/permission";
+import type {
+  PermissionLevel,
+  PersonalizedCollectionItem,
+} from "@/utils/types";
+import { AttitudeButtonGroup } from "./attitude-button-group";
 import { CollectionItemCardMenu } from "./menu";
 import { SourceBadge } from "./source-badge";
 
 export type CollectionItemCardProps = {
-  item: EnrichedCollectionItem;
+  item: PersonalizedCollectionItem;
+  permissionLevel: PermissionLevel;
 };
 
-export const CollectionItemCard = ({ item }: CollectionItemCardProps) => {
+export const CollectionItemCard = ({
+  item,
+  permissionLevel,
+}: CollectionItemCardProps) => {
   return (
     <div className="flex flex-col relative h-full border rounded-md overflow-hidden">
       {/* <a href={item.url} target="_blank" className="absolute inset-0">
@@ -37,6 +46,9 @@ export const CollectionItemCard = ({ item }: CollectionItemCardProps) => {
               添加于&nbsp;{item.createdAt.toLocaleDateString("zh")}
             </div>
           </div>
+          {comparePermissionLevels(permissionLevel, "rater") >= 0 && (
+            <AttitudeButtonGroup item={item} />
+          )}
         </div>
       </div>
       <div className="absolute top-2 left-2">

@@ -25,32 +25,27 @@ export const comparePermissionLevels = (
   return PERMISSION_LEVEL_WEIGHT[a] - PERMISSION_LEVEL_WEIGHT[b];
 };
 
+export const evaluatePermissionLevel = (collection: PersonalizedCollection) => {
+  // 未登录 / 获得链接的任何人
+  if (collection.my.permissionLevel === null) {
+    return collection.anyonePermissionLevel;
+  }
+  // 默认权限等级的协作者
+  if (collection.my.permissionLevel === "default") {
+    return collection.collaboratorPermissionLevel;
+  }
+  // 明确权限等级的协作者
+  return collection.my.permissionLevel;
+};
+
 export const hasPermission = (
   collection: PersonalizedCollection,
   permissionLevel: PermissionLevel,
 ) => {
-  // 未登录 / 获得链接的任何人
-  if (collection.my.permissionLevel === null) {
-    return (
-      comparePermissionLevels(
-        collection.anyonePermissionLevel,
-        permissionLevel,
-      ) >= 0
-    );
-  }
-
-  // 默认权限等级的协作者
-  if (collection.my.permissionLevel === "default") {
-    return (
-      comparePermissionLevels(
-        collection.collaboratorPermissionLevel,
-        permissionLevel,
-      ) >= 0
-    );
-  }
-
-  // 明确权限等级的协作者
   return (
-    comparePermissionLevels(collection.my.permissionLevel, permissionLevel) >= 0
+    comparePermissionLevels(
+      evaluatePermissionLevel(collection),
+      permissionLevel,
+    ) >= 0
   );
 };

@@ -28,10 +28,10 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { CollectionItemForm } from "@/forms/collection-item";
 import { deleteCollectionItem } from "@/server/collection-item";
-import type { EnrichedCollectionItem } from "@/utils/types";
+import type { PersonalizedCollectionItem } from "@/utils/types";
 
 export type EditCollectionItemDialogContentProps = {
-  item: EnrichedCollectionItem;
+  item: PersonalizedCollectionItem;
   closeDialog: () => void;
 };
 
@@ -77,7 +77,7 @@ const EditCollectionItemDialogContent = ({
 };
 
 export type DeleteCollectionItemDialogContentProps = {
-  item: EnrichedCollectionItem;
+  item: PersonalizedCollectionItem;
   closeDialog: () => void;
 };
 
@@ -119,7 +119,7 @@ const DeleteCollectionItemDialogContent = ({
 };
 
 export type CollectionItemCardMenuProps = {
-  item: EnrichedCollectionItem;
+  item: PersonalizedCollectionItem;
 };
 
 export const CollectionItemCardMenu = ({

@@ -1,15 +1,17 @@
-import { listEnrichedCollectionItemsByCollectionId } from "@/server/collection-item";
-import type { PersonalizedCollection } from "@/utils/types";
+import { listPersonalizedCollectionItemsByCollectionId } from "@/server/collection-item";
+import type { PermissionLevel, PersonalizedCollection } from "@/utils/types";
 import { CollectionItemCard } from "./collection-item-card";
 
 export type CollectionItemList = {
   collection: PersonalizedCollection;
+  permissionLevel: PermissionLevel;
 };
 
 export const CollectionItemList = async ({
   collection,
+  permissionLevel,
 }: CollectionItemList) => {
-  const collectionItems = await listEnrichedCollectionItemsByCollectionId(
+  const collectionItems = await listPersonalizedCollectionItemsByCollectionId(
     collection.id,
   );
 
@@ -17,7 +19,7 @@ export const CollectionItemList = async ({
     <ul className="grid grid-cols-[repeat(auto-fit,minmax(320px,1fr))] gap-4 py-4">
       {collectionItems.map((item) => (
         <li key={item.id}>
-          <CollectionItemCard item={item} />
+          <CollectionItemCard item={item} permissionLevel={permissionLevel} />
         </li>
       ))}
     </ul>

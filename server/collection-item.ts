@@ -5,7 +5,7 @@ import { forbidden, notFound, redirect } from "next/navigation";
 import { selectOnePersonalizedCollectionById } from "@/database/collection";
 import {
   insertOneCollectionItem,
-  selectManyEnrichedCollectionItemsByCollectionId,
+  selectManyPersonalizedCollectionItemsByCollectionId,
   selectOneCollectionItemById,
   updateOneCollectionItemById,
 } from "@/database/collection-item";
@@ -13,7 +13,7 @@ import { hasPermission } from "@/utils/permission";
 import type { Source } from "@/utils/types";
 import { findCurrentUser } from "./auth";
 
-export const listEnrichedCollectionItemsByCollectionId = async (
+export const listPersonalizedCollectionItemsByCollectionId = async (
   collectionId: number,
 ) => {
   const user = await findCurrentUser();
@@ -24,7 +24,7 @@ export const listEnrichedCollectionItemsByCollectionId = async (
 
   const collection = await selectOnePersonalizedCollectionById(
     collectionId,
-    user?.id,
+    user.id,
   );
 
   if (!collection) {
@@ -36,7 +36,10 @@ export const listEnrichedCollectionItemsByCollectionId = async (
   }
 
   const collectionItems =
-    await selectManyEnrichedCollectionItemsByCollectionId(collectionId);
+    await selectManyPersonalizedCollectionItemsByCollectionId(
+      collectionId,
+      user.id,
+    );
   return collectionItems;
 };
 

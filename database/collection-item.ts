@@ -1,12 +1,13 @@
 import { and, eq, isNull } from "drizzle-orm";
-import type { CollectionItem } from "@/utils/types";
+import type { CollectionItem, PersonalizedCollectionItem } from "@/utils/types";
 import { db } from "./client";
 import { collectionItemsTable } from "./schema";
 
-export const selectManyEnrichedCollectionItemsByCollectionId = async (
+export const selectManyPersonalizedCollectionItemsByCollectionId = async (
   collectionId: number,
+  userId: number | undefined,
 ) => {
-  const collectionItems = await db.query.collectionItemsTable.findMany({
+  const rows = await db.query.collectionItemsTable.findMany({
     with: {
       creator: {
         columns: {
@@ -26,6 +27,14 @@ export const selectManyEnrichedCollectionItemsByCollectionId = async (
           avatarUrl: true,
         },
       },
+      reactions: {
+        columns: {
+          attitude: true,
+          comment: true,
+        },
+        where: (reactionsTable, { eq }) =>
+          eq(reactionsTable.reactorId, userId ?? -1),
+      },
     },
     where: (collectionItemsTable, { eq }) =>
       and(
@@ -36,7 +45,18 @@ export const selectManyEnrichedCollectionItemsByCollectionId = async (
       desc(collectionItemsTable.createdAt),
     ],
   });
-  return collectionItems;
+
+  return rows.map((row) => {
+    const { reactions, ...rest } = row;
+    const collectionItem: PersonalizedCollectionItem = {
+      ...rest,
+      my: {
+        attitude: reactions[0]?.attitude ?? null,
+        comment: reactions[0]?.comment ?? "",
+      },
+    };
+    return collectionItem;
+  });
 };
 
 export const selectOneCollectionItemById = async (id: number) => {

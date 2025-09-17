@@ -71,6 +71,9 @@ export const usersRelations = relations(usersTable, ({ many }) => ({
   deletedCollectionItems: many(collectionItemsTable, {
     relationName: "user_delete_collectionItems",
   }),
+  reactions: many(reactionsTable, {
+    relationName: "user_make_reactions",
+  }),
   collaborations: many(collaborationsTable, {
     relationName: "user_have_collaborations",
   }),
@@ -220,7 +223,7 @@ export const collectionItemsTable = pgTable("collectionItems", {
 
 export const collectionItemsRelations = relations(
   collectionItemsTable,
-  ({ one }) => ({
+  ({ one, many }) => ({
     collection: one(collectionsTable, {
       fields: [collectionItemsTable.collectionId],
       references: [collectionsTable.id],
@@ -241,8 +244,54 @@ export const collectionItemsRelations = relations(
       references: [usersTable.id],
       relationName: "user_delete_collectionItems",
     }),
+    reactions: many(reactionsTable, {
+      relationName: "collectionItem_receive_reactions",
+    }),
   }),
 );
+
+export const attitudes = ["liked", "disliked"] as const;
+
+export const attitudeEnum = pgEnum("attitude", attitudes);
+
+export const reactionsTable = pgTable(
+  "reactions",
+  {
+    // 物理 ID
+    id: integer().primaryKey().generatedAlwaysAsIdentity(),
+    // 用户 ID
+    reactorId: integer()
+      .notNull()
+      .references(() => usersTable.id),
+    // 作品 ID
+    collectionItemId: integer()
+      .notNull()
+      .references(() => collectionItemsTable.id),
+    // 点赞/无/点踩
+    attitude: attitudeEnum(),
+    // 评论
+    comment: text().notNull().default(""),
+    // 审计时间
+    ...auditTimestamps,
+  },
+  (table) => [
+    // 用户-作品对唯一
+    uniqueIndex().on(table.reactorId, table.collectionItemId),
+  ],
+);
+
+export const reactionsRelations = relations(reactionsTable, ({ one }) => ({
+  reactor: one(usersTable, {
+    fields: [reactionsTable.reactorId],
+    references: [usersTable.id],
+    relationName: "user_make_reactions",
+  }),
+  collectionItem: one(collectionItemsTable, {
+    fields: [reactionsTable.collectionItemId],
+    references: [collectionItemsTable.id],
+    relationName: "collectionItem_receive_reactions",
+  }),
+}));
 
 export const collaborationsTable = pgTable(
   "collaborations",

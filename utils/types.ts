@@ -102,6 +102,13 @@ export type PersonalizedCollectionItem = EnrichedCollectionItem & {
 export type Collaboration = typeof collaborationsTable.$inferSelect;
 
 /**
+ * 填充过的协作
+ */
+export type EnrichedCollaboration = Collaboration & {
+  collaborator: PublicUser;
+};
+
+/**
  * 关注
  */
 export type Subscription = typeof subscriptionsTable.$inferSelect;

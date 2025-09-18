@@ -10,6 +10,7 @@
     "defaultBranch": "main"
   },
   "linter": {
+    "includes": ["**/*", "!components/ui/**/*"],
     "rules": {
       "suspicious": {
         "noUnknownAtRules": "off"

@@ -2,7 +2,7 @@ import Link from "next/link";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { UserAvatar } from "@/components/user-avatar";
-import { listCollaborationsByCollectionId } from "@/database/collaboration";
+import { listEnrichedCollaborations } from "@/server/collaboration";
 import type { PersonalizedCollection } from "@/utils/types";
 
 export type CollaboratorListProps = {
@@ -14,7 +14,7 @@ export const CollaboratorList = async ({
   collection,
   limit = 5,
 }: CollaboratorListProps) => {
-  const collaborations = await listCollaborationsByCollectionId(collection.id);
+  const collaborations = await listEnrichedCollaborations(collection.id);
 
   return (
     <div className="flex justify-between items-center">

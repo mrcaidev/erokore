@@ -1,6 +1,6 @@
 import type { SelectProps } from "@radix-ui/react-select";
 import { PERMISSION_LEVEL_LABEL_MAP } from "@/utils/permission";
-import type { PermissionLevel } from "@/utils/types";
+import type { DefaultablePermissionLevel } from "@/utils/types";
 import {
   Select,
   SelectContent,
@@ -10,22 +10,18 @@ import {
 } from "./ui/select";
 
 export type PermissionLevelSelectOption = {
-  value: PermissionLevel;
+  value: DefaultablePermissionLevel;
   label?: string;
   disabled?: boolean;
 };
 
 export type PermissionLevelSelectProps = SelectProps & {
   options: PermissionLevelSelectOption[];
-  defaultable?: boolean;
-  defaultLabel?: string;
   onChange?: () => void;
 };
 
 export const PermissionLevelSelect = ({
   options,
-  defaultable = false,
-  defaultLabel = "跟随默认",
   onChange,
   ...props
 }: PermissionLevelSelectProps) => {
@@ -35,14 +31,16 @@ export const PermissionLevelSelect = ({
         <SelectValue placeholder="请选择" />
       </SelectTrigger>
       <SelectContent>
-        {defaultable && <SelectItem value="default">{defaultLabel}</SelectItem>}
         {options.map((option) => (
           <SelectItem
             key={option.value}
             value={option.value}
             disabled={option.disabled}
           >
-            {option.label || PERMISSION_LEVEL_LABEL_MAP[option.value]}
+            {option.label ||
+              (option.value === "default"
+                ? "跟随默认"
+                : PERMISSION_LEVEL_LABEL_MAP[option.value])}
           </SelectItem>
         ))}
       </SelectContent>

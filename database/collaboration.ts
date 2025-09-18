@@ -1,7 +1,8 @@
+import { eq } from "drizzle-orm";
 import { db } from "./client";
 import { collaborationsTable } from "./schema";
 
-export const listCollaborationsByCollectionId = async (
+export const selectManyEnrichedCollaborationsByCollectionId = async (
   collectionId: number,
 ) => {
   const collaborators = await db.query.collaborationsTable.findMany({
@@ -25,6 +26,13 @@ export const listCollaborationsByCollectionId = async (
   return collaborators;
 };
 
+export const selectOneCollaborationById = async (id: number) => {
+  const collaboration = await db.query.collaborationsTable.findFirst({
+    where: (collaborationsTable, { eq }) => eq(collaborationsTable.id, id),
+  });
+  return collaboration;
+};
+
 export const insertOneCollaboration = async (
   value: typeof collaborationsTable.$inferInsert,
 ) => {
@@ -33,4 +41,20 @@ export const insertOneCollaboration = async (
     .values(value)
     .returning();
   return collaboration;
+};
+
+export const updateOneCollaborationById = async (
+  id: number,
+  value: Partial<typeof collaborationsTable.$inferInsert>,
+) => {
+  const [collaboration] = await db
+    .update(collaborationsTable)
+    .set(value)
+    .where(eq(collaborationsTable.id, id))
+    .returning();
+  return collaboration;
+};
+
+export const deleteOneCollaborationById = async (id: number) => {
+  await db.delete(collaborationsTable).where(eq(collaborationsTable.id, id));
 };

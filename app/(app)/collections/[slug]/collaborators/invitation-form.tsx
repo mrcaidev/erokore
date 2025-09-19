@@ -143,19 +143,21 @@ export const InvitationForm = ({ collection }: InvitationFormProps) => {
           )}
           {invitation ? "重新生成链接" : "生成邀请链接"}
         </Button>
-        <div className="flex items-center">
-          <Input value={invitationUrl} readOnly className="rounded-r-none" />
-          <Button
-            type="button"
-            variant="outline"
-            size="icon"
-            onClick={handleCopy}
-            aria-label="复制分享链接"
-            className="rounded-l-none"
-          >
-            {copied ? <CopyCheckIcon /> : <CopyIcon />}
-          </Button>
-        </div>
+        {invitation && (
+          <div className="flex items-center">
+            <Input value={invitationUrl} readOnly className="rounded-r-none" />
+            <Button
+              type="button"
+              variant="outline"
+              size="icon"
+              onClick={handleCopy}
+              aria-label="复制分享链接"
+              className="rounded-l-none"
+            >
+              {copied ? <CopyCheckIcon /> : <CopyIcon />}
+            </Button>
+          </div>
+        )}
       </form>
     </Form>
   );

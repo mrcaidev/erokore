@@ -1,6 +1,6 @@
 "use server";
 
-import { forbidden, notFound, redirect } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { insertOneCollaboration } from "@/database/collaboration";
 import {
   selectOnePersonalizedCollectionById,
@@ -39,7 +39,7 @@ export const verifyInvitation = async ({
   }
 
   if (collection.my.permissionLevel !== null) {
-    return forbidden();
+    return redirect(`/collections/${collectionSlug}`);
   }
 
   const invitation = await selectOneEnrichedInvitationByCollectionIdAndCode(
@@ -95,7 +95,7 @@ export const generateInvitation = async (req: GenerateInvitationRequest) => {
 };
 
 export type AcceptInvitationRequest = {
-  collectionId: number;
+  collectionSlug: string;
   code: string;
 };
 
@@ -106,8 +106,8 @@ export const acceptInvitation = async (req: AcceptInvitationRequest) => {
     return redirect("/sign-in");
   }
 
-  const collection = await selectOnePersonalizedCollectionById(
-    req.collectionId,
+  const collection = await selectOnePersonalizedCollectionBySlug(
+    req.collectionSlug,
     session.id,
   );
 
@@ -116,11 +116,11 @@ export const acceptInvitation = async (req: AcceptInvitationRequest) => {
   }
 
   if (collection.my.permissionLevel !== null) {
-    return { ok: false, error: "你已经是协作者啦" };
+    return redirect(`/collections/${collection.slug}`);
   }
 
   const invitation = await selectOneEnrichedInvitationByCollectionIdAndCode(
-    req.collectionId,
+    collection.id,
     req.code,
   );
 
@@ -133,7 +133,7 @@ export const acceptInvitation = async (req: AcceptInvitationRequest) => {
   }
 
   await insertOneCollaboration({
-    collectionId: req.collectionId,
+    collectionId: collection.id,
     collaboratorId: session.id,
     permissionLevel: invitation.permissionLevel,
   });

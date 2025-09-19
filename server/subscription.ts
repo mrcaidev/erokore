@@ -13,14 +13,16 @@ import { findCurrentUser } from "./auth";
 export const subscribeToCollection = async (id: number) => {
   const user = await findCurrentUser();
 
-  if (!user) {
-    return redirect("/sign-in");
-  }
-
-  const collection = await selectOnePersonalizedCollectionById(id, user.id);
+  const collection = await selectOnePersonalizedCollectionById(id, user?.id);
 
   if (!collection) {
     return notFound();
+  }
+
+  if (!user) {
+    return redirect(
+      `/sign-in?next=${encodeURIComponent(`/collections/${collection.slug}`)}`,
+    );
   }
 
   if (!hasPermission(collection, "viewer")) {
@@ -35,14 +37,14 @@ export const subscribeToCollection = async (id: number) => {
 export const unsubscribeFromCollection = async (id: number) => {
   const user = await findCurrentUser();
 
-  if (!user) {
-    return redirect("/sign-in");
-  }
-
-  const collection = await selectOnePersonalizedCollectionById(id, user.id);
+  const collection = await selectOnePersonalizedCollectionById(id, user?.id);
 
   if (!collection) {
     return notFound();
+  }
+
+  if (!user) {
+    return redirect(`/collections/${collection.slug}`);
   }
 
   if (!hasPermission(collection, "viewer")) {

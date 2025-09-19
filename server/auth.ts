@@ -9,6 +9,7 @@ import {
 } from "@/database/user";
 import { generateSalt, hashPassword } from "@/utils/password";
 import { clearSession, getSession, setSession } from "@/utils/session";
+import type { Route } from "next";
 
 export const findCurrentUser = cache(async () => {
   const session = await getSession();
@@ -56,9 +57,10 @@ export const signUp = async ({ email, password, nickname }: SignUpRequest) => {
 type SignInRequest = {
   email: string;
   password: string;
+  next: Route;
 };
 
-export const signIn = async ({ email, password }: SignInRequest) => {
+export const signIn = async ({ email, password, next }: SignInRequest) => {
   const user = await selectOneUserByEmail(email);
 
   if (!user) {
@@ -73,7 +75,7 @@ export const signIn = async ({ email, password }: SignInRequest) => {
 
   await setSession({ id: user.id });
 
-  return redirect("/");
+  return redirect(next);
 };
 
 export const signOut = async () => {

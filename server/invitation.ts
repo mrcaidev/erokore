@@ -26,7 +26,9 @@ export const verifyInvitation = async ({
   const session = await getSession();
 
   if (!session) {
-    return redirect("/sign-in");
+    return redirect(
+      `/sign-in?next=${encodeURIComponent(`/collections/${collectionSlug}/collaborators/invite?code=${invitationCode}`)}`,
+    );
   }
 
   const collection = await selectOnePersonalizedCollectionBySlug(
@@ -63,17 +65,19 @@ export type GenerateInvitationRequest = {
 export const generateInvitation = async (req: GenerateInvitationRequest) => {
   const session = await getSession();
 
-  if (!session) {
-    return redirect("/sign-in");
-  }
-
   const collection = await selectOnePersonalizedCollectionById(
     req.collectionId,
-    session.id,
+    session?.id,
   );
 
   if (!collection) {
     return { ok: false, error: "作品集可能被删掉了" } as const;
+  }
+
+  if (!session) {
+    return redirect(
+      `/sign-in?next=${encodeURIComponent(`/collections/${collection.slug}/collaborators`)}`,
+    );
   }
 
   if (!hasPermission(collection, "admin")) {
@@ -102,17 +106,19 @@ export type AcceptInvitationRequest = {
 export const acceptInvitation = async (req: AcceptInvitationRequest) => {
   const session = await getSession();
 
-  if (!session) {
-    return redirect("/sign-in");
-  }
-
   const collection = await selectOnePersonalizedCollectionBySlug(
     req.collectionSlug,
-    session.id,
+    session?.id,
   );
 
   if (!collection) {
     return { ok: false, error: "作品集可能被删掉了" };
+  }
+
+  if (!session) {
+    return redirect(
+      `/sign-in?next=${encodeURIComponent(`/collections/${collection.slug}/collaborators/invite?code=${req.code}`)}`,
+    );
   }
 
   if (collection.my.permissionLevel !== null) {

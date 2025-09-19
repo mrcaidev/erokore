@@ -20,10 +20,6 @@ export const reactToCollectionItem = async (
 ) => {
   const user = await findCurrentUser();
 
-  if (!user) {
-    return redirect("/sign-in");
-  }
-
   const collectionItem = await selectOneCollectionItemById(
     req.collectionItemId,
   );
@@ -34,11 +30,17 @@ export const reactToCollectionItem = async (
 
   const collection = await selectOnePersonalizedCollectionById(
     collectionItem.collectionId,
-    user.id,
+    user?.id,
   );
 
   if (!collection) {
     return notFound();
+  }
+
+  if (!user) {
+    return redirect(
+      `/sign-in?next=${encodeURIComponent(`/collections/${collection.slug}`)}`,
+    );
   }
 
   if (!hasPermission(collection, "rater")) {

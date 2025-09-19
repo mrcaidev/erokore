@@ -6,7 +6,9 @@ const CreateCollectionPage = async () => {
   const user = await findCurrentUser();
 
   if (!user) {
-    return redirect("/sign-in");
+    return redirect(
+      `/sign-in?next=${encodeURIComponent(`/collections/create`)}`,
+    );
   }
 
   return (

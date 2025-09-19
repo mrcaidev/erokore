@@ -50,7 +50,9 @@ export const createCollection = async ({
   const user = await findCurrentUser();
 
   if (!user) {
-    return redirect("/sign-in");
+    return redirect(
+      `/sign-in?next=${encodeURIComponent("/collections/create")}`,
+    );
   }
 
   const collection = await insertOneCollection({
@@ -100,14 +102,16 @@ export const editCollection = async ({
 }: EditCollectionRequest) => {
   const user = await findCurrentUser();
 
-  if (!user) {
-    return redirect("/sign-in");
-  }
-
-  const collection = await selectOnePersonalizedCollectionById(id, user.id);
+  const collection = await selectOnePersonalizedCollectionById(id, user?.id);
 
   if (!collection) {
     return notFound();
+  }
+
+  if (!user) {
+    return redirect(
+      `/sign-in?next=${encodeURIComponent(`/collections/${collection.slug}/edit`)}`,
+    );
   }
 
   if (!hasPermission(collection, "admin")) {
@@ -130,14 +134,16 @@ export const editCollection = async ({
 export const deleteCollection = async (id: number) => {
   const user = await findCurrentUser();
 
-  if (!user) {
-    return redirect("/sign-in");
-  }
-
-  const collection = await selectOnePersonalizedCollectionById(id, user.id);
+  const collection = await selectOnePersonalizedCollectionById(id, user?.id);
 
   if (!collection) {
     return notFound();
+  }
+
+  if (!user) {
+    return redirect(
+      `/sign-in?next=${encodeURIComponent(`/collections/${collection.slug}`)}`,
+    );
   }
 
   if (!hasPermission(collection, "owner")) {

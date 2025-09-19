@@ -17,13 +17,9 @@ export const listPersonalizedCollectionItemsByCollectionId = async (
 ) => {
   const user = await findCurrentUser();
 
-  if (!user) {
-    return redirect("/sign-in");
-  }
-
   const collection = await selectOnePersonalizedCollectionById(
     collectionId,
-    user.id,
+    user?.id,
   );
 
   if (!collection) {
@@ -37,7 +33,7 @@ export const listPersonalizedCollectionItemsByCollectionId = async (
   const collectionItems =
     await selectManyPersonalizedCollectionItemsByCollectionId(
       collectionId,
-      user.id,
+      user?.id,
     );
   return collectionItems;
 };
@@ -56,10 +52,6 @@ export const createCollectionItem = async (
 ) => {
   const user = await findCurrentUser();
 
-  if (!user) {
-    return redirect("/sign-in");
-  }
-
   const collection = await selectOnePersonalizedCollectionById(
     req.collectionId,
     user?.id,
@@ -67,6 +59,12 @@ export const createCollectionItem = async (
 
   if (!collection) {
     return notFound();
+  }
+
+  if (!user) {
+    return redirect(
+      `/sign-in?next=${encodeURIComponent(`/collections/${collection.slug}`)}`,
+    );
   }
 
   if (!hasPermission(collection, "contributor")) {
@@ -89,10 +87,6 @@ export type EditCollectionItemRequest = CreateCollectionItemRequest & {
 export const editCollectionItem = async (req: EditCollectionItemRequest) => {
   const user = await findCurrentUser();
 
-  if (!user) {
-    return redirect("/sign-in");
-  }
-
   const collection = await selectOnePersonalizedCollectionById(
     req.collectionId,
     user?.id,
@@ -100,6 +94,12 @@ export const editCollectionItem = async (req: EditCollectionItemRequest) => {
 
   if (!collection) {
     return notFound();
+  }
+
+  if (!user) {
+    return redirect(
+      `/sign-in?next=${encodeURIComponent(`/collections/${collection.slug}`)}`,
+    );
   }
 
   if (!hasPermission(collection, "contributor")) {
@@ -121,10 +121,6 @@ export const editCollectionItem = async (req: EditCollectionItemRequest) => {
 export const deleteCollectionItem = async (id: number) => {
   const user = await findCurrentUser();
 
-  if (!user) {
-    return redirect("/sign-in");
-  }
-
   const collectionItem = await selectOneCollectionItemById(id);
 
   if (!collectionItem) {
@@ -133,11 +129,17 @@ export const deleteCollectionItem = async (id: number) => {
 
   const collection = await selectOnePersonalizedCollectionById(
     collectionItem.collectionId,
-    user.id,
+    user?.id,
   );
 
   if (!collection) {
     return notFound();
+  }
+
+  if (!user) {
+    return redirect(
+      `/sign-in?next=${encodeURIComponent(`/collections/${collection.slug}`)}`,
+    );
   }
 
   if (!hasPermission(collection, "contributor")) {

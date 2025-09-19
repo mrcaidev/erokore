@@ -10,7 +10,6 @@ import {
   updateOneCollectionItemById,
 } from "@/database/collection-item";
 import { hasPermission } from "@/utils/permission";
-import type { Source } from "@/utils/types";
 import { findCurrentUser } from "./auth";
 
 export const listPersonalizedCollectionItemsByCollectionId = async (
@@ -45,7 +44,7 @@ export const listPersonalizedCollectionItemsByCollectionId = async (
 
 export type CreateCollectionItemRequest = {
   collectionId: number;
-  source: Source;
+  source: string;
   title: string;
   description: string;
   url: string;

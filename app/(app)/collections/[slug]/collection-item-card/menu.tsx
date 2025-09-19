@@ -1,14 +1,13 @@
 "use client";
 
 import {
-  CheckIcon,
   EllipsisIcon,
   Loader2Icon,
   SquarePenIcon,
   TrashIcon,
   XIcon,
 } from "lucide-react";
-import { useId, useState } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -26,55 +25,9 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { CollectionItemForm } from "@/forms/collection-item";
+import { CollectionItemFormDialogContent } from "@/forms/collection-item-dialog-content";
 import { deleteCollectionItem } from "@/server/collection-item";
 import type { PersonalizedCollectionItem } from "@/utils/types";
-
-export type EditCollectionItemDialogContentProps = {
-  item: PersonalizedCollectionItem;
-  closeDialog: () => void;
-};
-
-const EditCollectionItemDialogContent = ({
-  item,
-  closeDialog,
-}: EditCollectionItemDialogContentProps) => {
-  const formId = useId();
-  const [pending, setPending] = useState(false);
-
-  return (
-    <DialogContent>
-      <DialogHeader>
-        <DialogTitle>编辑作品</DialogTitle>
-      </DialogHeader>
-      <CollectionItemForm
-        collectionId={item.collectionId}
-        mode="edit"
-        collectionItem={item}
-        beforeSubmit={() => {
-          setPending(true);
-        }}
-        afterSubmit={() => {
-          setPending(false);
-          closeDialog();
-        }}
-        id={formId}
-      />
-      <DialogFooter>
-        <DialogClose asChild>
-          <Button variant="secondary">
-            <XIcon />
-            取消
-          </Button>
-        </DialogClose>
-        <Button type="submit" form={formId} disabled={pending}>
-          {pending ? <Loader2Icon className="animate-spin" /> : <CheckIcon />}
-          确定
-        </Button>
-      </DialogFooter>
-    </DialogContent>
-  );
-};
 
 export type DeleteCollectionItemDialogContentProps = {
   item: PersonalizedCollectionItem;
@@ -156,8 +109,10 @@ export const CollectionItemCardMenu = ({
         </DropdownMenuContent>
       </DropdownMenu>
       {dialogType === "edit" && (
-        <EditCollectionItemDialogContent
-          item={item}
+        <CollectionItemFormDialogContent
+          collectionId={item.collectionId}
+          mode="edit"
+          collectionItem={item}
           closeDialog={() => setDialogOpen(false)}
         />
       )}

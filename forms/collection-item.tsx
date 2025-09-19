@@ -20,16 +20,18 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { sources } from "@/database/schema";
 import {
   createCollectionItem,
   editCollectionItem,
 } from "@/server/collection-item";
-import { SOURCE_LABEL_MAP } from "@/utils/source";
+import { sourceConfigs } from "@/sources";
 import type { CollectionItem } from "@/utils/types";
 
 const collectionItemFormSchema = v.object({
-  source: v.picklist(sources, "来源无效"),
+  source: v.picklist(
+    sourceConfigs.map((sourceConfig) => sourceConfig.source),
+    "来源无效",
+  ),
   title: v.pipe(
     v.string(),
     v.minLength(1, "必填"),
@@ -137,9 +139,12 @@ export const CollectionItemForm = ({
                     <SelectValue placeholder="请选择" />
                   </SelectTrigger>
                   <SelectContent>
-                    {sources.map((source) => (
-                      <SelectItem key={source} value={source}>
-                        {SOURCE_LABEL_MAP[source]}
+                    {sourceConfigs.map((sourceConfig) => (
+                      <SelectItem
+                        key={sourceConfig.source}
+                        value={sourceConfig.source}
+                      >
+                        {sourceConfig.name}
                       </SelectItem>
                     ))}
                   </SelectContent>

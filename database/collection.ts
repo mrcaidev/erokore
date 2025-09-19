@@ -1,5 +1,5 @@
 import { eq } from "drizzle-orm";
-import type { Collection, PersonalizedCollection } from "@/utils/types";
+import type { PersonalizedCollection } from "@/utils/types";
 import { db } from "./client";
 import { collectionsTable } from "./schema";
 
@@ -119,7 +119,7 @@ export const insertOneCollection = async (
 
 export const updateOneCollectionById = async (
   id: number,
-  value: Partial<Collection>,
+  value: Partial<typeof collectionsTable.$inferInsert>,
 ) => {
   await db
     .update(collectionsTable)

@@ -12,6 +12,7 @@ import { findCurrentUser } from "@/server/auth";
 import { listEnrichedCollaborations } from "@/server/collaboration";
 import { findCollection } from "@/server/collection";
 import { CollaboratorCard } from "./collaborator-card";
+import { InvitationForm } from "./invitation-form";
 
 export type CollectionCollaboratorsPageProps = {
   params: Promise<{ slug: string }>;
@@ -62,7 +63,12 @@ const CollectionCollaboratorsPage = async ({
               ))}
             </ul>
           </div>
-          <div className="order-1 md:order-2">form</div>
+          <div className="order-1 md:order-2">
+            <div className="space-y-6 px-5 py-4 border rounded-md">
+              <div className="font-medium text-xl">邀请协作者</div>
+              <InvitationForm collection={collection} />
+            </div>
+          </div>
         </div>
       </div>
     </main>

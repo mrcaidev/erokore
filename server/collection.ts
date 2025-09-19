@@ -83,8 +83,12 @@ export const createCollection = async ({
   return redirect(`/collections/${collection.slug}`);
 };
 
-export type EditCollectionRequest = CreateCollectionRequest & {
+export type EditCollectionRequest = {
   id: number;
+  title?: string;
+  description?: string;
+  collaboratorPermissionLevel?: PermissionLevel;
+  anyonePermissionLevel?: PermissionLevel;
 };
 
 export const editCollection = async ({

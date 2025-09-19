@@ -121,7 +121,6 @@ export type Invitation = typeof invitationsTable.$inferSelect;
 /**
  * 个性化的邀请
  */
-export type PersonalizedInvitation = Invitation & {
+export type EnrichedInvitation = Invitation & {
   inviter: PublicUser;
-  collection: PersonalizedCollection;
 };

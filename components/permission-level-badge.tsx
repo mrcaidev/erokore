@@ -1,5 +1,5 @@
+import type { PermissionLevel } from "@/database/types";
 import { PERMISSION_LEVEL_LABEL_MAP } from "@/utils/permission";
-import type { PermissionLevel } from "@/utils/types";
 import { Badge } from "./ui/badge";
 
 export type PermissionLevelBadgeProps = {

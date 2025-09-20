@@ -3,7 +3,7 @@
 import { CopyIcon } from "lucide-react";
 import { toast } from "sonner";
 import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
-import type { PersonalizedCollection } from "@/utils/types";
+import type { PersonalizedCollection } from "@/database/types";
 
 export type CopyShareLinkButtonProps = {
   collection: PersonalizedCollection;

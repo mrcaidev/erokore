@@ -25,9 +25,9 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { defaultablePermissionLevels } from "@/database/schema";
+import type { Invitation, PersonalizedCollection } from "@/database/types";
 import { generateInvitation } from "@/server/invitation";
 import { PERMISSION_LEVEL_LABEL_MAP } from "@/utils/permission";
-import type { Invitation, PersonalizedCollection } from "@/utils/types";
 
 const invitationFormSchema = v.object({
   permissionLevel: v.picklist(defaultablePermissionLevels, "权限等级无效"),

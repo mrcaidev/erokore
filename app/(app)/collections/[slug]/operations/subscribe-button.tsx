@@ -3,11 +3,11 @@
 import { EyeIcon, EyeOffIcon } from "lucide-react";
 import { startTransition, useOptimistic } from "react";
 import { Button } from "@/components/ui/button";
+import type { PersonalizedCollection } from "@/database/types";
 import {
   subscribeToCollection,
   unsubscribeFromCollection,
 } from "@/server/subscription";
-import type { PersonalizedCollection } from "@/utils/types";
 
 export type SubscribeButtonProps = {
   collection: PersonalizedCollection;

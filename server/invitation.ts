@@ -10,9 +10,9 @@ import {
   insertOneInvitation,
   selectOneEnrichedInvitationByCollectionIdAndCode,
 } from "@/database/invitation";
+import type { DefaultablePermissionLevel } from "@/database/types";
 import { hasPermission } from "@/utils/permission";
 import { getSession } from "@/utils/session";
-import type { DefaultablePermissionLevel } from "@/utils/types";
 
 export type VerifyInvitationRequest = {
   collectionSlug: string;

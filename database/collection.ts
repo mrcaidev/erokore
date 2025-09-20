@@ -1,5 +1,5 @@
 import { eq } from "drizzle-orm";
-import type { PersonalizedCollection } from "@/utils/types";
+import type { PersonalizedCollection } from "@/database/types";
 import { db } from "./client";
 import { collectionsTable } from "./schema";
 

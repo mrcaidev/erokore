@@ -9,12 +9,12 @@ import {
   updateOneCollaborationById,
 } from "@/database/collaboration";
 import { selectOnePersonalizedCollectionById } from "@/database/collection";
+import type { DefaultablePermissionLevel } from "@/database/types";
 import {
   comparePermissionLevels,
   evaluatePermissionLevel,
   hasPermission,
 } from "@/utils/permission";
-import type { DefaultablePermissionLevel } from "@/utils/types";
 import { findCurrentUser } from "./auth";
 
 export const listEnrichedCollaborations = async (collectionId: number) => {

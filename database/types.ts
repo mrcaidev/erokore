@@ -8,10 +8,10 @@ import type {
   permissionLevelEnum,
   subscriptionsTable,
   usersTable,
-} from "@/database/schema";
+} from "./schema";
 
 /**
- * 完整的用户信息，仅服务端可见
+ * 原始的用户信息，仅服务端可见
  */
 export type User = typeof usersTable.$inferSelect;
 

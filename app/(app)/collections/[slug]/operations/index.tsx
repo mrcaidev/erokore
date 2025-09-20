@@ -6,8 +6,8 @@ import {
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import type { PersonalizedCollection } from "@/database/types";
 import { hasPermission } from "@/utils/permission";
-import type { PersonalizedCollection } from "@/utils/types";
 import { AddCollectionItemDialog } from "./add-collection-item-dialog";
 import { CopyShareLinkButton } from "./copy-share-link-button";
 import { DeleteCollectionDialogContent } from "./delete-collection-dialog-content";

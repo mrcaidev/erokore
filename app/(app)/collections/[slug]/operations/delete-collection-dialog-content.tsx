@@ -11,8 +11,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import type { PersonalizedCollection } from "@/database/types";
 import { deleteCollection } from "@/server/collection";
-import type { PersonalizedCollection } from "@/utils/types";
 
 export type DeleteCollectionDialogContentProps = {
   collection: PersonalizedCollection;

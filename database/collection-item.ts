@@ -1,5 +1,8 @@
 import { and, eq, isNull } from "drizzle-orm";
-import type { CollectionItem, PersonalizedCollectionItem } from "@/utils/types";
+import type {
+  CollectionItem,
+  PersonalizedCollectionItem,
+} from "@/database/types";
 import { db } from "./client";
 import { collectionItemsTable } from "./schema";
 

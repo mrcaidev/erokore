@@ -20,8 +20,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { permissionLevels } from "@/database/schema";
+import type { PersonalizedCollection } from "@/database/types";
 import { createCollection, editCollection } from "@/server/collection";
-import type { PersonalizedCollection } from "@/utils/types";
 
 const collectionFormSchema = v.object({
   title: v.pipe(

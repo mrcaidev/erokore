@@ -1,4 +1,4 @@
-import type { CollectionItem } from "@/utils/types";
+import type { CollectionItem } from "@/database/types";
 
 export type SourceConfig<T = unknown> = {
   source: string;

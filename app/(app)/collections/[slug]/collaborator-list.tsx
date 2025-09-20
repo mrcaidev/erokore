@@ -2,8 +2,8 @@ import Link from "next/link";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { UserAvatar } from "@/components/user-avatar";
+import type { PersonalizedCollection } from "@/database/types";
 import { listEnrichedCollaborations } from "@/server/collaboration";
-import type { PersonalizedCollection } from "@/utils/types";
 
 export type CollaboratorListProps = {
   collection: PersonalizedCollection;

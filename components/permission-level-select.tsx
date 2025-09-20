@@ -1,6 +1,6 @@
 import type { SelectProps } from "@radix-ui/react-select";
+import type { DefaultablePermissionLevel } from "@/database/types";
 import { PERMISSION_LEVEL_LABEL_MAP } from "@/utils/permission";
-import type { DefaultablePermissionLevel } from "@/utils/types";
 import {
   Select,
   SelectContent,

@@ -26,8 +26,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import type { PersonalizedCollectionItem } from "@/database/types";
 import { deleteCollectionItem } from "@/server/collection-item";
-import type { PersonalizedCollectionItem } from "@/utils/types";
 
 export type DeleteCollectionItemDialogContentProps = {
   item: PersonalizedCollectionItem;

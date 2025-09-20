@@ -32,13 +32,13 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import type { CollectionItem } from "@/database/types";
 import {
   createCollectionItem,
   editCollectionItem,
 } from "@/server/collection-item";
 import { inferSource } from "@/server/infer";
 import { sourceConfigs } from "@/sources";
-import type { CollectionItem } from "@/utils/types";
 
 const formSchema = v.object({
   source: v.picklist(

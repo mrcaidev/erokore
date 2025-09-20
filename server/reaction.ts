@@ -5,8 +5,8 @@ import { notFound, redirect } from "next/navigation";
 import { selectOnePersonalizedCollectionById } from "@/database/collection";
 import { selectOneCollectionItemById } from "@/database/collection-item";
 import { upsertOneReaction } from "@/database/reaction";
+import type { Attitude } from "@/database/types";
 import { hasPermission } from "@/utils/permission";
-import type { Attitude } from "@/utils/types";
 import { findCurrentUser } from "./auth";
 
 export type ReactToCollectionItemRequest = {

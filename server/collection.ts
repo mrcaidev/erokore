@@ -11,8 +11,8 @@ import {
   updateOneCollectionById,
 } from "@/database/collection";
 import { insertOneSubscription } from "@/database/subscription";
+import type { PermissionLevel } from "@/database/types";
 import { hasPermission } from "@/utils/permission";
-import type { PermissionLevel } from "@/utils/types";
 import { findCurrentUser } from "./auth";
 
 export const findCollection = cache(async (slug: string) => {

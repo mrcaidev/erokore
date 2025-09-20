@@ -7,6 +7,11 @@ import { PermissionLevelBadge } from "@/components/permission-level-badge";
 import { PermissionLevelSelect } from "@/components/permission-level-select";
 import { Button } from "@/components/ui/button";
 import { UserAvatar } from "@/components/user-avatar";
+import type {
+  DefaultablePermissionLevel,
+  EnrichedCollaboration,
+  PersonalizedCollection,
+} from "@/database/types";
 import {
   alterPermissionLevel,
   removeCollaboration,
@@ -17,11 +22,6 @@ import {
   hasPermission,
   PERMISSION_LEVEL_LABEL_MAP,
 } from "@/utils/permission";
-import type {
-  DefaultablePermissionLevel,
-  EnrichedCollaboration,
-  PersonalizedCollection,
-} from "@/utils/types";
 
 export type CollaboratorCardProps = {
   currentUserId: number;

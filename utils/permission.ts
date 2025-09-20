@@ -1,4 +1,7 @@
-import type { PermissionLevel, PersonalizedCollection } from "./types";
+import type {
+  PermissionLevel,
+  PersonalizedCollection,
+} from "../database/types";
 
 export const PERMISSION_LEVEL_LABEL_MAP: Record<PermissionLevel, string> = {
   none: "不可见",

@@ -2,6 +2,7 @@
 
 import { Loader2Icon, TrashIcon, XIcon } from "lucide-react";
 import { useState } from "react";
+import { deleteCollection } from "@/actions/collection";
 import { Button } from "@/components/ui/button";
 import {
   DialogClose,
@@ -12,7 +13,6 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import type { FullCollection } from "@/database/types";
-import { deleteCollection } from "@/server/collection";
 
 export type DeleteCollectionDialogContentProps = {
   collection: FullCollection;

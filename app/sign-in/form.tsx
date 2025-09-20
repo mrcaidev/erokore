@@ -8,6 +8,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import * as v from "valibot";
+import { signIn } from "@/actions/auth";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -18,7 +19,6 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { signIn } from "@/server/auth";
 
 const signInFormSchema = v.object({
   email: v.pipe(v.string(), v.email("格式错误")),

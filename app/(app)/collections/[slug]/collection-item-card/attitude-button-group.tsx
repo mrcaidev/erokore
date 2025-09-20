@@ -2,10 +2,10 @@
 
 import { ThumbsDownIcon, ThumbsUpIcon } from "lucide-react";
 import { startTransition, useOptimistic } from "react";
+import { reactToCollectionItem } from "@/actions/reaction";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/components/ui/utils";
 import type { Attitude, FullCollectionItem } from "@/database/types";
-import { reactToCollectionItem } from "@/server/reaction";
 
 export type AttitudeButtonGroupProps = {
   item: FullCollectionItem;

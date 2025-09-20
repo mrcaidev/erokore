@@ -4,8 +4,8 @@ import { CheckIcon, Loader2Icon } from "lucide-react";
 import { useParams, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
+import { acceptInvitation } from "@/actions/invitation";
 import { Button } from "@/components/ui/button";
-import { acceptInvitation } from "@/server/invitation";
 
 export const AcceptInvitationButton = () => {
   const { slug } = useParams<{ slug: string }>();

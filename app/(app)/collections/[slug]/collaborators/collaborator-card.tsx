@@ -3,6 +3,10 @@
 import { debounce } from "lodash-es";
 import { TrashIcon } from "lucide-react";
 import { toast } from "sonner";
+import {
+  alterPermissionLevel,
+  removeCollaboration,
+} from "@/actions/collaboration";
 import { PermissionLevelBadge } from "@/components/permission-level-badge";
 import { PermissionLevelSelect } from "@/components/permission-level-select";
 import { Button } from "@/components/ui/button";
@@ -12,10 +16,6 @@ import type {
   FullCollaboration,
   FullCollection,
 } from "@/database/types";
-import {
-  alterPermissionLevel,
-  removeCollaboration,
-} from "@/server/collaboration";
 import {
   comparePermissionLevels,
   evaluatePermissionLevel,

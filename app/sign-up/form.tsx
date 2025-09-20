@@ -6,6 +6,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import * as v from "valibot";
+import { signUp } from "@/actions/auth";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -16,7 +17,6 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { signUp } from "@/server/auth";
 
 const signUpFormSchema = v.pipe(
   v.object({

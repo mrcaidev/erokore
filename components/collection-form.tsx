@@ -7,6 +7,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import * as v from "valibot";
+import { createCollection, editCollection } from "@/actions/collection";
 import { PermissionLevelSelect } from "@/components/permission-level-select";
 import { Button } from "@/components/ui/button";
 import {
@@ -21,7 +22,6 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { permissionLevels } from "@/database/schema";
 import type { FullCollection } from "@/database/types";
-import { createCollection, editCollection } from "@/server/collection";
 
 const collectionFormSchema = v.object({
   title: v.pipe(

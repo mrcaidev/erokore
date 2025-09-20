@@ -2,12 +2,12 @@
 
 import { EyeIcon, EyeOffIcon } from "lucide-react";
 import { startTransition, useOptimistic } from "react";
-import { Button } from "@/components/ui/button";
-import type { FullCollection } from "@/database/types";
 import {
   subscribeToCollection,
   unsubscribeFromCollection,
-} from "@/server/subscription";
+} from "@/actions/subscription";
+import { Button } from "@/components/ui/button";
+import type { FullCollection } from "@/database/types";
 
 export type SubscribeButtonProps = {
   collection: FullCollection;

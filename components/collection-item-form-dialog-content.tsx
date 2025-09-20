@@ -6,6 +6,11 @@ import { useCallback, useId, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import * as v from "valibot";
+import {
+  createCollectionItem,
+  editCollectionItem,
+} from "@/actions/collection-item";
+import { inferSource } from "@/actions/infer";
 import { Button } from "@/components/ui/button";
 import {
   DialogClose,
@@ -33,11 +38,6 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import type { CollectionItem } from "@/database/types";
-import {
-  createCollectionItem,
-  editCollectionItem,
-} from "@/server/collection-item";
-import { inferSource } from "@/server/infer";
 import { sourceConfigs } from "@/sources";
 
 const formSchema = v.object({

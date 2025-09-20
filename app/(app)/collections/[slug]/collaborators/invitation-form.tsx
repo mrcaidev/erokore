@@ -13,6 +13,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import * as v from "valibot";
+import { generateInvitation } from "@/actions/invitation";
 import { PermissionLevelSelect } from "@/components/permission-level-select";
 import { Button } from "@/components/ui/button";
 import {
@@ -26,7 +27,6 @@ import {
 import { Input } from "@/components/ui/input";
 import { defaultablePermissionLevels } from "@/database/schema";
 import type { FullCollection, Invitation } from "@/database/types";
-import { generateInvitation } from "@/server/invitation";
 import { PERMISSION_LEVEL_LABEL_MAP } from "@/utils/permission";
 
 const invitationFormSchema = v.object({

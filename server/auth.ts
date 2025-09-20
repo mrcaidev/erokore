@@ -1,5 +1,6 @@
 "use server";
 
+import type { Route } from "next";
 import { redirect } from "next/navigation";
 import { cache } from "react";
 import {
@@ -9,7 +10,6 @@ import {
 } from "@/database/user";
 import { generateSalt, hashPassword } from "@/utils/password";
 import { clearSession, getSession, setSession } from "@/utils/session";
-import type { Route } from "next";
 
 export const findCurrentUser = cache(async () => {
   const session = await getSession();

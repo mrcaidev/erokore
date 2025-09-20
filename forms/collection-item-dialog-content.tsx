@@ -171,7 +171,7 @@ export const CollectionItemFormDialogContent = ({
                           key={sourceConfig.source}
                           value={sourceConfig.source}
                         >
-                          {sourceConfig.name}
+                          {sourceConfig.name ?? sourceConfig.source}
                         </SelectItem>
                       ))}
                     </SelectContent>

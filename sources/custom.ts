@@ -1,4 +1,4 @@
-import type { SourceConfig } from "@/utils/types";
+import type { SourceConfig } from "./types";
 
 export const customSourceConfig: SourceConfig<string> = {
   source: "custom",
@@ -9,7 +9,4 @@ export const customSourceConfig: SourceConfig<string> = {
       priority: -1,
     },
   ],
-  badge: {
-    className: "bg-gray-300 text-black dark:bg-gray-700 dark:text-white",
-  },
 };

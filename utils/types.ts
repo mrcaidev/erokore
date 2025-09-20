@@ -118,21 +118,3 @@ export type Invitation = typeof invitationsTable.$inferSelect;
 export type EnrichedInvitation = Invitation & {
   inviter: PublicUser;
 };
-
-export type SourceConfig<T = unknown> = {
-  source: string;
-  name?: string;
-  rules?: {
-    match: (input: string) => T | undefined;
-    priority?: number;
-  }[];
-  scrape?: (
-    input: T,
-  ) => Promise<
-    Pick<CollectionItem, "title" | "description" | "url" | "coverUrl">
-  >;
-  badge?: {
-    icon?: "image" | "video";
-    className?: string;
-  };
-};

@@ -7,7 +7,7 @@ import { selectOnePersonalizedCollectionById } from "@/repository/collection";
 import { selectOneCollectionItemById } from "@/repository/collection-item";
 import { upsertOneReaction } from "@/repository/reaction";
 import { hasPermission } from "@/utils/permission";
-import { findCurrentUser } from "./auth";
+import { getSession } from "@/utils/session";
 
 export type ReactToCollectionItemRequest = {
   collectionItemId: number;
@@ -18,7 +18,7 @@ export type ReactToCollectionItemRequest = {
 export const reactToCollectionItem = async (
   req: ReactToCollectionItemRequest,
 ) => {
-  const user = await findCurrentUser();
+  const session = await getSession();
 
   const collectionItem = await selectOneCollectionItemById(
     req.collectionItemId,
@@ -30,14 +30,14 @@ export const reactToCollectionItem = async (
 
   const collection = await selectOnePersonalizedCollectionById(
     collectionItem.collectionId,
-    user?.id,
+    session?.id,
   );
 
   if (!collection) {
     return notFound();
   }
 
-  if (!user) {
+  if (!session) {
     return redirect(
       `/sign-in?next=${encodeURIComponent(`/collections/${collection.slug}`)}`,
     );
@@ -48,7 +48,7 @@ export const reactToCollectionItem = async (
   }
 
   await upsertOneReaction({
-    reactorId: user.id,
+    reactorId: session.id,
     collectionItemId: req.collectionItemId,
     ...(req.attitude !== undefined ? { attitude: req.attitude } : {}),
     ...(req.comment !== undefined ? { comment: req.comment } : {}),

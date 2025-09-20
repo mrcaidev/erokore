@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { forbidden, notFound } from "next/navigation";
+import { cache } from "react";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -8,12 +9,34 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import { findCurrentUser } from "@/server/auth";
-import { listEnrichedCollaborations } from "@/server/collaboration";
-import { findCollection } from "@/server/collection";
+import { selectManyEnrichedCollaborationsByCollectionId } from "@/repository/collaboration";
+import { selectOnePersonalizedCollectionBySlug } from "@/repository/collection";
 import { hasPermission } from "@/utils/permission";
+import { getSession } from "@/utils/session";
 import { CollaboratorCard } from "./collaborator-card";
 import { InvitationForm } from "./invitation-form";
+
+const fetchPageData = cache(async (slug: string) => {
+  const session = await getSession();
+
+  const collection = await selectOnePersonalizedCollectionBySlug(
+    slug,
+    session?.id,
+  );
+
+  if (!collection) {
+    return notFound();
+  }
+
+  if (!hasPermission(collection, "viewer")) {
+    return forbidden();
+  }
+
+  const collaborations = await selectManyEnrichedCollaborationsByCollectionId(
+    collection.id,
+  );
+  return { session, collection, collaborations };
+});
 
 export type CollectionCollaboratorsPageProps = {
   params: Promise<{ slug: string }>;
@@ -23,16 +46,7 @@ const CollectionCollaboratorsPage = async ({
   params,
 }: CollectionCollaboratorsPageProps) => {
   const { slug } = await params;
-  const collection = await findCollection(slug);
-
-  if (!collection) {
-    return notFound();
-  }
-
-  const [user, collaborations] = await Promise.all([
-    findCurrentUser(),
-    listEnrichedCollaborations(collection.id),
-  ]);
+  const { session, collection, collaborations } = await fetchPageData(slug);
 
   return (
     <main className="max-w-7xl px-8 py-24 mx-auto">
@@ -57,7 +71,7 @@ const CollectionCollaboratorsPage = async ({
               {collaborations.map((collaboration) => (
                 <CollaboratorCard
                   key={collaboration.id}
-                  currentUserId={user!.id}
+                  currentUserId={session!.id}
                   collection={collection}
                   collaboration={collaboration}
                 />

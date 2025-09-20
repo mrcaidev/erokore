@@ -2,20 +2,19 @@ import Link from "next/link";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { UserAvatar } from "@/components/user-avatar";
-import type { FullCollection } from "@/database/types";
-import { listEnrichedCollaborations } from "@/server/collaboration";
+import type { FullCollaboration } from "@/database/types";
 
 export type CollaboratorListProps = {
-  collection: FullCollection;
+  collectionSlug: string;
+  collaborations: FullCollaboration[];
   limit?: number;
 };
 
 export const CollaboratorList = async ({
-  collection,
+  collectionSlug,
+  collaborations,
   limit = 5,
 }: CollaboratorListProps) => {
-  const collaborations = await listEnrichedCollaborations(collection.id);
-
   return (
     <div className="flex justify-between items-center">
       <ul className="flex items-center gap-1">
@@ -43,7 +42,7 @@ export const CollaboratorList = async ({
         className="px-1 text-muted-foreground hover:text-foreground"
         asChild
       >
-        <Link href={`/collections/${collection.slug}/collaborators`}>更多</Link>
+        <Link href={`/collections/${collectionSlug}/collaborators`}>更多</Link>
       </Button>
     </div>
   );

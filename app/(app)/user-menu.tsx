@@ -1,5 +1,6 @@
 import { LogInIcon, LogOutIcon } from "lucide-react";
 import Link from "next/link";
+import { cache } from "react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -9,10 +10,23 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { UserAvatar } from "@/components/user-avatar";
-import { findCurrentUser, signOut } from "@/server/auth";
+import { selectOnePrivateUserById } from "@/repository/user";
+import { signOut } from "@/server/auth";
+import { getSession } from "@/utils/session";
+
+const fetchCurrentUser = cache(async () => {
+  const session = await getSession();
+
+  if (!session) {
+    return undefined;
+  }
+
+  const user = await selectOnePrivateUserById(session.id);
+  return user;
+});
 
 export const UserMenu = async () => {
-  const user = await findCurrentUser();
+  const user = await fetchCurrentUser();
 
   if (!user) {
     return (

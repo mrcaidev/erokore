@@ -8,18 +8,18 @@ import {
   insertOneSubscription,
 } from "@/repository/subscription";
 import { hasPermission } from "@/utils/permission";
-import { findCurrentUser } from "./auth";
+import { getSession } from "@/utils/session";
 
 export const subscribeToCollection = async (id: number) => {
-  const user = await findCurrentUser();
+  const session = await getSession();
 
-  const collection = await selectOnePersonalizedCollectionById(id, user?.id);
+  const collection = await selectOnePersonalizedCollectionById(id, session?.id);
 
   if (!collection) {
     return notFound();
   }
 
-  if (!user) {
+  if (!session) {
     return redirect(
       `/sign-in?next=${encodeURIComponent(`/collections/${collection.slug}`)}`,
     );
@@ -29,21 +29,21 @@ export const subscribeToCollection = async (id: number) => {
     return forbidden();
   }
 
-  await insertOneSubscription({ subscriberId: user.id, collectionId: id });
+  await insertOneSubscription({ subscriberId: session.id, collectionId: id });
 
   revalidatePath(`/collections/${collection.slug}`);
 };
 
 export const unsubscribeFromCollection = async (id: number) => {
-  const user = await findCurrentUser();
+  const session = await getSession();
 
-  const collection = await selectOnePersonalizedCollectionById(id, user?.id);
+  const collection = await selectOnePersonalizedCollectionById(id, session?.id);
 
   if (!collection) {
     return notFound();
   }
 
-  if (!user) {
+  if (!session) {
     return redirect(`/collections/${collection.slug}`);
   }
 
@@ -51,7 +51,7 @@ export const unsubscribeFromCollection = async (id: number) => {
     return forbidden();
   }
 
-  await deleteOneSubscriptionBySubscriberIdAndCollectionId(user.id, id);
+  await deleteOneSubscriptionBySubscriberIdAndCollectionId(session.id, id);
 
   revalidatePath(`/collections/${collection.slug}`);
 };

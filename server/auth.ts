@@ -2,25 +2,9 @@
 
 import type { Route } from "next";
 import { redirect } from "next/navigation";
-import { cache } from "react";
-import {
-  insertOneUser,
-  selectOnePrivateUserById,
-  selectOneUserByEmail,
-} from "@/repository/user";
+import { insertOneUser, selectOneUserByEmail } from "@/repository/user";
 import { generateSalt, hashPassword } from "@/utils/password";
-import { clearSession, getSession, setSession } from "@/utils/session";
-
-export const findCurrentUser = cache(async () => {
-  const session = await getSession();
-
-  if (!session) {
-    return undefined;
-  }
-
-  const user = await selectOnePrivateUserById(session.id);
-  return user;
-});
+import { clearSession, setSession } from "@/utils/session";
 
 type SignUpRequest = {
   email: string;

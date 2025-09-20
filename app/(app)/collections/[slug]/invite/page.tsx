@@ -1,14 +1,51 @@
 import { CircleCheckIcon, XIcon } from "lucide-react";
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
+import { cache } from "react";
 import { Button } from "@/components/ui/button";
 import { UserAvatar } from "@/components/user-avatar";
-import { verifyInvitation } from "@/server/invitation";
+import { selectOnePersonalizedCollectionBySlug } from "@/repository/collection";
+import { selectOneEnrichedInvitationByCollectionIdAndCode } from "@/repository/invitation";
 import {
   comparePermissionLevels,
   PERMISSION_LEVEL_LABEL_MAP,
 } from "@/utils/permission";
+import { getSession } from "@/utils/session";
 import { AcceptInvitationButton } from "./accept-invitation-button";
+
+const fetchPageData = cache(async (slug: string, code: string) => {
+  const session = await getSession();
+
+  if (!session) {
+    return redirect(
+      `/sign-in?next=${encodeURIComponent(`/collections/${slug}/invite?code=${code}`)}`,
+    );
+  }
+
+  const collection = await selectOnePersonalizedCollectionBySlug(
+    slug,
+    session.id,
+  );
+
+  if (!collection) {
+    return notFound();
+  }
+
+  if (collection.my.permissionLevel !== null) {
+    return redirect(`/collections/${slug}`);
+  }
+
+  const invitation = await selectOneEnrichedInvitationByCollectionIdAndCode(
+    collection.id,
+    code,
+  );
+
+  if (!invitation) {
+    return notFound();
+  }
+
+  return { invitation, collection };
+});
 
 export type CollectionCollaboratorInvitationPageProps = {
   params: Promise<{ slug: string }>;
@@ -26,10 +63,7 @@ const CollectionCollaboratorInvitationPage = async ({
     return notFound();
   }
 
-  const { invitation, collection } = await verifyInvitation({
-    collectionSlug: slug,
-    invitationCode: code,
-  });
+  const { invitation, collection } = await fetchPageData(slug, code);
 
   const permissionLevel =
     invitation.permissionLevel === "default"

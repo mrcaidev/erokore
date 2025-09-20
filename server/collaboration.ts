@@ -1,11 +1,10 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { forbidden, notFound } from "next/navigation";
+import { notFound } from "next/navigation";
 import type { DefaultablePermissionLevel } from "@/database/types";
 import {
   deleteOneCollaborationById,
-  selectManyEnrichedCollaborationsByCollectionId,
   selectOneCollaborationById,
   updateOneCollaborationById,
 } from "@/repository/collaboration";
@@ -15,28 +14,7 @@ import {
   evaluatePermissionLevel,
   hasPermission,
 } from "@/utils/permission";
-import { findCurrentUser } from "./auth";
-
-export const listEnrichedCollaborations = async (collectionId: number) => {
-  const user = await findCurrentUser();
-
-  const collection = await selectOnePersonalizedCollectionById(
-    collectionId,
-    user?.id,
-  );
-
-  if (!collection) {
-    return notFound();
-  }
-
-  if (!hasPermission(collection, "viewer")) {
-    return forbidden();
-  }
-
-  const collaborations =
-    await selectManyEnrichedCollaborationsByCollectionId(collectionId);
-  return collaborations;
-};
+import { getSession } from "@/utils/session";
 
 export type AlterPermissionLevelRequest = {
   collaborationId: number;
@@ -52,10 +30,10 @@ export const alterPermissionLevel = async (
     return { error: "该协作者已被移除" };
   }
 
-  const user = await findCurrentUser();
+  const session = await getSession();
   const collection = await selectOnePersonalizedCollectionById(
     collaboration.collectionId,
-    user?.id,
+    session?.id,
   );
 
   if (!collection) {
@@ -71,6 +49,8 @@ export const alterPermissionLevel = async (
   });
 
   revalidatePath(`/collections/${collection.slug}/collaborators`);
+
+  return undefined;
 };
 
 export const removeCollaboration = async (collaborationId: number) => {
@@ -80,10 +60,10 @@ export const removeCollaboration = async (collaborationId: number) => {
     return { error: "该协作者已被删除" };
   }
 
-  const user = await findCurrentUser();
+  const session = await getSession();
   const collection = await selectOnePersonalizedCollectionById(
     collaboration.collectionId,
-    user?.id,
+    session?.id,
   );
 
   if (!collection) {

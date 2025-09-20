@@ -1,4 +1,5 @@
 import { forbidden, notFound } from "next/navigation";
+import { cache } from "react";
 import {
   Accordion,
   AccordionContent,
@@ -6,11 +7,43 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { UserAvatar } from "@/components/user-avatar";
-import { findCollection } from "@/server/collection";
+import { selectManyEnrichedCollaborationsByCollectionId } from "@/repository/collaboration";
+import { selectOnePersonalizedCollectionBySlug } from "@/repository/collection";
+import { selectManyPersonalizedCollectionItemsByCollectionId } from "@/repository/collection-item";
 import { evaluatePermissionLevel, hasPermission } from "@/utils/permission";
+import { getSession } from "@/utils/session";
 import { CollaboratorList } from "./collaborator-list";
 import { CollectionItemList } from "./collection-item-list";
 import { Operations } from "./operations";
+
+const fetchPageData = cache(async (slug: string) => {
+  const session = await getSession();
+
+  const collection = await selectOnePersonalizedCollectionBySlug(
+    slug,
+    session?.id,
+  );
+
+  if (!collection) {
+    return notFound();
+  }
+
+  if (!hasPermission(collection, "viewer")) {
+    return forbidden();
+  }
+
+  const collectionItems =
+    await selectManyPersonalizedCollectionItemsByCollectionId(
+      collection.id,
+      session?.id,
+    );
+
+  const collaborations = await selectManyEnrichedCollaborationsByCollectionId(
+    collection.id,
+  );
+
+  return { collection, collectionItems, collaborations };
+});
 
 export type CollectionPageProps = {
   params: Promise<{ slug: string }>;
@@ -18,7 +51,8 @@ export type CollectionPageProps = {
 
 const CollectionPage = async ({ params }: CollectionPageProps) => {
   const { slug } = await params;
-  const collection = await findCollection(slug);
+  const { collection, collectionItems, collaborations } =
+    await fetchPageData(slug);
 
   if (!collection) {
     return notFound();
@@ -37,7 +71,7 @@ const CollectionPage = async ({ params }: CollectionPageProps) => {
       <div className="grid grid-cols-1 md:grid-cols-[1fr_280px] lg:grid-cols-[1fr_360px] gap-x-8">
         <div className="order-2 md:order-1">
           <CollectionItemList
-            collection={collection}
+            collectionItems={collectionItems}
             permissionLevel={evaluatePermissionLevel(collection)}
           />
         </div>
@@ -55,7 +89,10 @@ const CollectionPage = async ({ params }: CollectionPageProps) => {
           <AccordionItem value="collaborator">
             <AccordionTrigger>协作者</AccordionTrigger>
             <AccordionContent>
-              <CollaboratorList collection={collection} />
+              <CollaboratorList
+                collectionSlug={collection.slug}
+                collaborations={collaborations}
+              />
             </AccordionContent>
           </AccordionItem>
           <AccordionItem value="activity">

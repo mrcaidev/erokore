@@ -1,20 +1,15 @@
-import type { FullCollection, PermissionLevel } from "@/database/types";
-import { listPersonalizedCollectionItemsByCollectionId } from "@/server/collection-item";
+import type { FullCollectionItem, PermissionLevel } from "@/database/types";
 import { CollectionItemCard } from "./collection-item-card";
 
 export type CollectionItemList = {
-  collection: FullCollection;
+  collectionItems: FullCollectionItem[];
   permissionLevel: PermissionLevel;
 };
 
 export const CollectionItemList = async ({
-  collection,
+  collectionItems,
   permissionLevel,
 }: CollectionItemList) => {
-  const collectionItems = await listPersonalizedCollectionItemsByCollectionId(
-    collection.id,
-  );
-
   return (
     <ul className="grid grid-cols-[repeat(auto-fit,minmax(320px,1fr))] gap-4 py-4">
       {collectionItems.map((item) => (

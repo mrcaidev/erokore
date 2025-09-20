@@ -1,7 +1,28 @@
 import { forbidden, notFound } from "next/navigation";
+import { cache } from "react";
 import { CollectionForm } from "@/components/collection-form";
-import { findCollection } from "@/server/collection";
+import { selectOnePersonalizedCollectionBySlug } from "@/repository/collection";
 import { hasPermission } from "@/utils/permission";
+import { getSession } from "@/utils/session";
+
+const fetchPageData = cache(async (slug: string) => {
+  const session = await getSession();
+
+  const collection = await selectOnePersonalizedCollectionBySlug(
+    slug,
+    session?.id,
+  );
+
+  if (!collection) {
+    return notFound();
+  }
+
+  if (!hasPermission(collection, "viewer")) {
+    return forbidden();
+  }
+
+  return { collection };
+});
 
 export type EditCollectionPageProps = {
   params: Promise<{ slug: string }>;
@@ -9,7 +30,7 @@ export type EditCollectionPageProps = {
 
 const EditCollectionPage = async ({ params }: EditCollectionPageProps) => {
   const { slug } = await params;
-  const collection = await findCollection(slug);
+  const { collection } = await fetchPageData(slug);
 
   if (!collection) {
     return notFound();

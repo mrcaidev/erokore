@@ -1,6 +1,6 @@
 "use server";
 
-import { notFound, redirect } from "next/navigation";
+import { redirect } from "next/navigation";
 import type { DefaultablePermissionLevel } from "@/database/types";
 import { insertOneCollaboration } from "@/repository/collaboration";
 import {
@@ -13,48 +13,6 @@ import {
 } from "@/repository/invitation";
 import { hasPermission } from "@/utils/permission";
 import { getSession } from "@/utils/session";
-
-export type VerifyInvitationRequest = {
-  collectionSlug: string;
-  invitationCode: string;
-};
-
-export const verifyInvitation = async ({
-  collectionSlug,
-  invitationCode,
-}: VerifyInvitationRequest) => {
-  const session = await getSession();
-
-  if (!session) {
-    return redirect(
-      `/sign-in?next=${encodeURIComponent(`/collections/${collectionSlug}/invite?code=${invitationCode}`)}`,
-    );
-  }
-
-  const collection = await selectOnePersonalizedCollectionBySlug(
-    collectionSlug,
-    session.id,
-  );
-
-  if (!collection) {
-    return notFound();
-  }
-
-  if (collection.my.permissionLevel !== null) {
-    return redirect(`/collections/${collectionSlug}`);
-  }
-
-  const invitation = await selectOneEnrichedInvitationByCollectionIdAndCode(
-    collection.id,
-    invitationCode,
-  );
-
-  if (!invitation) {
-    return notFound();
-  }
-
-  return { invitation, collection };
-};
 
 export type GenerateInvitationRequest = {
   collectionId: number;

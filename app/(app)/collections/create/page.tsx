@@ -1,9 +1,9 @@
 import { redirect } from "next/navigation";
 import { CollectionForm } from "@/components/collection-form";
-import { findCurrentUser } from "@/server/auth";
+import { getSession } from "@/utils/session";
 
 const CreateCollectionPage = async () => {
-  const user = await findCurrentUser();
+  const user = await getSession();
 
   if (!user) {
     return redirect(

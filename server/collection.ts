@@ -2,37 +2,16 @@
 
 import { revalidatePath } from "next/cache";
 import { forbidden, notFound, redirect } from "next/navigation";
-import { cache } from "react";
 import type { PermissionLevel } from "@/database/types";
 import { insertOneCollaboration } from "@/repository/collaboration";
 import {
   insertOneCollection,
   selectOnePersonalizedCollectionById,
-  selectOnePersonalizedCollectionBySlug,
   updateOneCollectionById,
 } from "@/repository/collection";
 import { insertOneSubscription } from "@/repository/subscription";
 import { hasPermission } from "@/utils/permission";
-import { findCurrentUser } from "./auth";
-
-export const findCollection = cache(async (slug: string) => {
-  const user = await findCurrentUser();
-
-  const collection = await selectOnePersonalizedCollectionBySlug(
-    slug,
-    user?.id,
-  );
-
-  if (!collection) {
-    return notFound();
-  }
-
-  if (!hasPermission(collection, "viewer")) {
-    return forbidden();
-  }
-
-  return collection;
-});
+import { getSession } from "@/utils/session";
 
 type CreateCollectionRequest = {
   title: string;
@@ -47,9 +26,9 @@ export const createCollection = async ({
   collaboratorPermissionLevel,
   anyonePermissionLevel,
 }: CreateCollectionRequest) => {
-  const user = await findCurrentUser();
+  const session = await getSession();
 
-  if (!user) {
+  if (!session) {
     return redirect(
       `/sign-in?next=${encodeURIComponent("/collections/create")}`,
     );
@@ -60,8 +39,8 @@ export const createCollection = async ({
     description,
     collaboratorPermissionLevel,
     anyonePermissionLevel,
-    creatorId: user.id,
-    updaterId: user.id,
+    creatorId: session.id,
+    updaterId: session.id,
   });
 
   if (!collection) {
@@ -71,13 +50,13 @@ export const createCollection = async ({
   await Promise.all([
     // 自动将创建者加入协作者列表
     insertOneCollaboration({
-      collaboratorId: user.id,
+      collaboratorId: session.id,
       collectionId: collection.id,
       permissionLevel: "owner",
     }),
     // 自动为创建者关注作品集
     insertOneSubscription({
-      subscriberId: user.id,
+      subscriberId: session.id,
       collectionId: collection.id,
     }),
   ]);
@@ -100,15 +79,15 @@ export const editCollection = async ({
   collaboratorPermissionLevel,
   anyonePermissionLevel,
 }: EditCollectionRequest) => {
-  const user = await findCurrentUser();
+  const session = await getSession();
 
-  const collection = await selectOnePersonalizedCollectionById(id, user?.id);
+  const collection = await selectOnePersonalizedCollectionById(id, session?.id);
 
   if (!collection) {
     return notFound();
   }
 
-  if (!user) {
+  if (!session) {
     return redirect(
       `/sign-in?next=${encodeURIComponent(`/collections/${collection.slug}/edit`)}`,
     );
@@ -123,7 +102,7 @@ export const editCollection = async ({
     description,
     collaboratorPermissionLevel,
     anyonePermissionLevel,
-    updaterId: user.id,
+    updaterId: session.id,
   });
 
   revalidatePath(`/collections/${collection.slug}`);
@@ -132,15 +111,15 @@ export const editCollection = async ({
 };
 
 export const deleteCollection = async (id: number) => {
-  const user = await findCurrentUser();
+  const session = await getSession();
 
-  const collection = await selectOnePersonalizedCollectionById(id, user?.id);
+  const collection = await selectOnePersonalizedCollectionById(id, session?.id);
 
   if (!collection) {
     return notFound();
   }
 
-  if (!user) {
+  if (!session) {
     return redirect(
       `/sign-in?next=${encodeURIComponent(`/collections/${collection.slug}`)}`,
     );
@@ -152,7 +131,7 @@ export const deleteCollection = async (id: number) => {
 
   await updateOneCollectionById(id, {
     deletedAt: new Date(),
-    deleterId: user.id,
+    deleterId: session.id,
   });
 
   revalidatePath(`/collections/${collection.slug}`);

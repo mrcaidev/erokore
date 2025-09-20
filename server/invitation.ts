@@ -27,7 +27,7 @@ export const verifyInvitation = async ({
 
   if (!session) {
     return redirect(
-      `/sign-in?next=${encodeURIComponent(`/collections/${collectionSlug}/collaborators/invite?code=${invitationCode}`)}`,
+      `/sign-in?next=${encodeURIComponent(`/collections/${collectionSlug}/invite?code=${invitationCode}`)}`,
     );
   }
 
@@ -117,7 +117,7 @@ export const acceptInvitation = async (req: AcceptInvitationRequest) => {
 
   if (!session) {
     return redirect(
-      `/sign-in?next=${encodeURIComponent(`/collections/${collection.slug}/collaborators/invite?code=${req.code}`)}`,
+      `/sign-in?next=${encodeURIComponent(`/collections/${collection.slug}/invite?code=${req.code}`)}`,
     );
   }
 

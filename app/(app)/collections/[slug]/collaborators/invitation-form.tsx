@@ -8,6 +8,7 @@ import {
   Loader2Icon,
   RotateCwIcon,
 } from "lucide-react";
+import { useParams } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -71,7 +72,8 @@ export const InvitationForm = ({ collection }: InvitationFormProps) => {
     setPending(false);
   });
 
-  const invitationUrl = `${window.location.href}/invite?code=${invitation?.code ?? ""}`;
+  const { slug } = useParams<{ slug: string }>();
+  const invitationUrl = `${window.location.origin}/collections/${slug}/invite?code=${invitation?.code ?? ""}`;
   const [copied, setCopied] = useState(false);
   const handleCopy = async () => {
     try {

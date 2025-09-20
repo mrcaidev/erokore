@@ -8,6 +8,7 @@ import {
   XIcon,
 } from "lucide-react";
 import { useState } from "react";
+import { CollectionItemFormDialogContent } from "@/components/collection-item-form-dialog-content";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -25,7 +26,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { CollectionItemFormDialogContent } from "@/forms/collection-item-dialog-content";
 import { deleteCollectionItem } from "@/server/collection-item";
 import type { PersonalizedCollectionItem } from "@/utils/types";
 

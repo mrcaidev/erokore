@@ -1,5 +1,5 @@
 import { forbidden, notFound } from "next/navigation";
-import { CollectionForm } from "@/forms/collection";
+import { CollectionForm } from "@/components/collection-form";
 import { findCollection } from "@/server/collection";
 import { hasPermission } from "@/utils/permission";
 

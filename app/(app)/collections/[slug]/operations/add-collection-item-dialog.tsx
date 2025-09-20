@@ -2,9 +2,9 @@
 
 import { PlusIcon } from "lucide-react";
 import { useState } from "react";
+import { CollectionItemFormDialogContent } from "@/components/collection-item-form-dialog-content";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
-import { CollectionItemFormDialogContent } from "@/forms/collection-item-dialog-content";
 import type { PersonalizedCollection } from "@/utils/types";
 
 export type AddCollectionItemDialogProps = {

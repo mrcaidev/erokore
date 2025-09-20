@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { CollectionForm } from "@/forms/collection";
+import { CollectionForm } from "@/components/collection-form";
 import { findCurrentUser } from "@/server/auth";
 
 const CreateCollectionPage = async () => {

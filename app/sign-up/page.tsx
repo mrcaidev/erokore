@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { SignUpForm } from "@/forms/sign-up";
+import { SignUpForm } from "./form";
 
 const SignUpPage = () => {
   return (

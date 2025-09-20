@@ -28,7 +28,11 @@ export const setSession = async (session: Session) => {
   const jwt = await signJwt(session);
 
   const cookieStore = await cookies();
-  cookieStore.set(COOKIE_KEY, jwt, { httpOnly: true, secure: true });
+  cookieStore.set(COOKIE_KEY, jwt, {
+    httpOnly: true,
+    secure: true,
+    expires: new Date("2099"),
+  });
 };
 
 export const clearSession = async () => {

@@ -11,11 +11,11 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import type { PersonalizedCollection } from "@/database/types";
+import type { FullCollection } from "@/database/types";
 import { deleteCollection } from "@/server/collection";
 
 export type DeleteCollectionDialogContentProps = {
-  collection: PersonalizedCollection;
+  collection: FullCollection;
 };
 
 export const DeleteCollectionDialogContent = ({

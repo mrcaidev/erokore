@@ -26,11 +26,11 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import type { PersonalizedCollectionItem } from "@/database/types";
+import type { FullCollectionItem } from "@/database/types";
 import { deleteCollectionItem } from "@/server/collection-item";
 
 export type DeleteCollectionItemDialogContentProps = {
-  item: PersonalizedCollectionItem;
+  item: FullCollectionItem;
   closeDialog: () => void;
 };
 
@@ -72,7 +72,7 @@ const DeleteCollectionItemDialogContent = ({
 };
 
 export type CollectionItemCardMenuProps = {
-  item: PersonalizedCollectionItem;
+  item: FullCollectionItem;
 };
 
 export const CollectionItemCardMenu = ({

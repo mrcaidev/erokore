@@ -1,10 +1,7 @@
 import { and, eq, isNull } from "drizzle-orm";
 import { db } from "@/database/client";
 import { collectionItemsTable } from "@/database/schema";
-import type {
-  CollectionItem,
-  PersonalizedCollectionItem,
-} from "@/database/types";
+import type { CollectionItem, FullCollectionItem } from "@/database/types";
 
 export const selectManyPersonalizedCollectionItemsByCollectionId = async (
   collectionId: number,
@@ -51,7 +48,7 @@ export const selectManyPersonalizedCollectionItemsByCollectionId = async (
 
   return rows.map((row) => {
     const { reactions, ...rest } = row;
-    const collectionItem: PersonalizedCollectionItem = {
+    const collectionItem: FullCollectionItem = {
       ...rest,
       my: {
         attitude: reactions[0]?.attitude ?? null,

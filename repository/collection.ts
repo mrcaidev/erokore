@@ -1,7 +1,7 @@
 import { eq } from "drizzle-orm";
 import { db } from "@/database/client";
 import { collectionsTable } from "@/database/schema";
-import type { PersonalizedCollection } from "@/database/types";
+import type { FullCollection } from "@/database/types";
 
 export const selectOnePersonalizedCollectionById = async (
   id: number,
@@ -45,7 +45,7 @@ export const selectOnePersonalizedCollectionById = async (
   }
 
   const { collaborations, subscriptions, ...rest } = row;
-  const collection: PersonalizedCollection = {
+  const collection: FullCollection = {
     ...rest,
     my: {
       permissionLevel: collaborations[0]?.permissionLevel ?? null,
@@ -97,7 +97,7 @@ export const selectOnePersonalizedCollectionBySlug = async (
   }
 
   const { collaborations, subscriptions, ...rest } = row;
-  const collection: PersonalizedCollection = {
+  const collection: FullCollection = {
     ...rest,
     my: {
       permissionLevel: collaborations[0]?.permissionLevel ?? null,

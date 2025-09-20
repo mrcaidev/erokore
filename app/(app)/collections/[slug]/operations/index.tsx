@@ -6,7 +6,7 @@ import {
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import type { PersonalizedCollection } from "@/database/types";
+import type { FullCollection } from "@/database/types";
 import { hasPermission } from "@/utils/permission";
 import { AddCollectionItemDialog } from "./add-collection-item-dialog";
 import { CopyShareLinkButton } from "./copy-share-link-button";
@@ -16,7 +16,7 @@ import { EditCollectionLink } from "./edit-collection-link";
 import { SubscribeButton } from "./subscribe-button";
 
 export type OperationsProps = {
-  collection: PersonalizedCollection;
+  collection: FullCollection;
 };
 
 export const Operations = ({ collection }: OperationsProps) => {

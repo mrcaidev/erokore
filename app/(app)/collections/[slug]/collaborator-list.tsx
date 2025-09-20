@@ -2,11 +2,11 @@ import Link from "next/link";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { UserAvatar } from "@/components/user-avatar";
-import type { PersonalizedCollection } from "@/database/types";
+import type { FullCollection } from "@/database/types";
 import { listEnrichedCollaborations } from "@/server/collaboration";
 
 export type CollaboratorListProps = {
-  collection: PersonalizedCollection;
+  collection: FullCollection;
   limit?: number;
 };
 

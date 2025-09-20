@@ -9,6 +9,16 @@ import {
 } from "drizzle-orm/pg-core";
 import { nanoid } from "nanoid";
 
+// 物理 ID
+const id = integer().primaryKey().generatedAlwaysAsIdentity();
+
+// 业务 ID
+const slug = text()
+  .notNull()
+  .unique()
+  .$default(() => nanoid(10));
+
+// 审计时间
 const auditTimestamps = {
   // 创建时间
   createdAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
@@ -25,12 +35,9 @@ export const usersTable = pgTable(
   "users",
   {
     // 物理 ID
-    id: integer().primaryKey().generatedAlwaysAsIdentity(),
+    id,
     // 业务 ID
-    slug: text()
-      .notNull()
-      .unique()
-      .$default(() => nanoid(10)),
+    slug,
     // 邮箱
     email: text().notNull(),
     // 昵称
@@ -71,9 +78,6 @@ export const usersRelations = relations(usersTable, ({ many }) => ({
   deletedCollectionItems: many(collectionItemsTable, {
     relationName: "user_delete_collectionItems",
   }),
-  reactions: many(reactionsTable, {
-    relationName: "user_make_reactions",
-  }),
   collaborations: many(collaborationsTable, {
     relationName: "user_have_collaborations",
   }),
@@ -81,10 +85,14 @@ export const usersRelations = relations(usersTable, ({ many }) => ({
     relationName: "user_have_subscriptions",
   }),
   invitations: many(invitationsTable, {
-    relationName: "user_have_invitations",
+    relationName: "user_generate_invitations",
+  }),
+  reactions: many(reactionsTable, {
+    relationName: "user_make_reactions",
   }),
 }));
 
+// 审计用户
 const auditUsers = {
   // 创建者 ID
   creatorId: integer()
@@ -128,12 +136,9 @@ export const defaultablePermissionLevelEnum = pgEnum(
 
 export const collectionsTable = pgTable("collections", {
   // 物理 ID
-  id: integer().primaryKey().generatedAlwaysAsIdentity(),
+  id,
   // 业务 ID
-  slug: text()
-    .notNull()
-    .unique()
-    .$default(() => nanoid(10)),
+  slug,
   // 标题
   title: text().notNull(),
   // 描述
@@ -153,9 +158,6 @@ export const collectionsTable = pgTable("collections", {
 export const collectionsRelations = relations(
   collectionsTable,
   ({ one, many }) => ({
-    items: many(collectionItemsTable, {
-      relationName: "collection_comprise_items",
-    }),
     collaborations: many(collaborationsTable, {
       relationName: "collection_have_collaborations",
     }),
@@ -164,6 +166,9 @@ export const collectionsRelations = relations(
     }),
     invitations: many(invitationsTable, {
       relationName: "collection_have_invitations",
+    }),
+    items: many(collectionItemsTable, {
+      relationName: "collection_comprise_items",
     }),
     creator: one(usersTable, {
       fields: [collectionsTable.creatorId],
@@ -183,111 +188,11 @@ export const collectionsRelations = relations(
   }),
 );
 
-export const collectionItemsTable = pgTable("collectionItems", {
-  // 物理 ID
-  id: integer().primaryKey().generatedAlwaysAsIdentity(),
-  // 业务 ID
-  slug: text()
-    .notNull()
-    .unique()
-    .$default(() => nanoid(10)),
-  // 来源
-  source: text().notNull(),
-  // 标题
-  title: text().notNull(),
-  // 描述
-  description: text().notNull(),
-  // URL
-  url: text().notNull(),
-  // 封面 URL
-  coverUrl: text().notNull(),
-  // 作品集 ID
-  collectionId: integer()
-    .notNull()
-    .references(() => collectionsTable.id),
-  // 审计时间
-  ...auditTimestamps,
-  // 审计用户
-  ...auditUsers,
-});
-
-export const collectionItemsRelations = relations(
-  collectionItemsTable,
-  ({ one, many }) => ({
-    collection: one(collectionsTable, {
-      fields: [collectionItemsTable.collectionId],
-      references: [collectionsTable.id],
-      relationName: "collection_comprise_items",
-    }),
-    creator: one(usersTable, {
-      fields: [collectionItemsTable.creatorId],
-      references: [usersTable.id],
-      relationName: "user_create_collectionItems",
-    }),
-    updater: one(usersTable, {
-      fields: [collectionItemsTable.updaterId],
-      references: [usersTable.id],
-      relationName: "user_update_collectionItems",
-    }),
-    deleter: one(usersTable, {
-      fields: [collectionItemsTable.deleterId],
-      references: [usersTable.id],
-      relationName: "user_delete_collectionItems",
-    }),
-    reactions: many(reactionsTable, {
-      relationName: "collectionItem_receive_reactions",
-    }),
-  }),
-);
-
-export const attitudes = ["liked", "disliked"] as const;
-
-export const attitudeEnum = pgEnum("attitude", attitudes);
-
-export const reactionsTable = pgTable(
-  "reactions",
-  {
-    // 物理 ID
-    id: integer().primaryKey().generatedAlwaysAsIdentity(),
-    // 用户 ID
-    reactorId: integer()
-      .notNull()
-      .references(() => usersTable.id),
-    // 作品 ID
-    collectionItemId: integer()
-      .notNull()
-      .references(() => collectionItemsTable.id),
-    // 点赞/无/点踩
-    attitude: attitudeEnum(),
-    // 评论
-    comment: text().notNull().default(""),
-    // 审计时间
-    ...auditTimestamps,
-  },
-  (table) => [
-    // 用户-作品对唯一
-    uniqueIndex().on(table.reactorId, table.collectionItemId),
-  ],
-);
-
-export const reactionsRelations = relations(reactionsTable, ({ one }) => ({
-  reactor: one(usersTable, {
-    fields: [reactionsTable.reactorId],
-    references: [usersTable.id],
-    relationName: "user_make_reactions",
-  }),
-  collectionItem: one(collectionItemsTable, {
-    fields: [reactionsTable.collectionItemId],
-    references: [collectionItemsTable.id],
-    relationName: "collectionItem_receive_reactions",
-  }),
-}));
-
 export const collaborationsTable = pgTable(
   "collaborations",
   {
     // 物理 ID
-    id: integer().primaryKey().generatedAlwaysAsIdentity(),
+    id,
     // 协作者 ID
     collaboratorId: integer()
       .notNull()
@@ -327,7 +232,7 @@ export const subscriptionsTable = pgTable(
   "subscriptions",
   {
     // 物理 ID
-    id: integer().primaryKey().generatedAlwaysAsIdentity(),
+    id,
     // 订阅者 ID
     subscriberId: integer()
       .notNull()
@@ -365,7 +270,7 @@ export const invitationsTable = pgTable(
   "invitations",
   {
     // 物理 ID
-    id: integer().primaryKey().generatedAlwaysAsIdentity(),
+    id,
     // 邀请者 ID
     inviterId: integer()
       .notNull()
@@ -386,7 +291,7 @@ export const invitationsTable = pgTable(
     ...auditTimestamps,
   },
   (table) => [
-    // 在一个作品集中，邀请码唯一
+    // 作品集-邀请码对唯一
     uniqueIndex().on(table.collectionId, table.code),
   ],
 );
@@ -395,11 +300,108 @@ export const invitationsRelations = relations(invitationsTable, ({ one }) => ({
   inviter: one(usersTable, {
     fields: [invitationsTable.inviterId],
     references: [usersTable.id],
-    relationName: "user_have_invitations",
+    relationName: "user_generate_invitations",
   }),
   collection: one(collectionsTable, {
     fields: [invitationsTable.collectionId],
     references: [collectionsTable.id],
     relationName: "collection_have_invitations",
+  }),
+}));
+
+export const collectionItemsTable = pgTable("collectionItems", {
+  // 物理 ID
+  id,
+  // 业务 ID
+  slug,
+  // 来源
+  source: text().notNull(),
+  // 标题
+  title: text().notNull(),
+  // 描述
+  description: text().notNull(),
+  // URL
+  url: text().notNull(),
+  // 封面 URL
+  coverUrl: text().notNull(),
+  // 作品集 ID
+  collectionId: integer()
+    .notNull()
+    .references(() => collectionsTable.id),
+  // 审计时间
+  ...auditTimestamps,
+  // 审计用户
+  ...auditUsers,
+});
+
+export const collectionItemsRelations = relations(
+  collectionItemsTable,
+  ({ one, many }) => ({
+    reactions: many(reactionsTable, {
+      relationName: "collectionItem_receive_reactions",
+    }),
+    collection: one(collectionsTable, {
+      fields: [collectionItemsTable.collectionId],
+      references: [collectionsTable.id],
+      relationName: "collection_comprise_items",
+    }),
+    creator: one(usersTable, {
+      fields: [collectionItemsTable.creatorId],
+      references: [usersTable.id],
+      relationName: "user_create_collectionItems",
+    }),
+    updater: one(usersTable, {
+      fields: [collectionItemsTable.updaterId],
+      references: [usersTable.id],
+      relationName: "user_update_collectionItems",
+    }),
+    deleter: one(usersTable, {
+      fields: [collectionItemsTable.deleterId],
+      references: [usersTable.id],
+      relationName: "user_delete_collectionItems",
+    }),
+  }),
+);
+
+export const attitudes = ["liked", "disliked"] as const;
+
+export const attitudeEnum = pgEnum("attitude", attitudes);
+
+export const reactionsTable = pgTable(
+  "reactions",
+  {
+    // 物理 ID
+    id,
+    // 回应者 ID
+    reactorId: integer()
+      .notNull()
+      .references(() => usersTable.id),
+    // 作品 ID
+    collectionItemId: integer()
+      .notNull()
+      .references(() => collectionItemsTable.id),
+    // 点赞/无/点踩
+    attitude: attitudeEnum(),
+    // 评论
+    comment: text().notNull().default(""),
+    // 审计时间
+    ...auditTimestamps,
+  },
+  (table) => [
+    // 用户-作品对唯一
+    uniqueIndex().on(table.reactorId, table.collectionItemId),
+  ],
+);
+
+export const reactionsRelations = relations(reactionsTable, ({ one }) => ({
+  reactor: one(usersTable, {
+    fields: [reactionsTable.reactorId],
+    references: [usersTable.id],
+    relationName: "user_make_reactions",
+  }),
+  collectionItem: one(collectionItemsTable, {
+    fields: [reactionsTable.collectionItemId],
+    references: [collectionItemsTable.id],
+    relationName: "collectionItem_receive_reactions",
   }),
 }));

@@ -9,8 +9,8 @@ import { Button } from "@/components/ui/button";
 import { UserAvatar } from "@/components/user-avatar";
 import type {
   DefaultablePermissionLevel,
-  EnrichedCollaboration,
-  PersonalizedCollection,
+  FullCollaboration,
+  FullCollection,
 } from "@/database/types";
 import {
   alterPermissionLevel,
@@ -25,8 +25,8 @@ import {
 
 export type CollaboratorCardProps = {
   currentUserId: number;
-  collection: PersonalizedCollection;
-  collaboration: EnrichedCollaboration;
+  collection: FullCollection;
+  collaboration: FullCollaboration;
 };
 
 export const CollaboratorCard = ({

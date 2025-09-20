@@ -25,7 +25,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { defaultablePermissionLevels } from "@/database/schema";
-import type { Invitation, PersonalizedCollection } from "@/database/types";
+import type { FullCollection, Invitation } from "@/database/types";
 import { generateInvitation } from "@/server/invitation";
 import { PERMISSION_LEVEL_LABEL_MAP } from "@/utils/permission";
 
@@ -40,7 +40,7 @@ const invitationFormSchema = v.object({
 });
 
 export type InvitationFormProps = {
-  collection: PersonalizedCollection;
+  collection: FullCollection;
 };
 
 export const InvitationForm = ({ collection }: InvitationFormProps) => {

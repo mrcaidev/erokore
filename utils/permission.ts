@@ -1,7 +1,4 @@
-import type {
-  PermissionLevel,
-  PersonalizedCollection,
-} from "../database/types";
+import type { FullCollection, PermissionLevel } from "../database/types";
 
 export const PERMISSION_LEVEL_LABEL_MAP: Record<PermissionLevel, string> = {
   none: "不可见",
@@ -28,7 +25,7 @@ export const comparePermissionLevels = (
   return PERMISSION_LEVEL_WEIGHT[a] - PERMISSION_LEVEL_WEIGHT[b];
 };
 
-export const evaluatePermissionLevel = (collection: PersonalizedCollection) => {
+export const evaluatePermissionLevel = (collection: FullCollection) => {
   // 未登录 / 获得链接的任何人
   if (collection.my.permissionLevel === null) {
     return collection.anyonePermissionLevel;
@@ -42,7 +39,7 @@ export const evaluatePermissionLevel = (collection: PersonalizedCollection) => {
 };
 
 export const hasPermission = (
-  collection: PersonalizedCollection,
+  collection: FullCollection,
   permissionLevel: PermissionLevel,
 ) => {
   return (

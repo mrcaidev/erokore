@@ -5,10 +5,10 @@ import { useState } from "react";
 import { CollectionItemFormDialogContent } from "@/components/collection-item-form-dialog-content";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
-import type { PersonalizedCollection } from "@/database/types";
+import type { FullCollection } from "@/database/types";
 
 export type AddCollectionItemDialogProps = {
-  collection: PersonalizedCollection;
+  collection: FullCollection;
 };
 
 export const AddCollectionItemDialog = ({

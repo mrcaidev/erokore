@@ -20,7 +20,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { permissionLevels } from "@/database/schema";
-import type { PersonalizedCollection } from "@/database/types";
+import type { FullCollection } from "@/database/types";
 import { createCollection, editCollection } from "@/server/collection";
 
 const collectionFormSchema = v.object({
@@ -36,7 +36,7 @@ const collectionFormSchema = v.object({
 
 export type CollectionFormProps = {
   mode: "create" | "edit";
-  collection?: PersonalizedCollection;
+  collection?: FullCollection;
 };
 
 export const CollectionForm = ({ mode, collection }: CollectionFormProps) => {

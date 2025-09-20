@@ -1,9 +1,9 @@
-import type { PermissionLevel, PersonalizedCollection } from "@/database/types";
+import type { FullCollection, PermissionLevel } from "@/database/types";
 import { listPersonalizedCollectionItemsByCollectionId } from "@/server/collection-item";
 import { CollectionItemCard } from "./collection-item-card";
 
 export type CollectionItemList = {
-  collection: PersonalizedCollection;
+  collection: FullCollection;
   permissionLevel: PermissionLevel;
 };
 

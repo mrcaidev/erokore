@@ -6,115 +6,97 @@ import type {
   defaultablePermissionLevelEnum,
   invitationsTable,
   permissionLevelEnum,
+  reactionsTable,
   subscriptionsTable,
   usersTable,
 } from "./schema";
 
-/**
- * 原始的用户信息，仅服务端可见
- */
+// ----------------------------------------------------------------------------
+
 export type User = typeof usersTable.$inferSelect;
 
-/**
- * 私密的用户信息，仅用户本人可见
- */
+export type InsertUser = typeof usersTable.$inferInsert;
+
 export type PrivateUser = Omit<User, "passwordSalt" | "passwordHash">;
 
-/**
- * 公开的用户信息，所有人可见
- */
 export type PublicUser = Omit<
   PrivateUser,
   "createdAt" | "updatedAt" | "deletedAt"
 >;
 
-/**
- * 用户在作品集上的权限等级
- */
+// ----------------------------------------------------------------------------
+
 export type PermissionLevel = (typeof permissionLevelEnum.enumValues)[number];
 
-/**
- * 用户在作品集上的权限等级（可默认）
- */
 export type DefaultablePermissionLevel =
   (typeof defaultablePermissionLevelEnum.enumValues)[number];
 
-/**
- * 作品集
- */
+// ----------------------------------------------------------------------------
+
 export type Collection = typeof collectionsTable.$inferSelect;
 
-/**
- * 填充过的作品集
- */
-export type EnrichedCollection = Collection & {
+export type InsertCollection = typeof collectionsTable.$inferInsert;
+
+export type FullCollection = Collection & {
   creator: PublicUser;
   updater: PublicUser;
-};
-
-/**
- * 个性化的作品集
- */
-export type PersonalizedCollection = EnrichedCollection & {
   my: {
     permissionLevel: DefaultablePermissionLevel | null;
     subscribed: boolean;
   };
 };
 
-/**
- * 作品
- */
-export type CollectionItem = typeof collectionItemsTable.$inferSelect;
+// ----------------------------------------------------------------------------
 
-/**
- * 态度
- */
-export type Attitude = (typeof attitudeEnum.enumValues)[number];
+export type Collaboration = typeof collaborationsTable.$inferSelect;
 
-/**
- * 填充过的作品
- */
-export type EnrichedCollectionItem = CollectionItem & {
-  creator: PublicUser;
-  updater: PublicUser;
+export type InsertCollaboration = typeof collaborationsTable.$inferInsert;
+
+export type FullCollaboration = Collaboration & {
+  collaborator: PublicUser;
 };
 
-/**
- * 个性化的作品
- */
-export type PersonalizedCollectionItem = EnrichedCollectionItem & {
+// ----------------------------------------------------------------------------
+
+export type Subscription = typeof subscriptionsTable.$inferSelect;
+
+export type InsertSubscription = typeof subscriptionsTable.$inferInsert;
+
+// ----------------------------------------------------------------------------
+
+export type Invitation = typeof invitationsTable.$inferSelect;
+
+export type InsertInvitation = typeof invitationsTable.$inferInsert;
+
+export type FullInvitation = Invitation & {
+  inviter: PublicUser;
+};
+
+// ----------------------------------------------------------------------------
+
+export type CollectionItem = typeof collectionItemsTable.$inferSelect;
+
+export type InsertCollectionItem = typeof collectionItemsTable.$inferInsert;
+
+export type FullCollectionItem = CollectionItem & {
+  creator: PublicUser;
+  updater: PublicUser;
   my: {
     attitude: Attitude | null;
     comment: string;
   };
 };
 
-/**
- * 协作
- */
-export type Collaboration = typeof collaborationsTable.$inferSelect;
+// ----------------------------------------------------------------------------
 
-/**
- * 填充过的协作
- */
-export type EnrichedCollaboration = Collaboration & {
-  collaborator: PublicUser;
-};
+export type Attitude = (typeof attitudeEnum.enumValues)[number];
 
-/**
- * 关注
- */
-export type Subscription = typeof subscriptionsTable.$inferSelect;
+// ----------------------------------------------------------------------------
 
-/**
- * 邀请
- */
-export type Invitation = typeof invitationsTable.$inferSelect;
+export type Reaction = typeof reactionsTable.$inferSelect;
 
-/**
- * 个性化的邀请
- */
-export type EnrichedInvitation = Invitation & {
-  inviter: PublicUser;
+export type InsertReaction = typeof reactionsTable.$inferInsert;
+
+export type FullReaction = Reaction & {
+  reactor: PublicUser;
 };

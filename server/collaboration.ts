@@ -2,14 +2,14 @@
 
 import { revalidatePath } from "next/cache";
 import { forbidden, notFound } from "next/navigation";
+import type { DefaultablePermissionLevel } from "@/database/types";
 import {
   deleteOneCollaborationById,
   selectManyEnrichedCollaborationsByCollectionId,
   selectOneCollaborationById,
   updateOneCollaborationById,
-} from "@/database/collaboration";
-import { selectOnePersonalizedCollectionById } from "@/database/collection";
-import type { DefaultablePermissionLevel } from "@/database/types";
+} from "@/repository/collaboration";
+import { selectOnePersonalizedCollectionById } from "@/repository/collection";
 import {
   comparePermissionLevels,
   evaluatePermissionLevel,

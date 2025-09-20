@@ -1,16 +1,16 @@
 "use server";
 
 import { notFound, redirect } from "next/navigation";
-import { insertOneCollaboration } from "@/database/collaboration";
+import type { DefaultablePermissionLevel } from "@/database/types";
+import { insertOneCollaboration } from "@/repository/collaboration";
 import {
   selectOnePersonalizedCollectionById,
   selectOnePersonalizedCollectionBySlug,
-} from "@/database/collection";
+} from "@/repository/collection";
 import {
   insertOneInvitation,
   selectOneEnrichedInvitationByCollectionIdAndCode,
-} from "@/database/invitation";
-import type { DefaultablePermissionLevel } from "@/database/types";
+} from "@/repository/invitation";
 import { hasPermission } from "@/utils/permission";
 import { getSession } from "@/utils/session";
 

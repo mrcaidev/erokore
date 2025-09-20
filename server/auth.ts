@@ -7,7 +7,7 @@ import {
   insertOneUser,
   selectOnePrivateUserById,
   selectOneUserByEmail,
-} from "@/database/user";
+} from "@/repository/user";
 import { generateSalt, hashPassword } from "@/utils/password";
 import { clearSession, getSession, setSession } from "@/utils/session";
 

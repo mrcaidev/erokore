@@ -2,11 +2,11 @@
 
 import { revalidatePath } from "next/cache";
 import { forbidden, notFound, redirect } from "next/navigation";
-import { selectOnePersonalizedCollectionById } from "@/database/collection";
+import { selectOnePersonalizedCollectionById } from "@/repository/collection";
 import {
   deleteOneSubscriptionBySubscriberIdAndCollectionId,
   insertOneSubscription,
-} from "@/database/subscription";
+} from "@/repository/subscription";
 import { hasPermission } from "@/utils/permission";
 import { findCurrentUser } from "./auth";
 

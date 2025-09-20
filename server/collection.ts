@@ -3,15 +3,15 @@
 import { revalidatePath } from "next/cache";
 import { forbidden, notFound, redirect } from "next/navigation";
 import { cache } from "react";
-import { insertOneCollaboration } from "@/database/collaboration";
+import type { PermissionLevel } from "@/database/types";
+import { insertOneCollaboration } from "@/repository/collaboration";
 import {
   insertOneCollection,
   selectOnePersonalizedCollectionById,
   selectOnePersonalizedCollectionBySlug,
   updateOneCollectionById,
-} from "@/database/collection";
-import { insertOneSubscription } from "@/database/subscription";
-import type { PermissionLevel } from "@/database/types";
+} from "@/repository/collection";
+import { insertOneSubscription } from "@/repository/subscription";
 import { hasPermission } from "@/utils/permission";
 import { findCurrentUser } from "./auth";
 

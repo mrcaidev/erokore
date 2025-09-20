@@ -1,6 +1,6 @@
 import { and } from "drizzle-orm";
-import { db } from "./client";
-import { invitationsTable } from "./schema";
+import { db } from "@/database/client";
+import { invitationsTable } from "@/database/schema";
 
 export const selectOneEnrichedInvitationByCollectionIdAndCode = async (
   collectionId: number,

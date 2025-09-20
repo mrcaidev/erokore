@@ -2,13 +2,13 @@
 
 import { revalidatePath } from "next/cache";
 import { forbidden, notFound, redirect } from "next/navigation";
-import { selectOnePersonalizedCollectionById } from "@/database/collection";
+import { selectOnePersonalizedCollectionById } from "@/repository/collection";
 import {
   insertOneCollectionItem,
   selectManyPersonalizedCollectionItemsByCollectionId,
   selectOneCollectionItemById,
   updateOneCollectionItemById,
-} from "@/database/collection-item";
+} from "@/repository/collection-item";
 import { hasPermission } from "@/utils/permission";
 import { findCurrentUser } from "./auth";
 

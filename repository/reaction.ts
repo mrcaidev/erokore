@@ -1,5 +1,5 @@
-import { db } from "./client";
-import { reactionsTable } from "./schema";
+import { db } from "@/database/client";
+import { reactionsTable } from "@/database/schema";
 
 export const upsertOneReaction = async (
   value: typeof reactionsTable.$inferInsert,

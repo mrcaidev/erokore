@@ -1,7 +1,7 @@
 import { eq } from "drizzle-orm";
+import { db } from "@/database/client";
+import { collectionsTable } from "@/database/schema";
 import type { PersonalizedCollection } from "@/database/types";
-import { db } from "./client";
-import { collectionsTable } from "./schema";
 
 export const selectOnePersonalizedCollectionById = async (
   id: number,

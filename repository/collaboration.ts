@@ -1,6 +1,6 @@
 import { eq } from "drizzle-orm";
-import { db } from "./client";
-import { collaborationsTable } from "./schema";
+import { db } from "@/database/client";
+import { collaborationsTable } from "@/database/schema";
 
 export const selectManyEnrichedCollaborationsByCollectionId = async (
   collectionId: number,

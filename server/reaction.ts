@@ -2,10 +2,10 @@
 
 import { revalidatePath } from "next/cache";
 import { notFound, redirect } from "next/navigation";
-import { selectOnePersonalizedCollectionById } from "@/database/collection";
-import { selectOneCollectionItemById } from "@/database/collection-item";
-import { upsertOneReaction } from "@/database/reaction";
 import type { Attitude } from "@/database/types";
+import { selectOnePersonalizedCollectionById } from "@/repository/collection";
+import { selectOneCollectionItemById } from "@/repository/collection-item";
+import { upsertOneReaction } from "@/repository/reaction";
 import { hasPermission } from "@/utils/permission";
 import { findCurrentUser } from "./auth";
 

@@ -1,5 +1,5 @@
-import { db } from "./client";
-import { usersTable } from "./schema";
+import { db } from "@/database/client";
+import { usersTable } from "@/database/schema";
 
 export const selectOnePrivateUserById = async (id: number) => {
   const user = await db.query.usersTable.findFirst({

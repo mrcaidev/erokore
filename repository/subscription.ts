@@ -1,6 +1,6 @@
 import { and, eq } from "drizzle-orm";
-import { db } from "./client";
-import { subscriptionsTable } from "./schema";
+import { db } from "@/database/client";
+import { subscriptionsTable } from "@/database/schema";
 
 export const insertOneSubscription = async (
   value: typeof subscriptionsTable.$inferInsert,

@@ -1,10 +1,10 @@
 import { and, eq, isNull } from "drizzle-orm";
+import { db } from "@/database/client";
+import { collectionItemsTable } from "@/database/schema";
 import type {
   CollectionItem,
   PersonalizedCollectionItem,
 } from "@/database/types";
-import { db } from "./client";
-import { collectionItemsTable } from "./schema";
 
 export const selectManyPersonalizedCollectionItemsByCollectionId = async (
   collectionId: number,

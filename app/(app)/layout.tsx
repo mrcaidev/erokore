@@ -6,11 +6,13 @@ const AppLayout = ({ children }: PropsWithChildren) => {
   return (
     <>
       {children}
-      <header className="flex justify-between items-center fixed inset-x-0 top-0 px-8 py-5 bg-background/70 backdrop-blur-lg">
-        <Link href="/" className="font-medium text-lg">
-          Erokore
-        </Link>
-        <UserMenu />
+      <header className="fixed inset-x-0 top-0 bg-background/70 backdrop-blur-lg">
+        <div className="flex justify-between items-center max-w-7xl px-8 py-5 mx-auto">
+          <Link href="/" className="font-medium text-lg">
+            Erokore
+          </Link>
+          <UserMenu />
+        </div>
       </header>
     </>
   );

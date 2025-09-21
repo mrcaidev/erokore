@@ -40,16 +40,28 @@ export type UpdateCollaboration = Partial<InsertCollaboration>;
 export type CollaborationWithCollaborator = Collaboration & {
   collaborator: PublicUser;
 };
+export type CollaborationWithCollection = Collaboration & {
+  collection: Collection;
+};
 
 export type Subscription = typeof subscriptionsTable.$inferSelect;
 export type InsertSubscription = typeof subscriptionsTable.$inferInsert;
 export type UpdateSubscription = Partial<InsertSubscription>;
+export type SubscriptionWithSubscriber = Subscription & {
+  subscriber: PublicUser;
+};
+export type SubscriptionWithCollection = Subscription & {
+  collection: Collection;
+};
 
 export type Invitation = typeof invitationsTable.$inferSelect;
 export type InsertInvitation = typeof invitationsTable.$inferInsert;
 export type UpdateInvitation = Partial<InsertInvitation>;
 export type InvitationWithInviter = Invitation & {
   inviter: PublicUser;
+};
+export type InvitationWithCollection = Invitation & {
+  collection: Collection;
 };
 
 export type CollectionItem = typeof collectionItemsTable.$inferSelect;
@@ -67,10 +79,11 @@ export type Attitude = (typeof attitudeEnum.enumValues)[number];
 export type Reaction = typeof reactionsTable.$inferSelect;
 export type InsertReaction = typeof reactionsTable.$inferInsert;
 export type UpdateReaction = Partial<InsertReaction>;
-
-export type PaginationOptions = {
-  page?: number;
-  limit?: number;
+export type ReactionWithReactor = Reaction & {
+  reactor: PublicUser;
+};
+export type ReactionWithCollectionItem = Reaction & {
+  collectionItem: CollectionItem;
 };
 
 export type SourceConfig<T = unknown> = {

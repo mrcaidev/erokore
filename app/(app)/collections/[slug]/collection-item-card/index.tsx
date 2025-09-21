@@ -54,9 +54,11 @@ export const CollectionItemCard = ({
       <div className="absolute top-2 left-2">
         <SourceBadge source={item.source} />
       </div>
-      <div className="absolute top-2 right-2">
-        <CollectionItemCardMenu item={item} />
-      </div>
+      {comparePermissionLevels(permissionLevel, "contributor") >= 0 && (
+        <div className="absolute top-2 right-2">
+          <CollectionItemCardMenu item={item} />
+        </div>
+      )}
     </div>
   );
 };

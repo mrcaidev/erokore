@@ -13,24 +13,20 @@ import { getSession } from "@/utils/session";
 import type { Collection, InsertInvitation, Invitation } from "@/utils/types";
 import { buildAuthUrl } from "@/utils/url";
 
-export type GenerateInvitationReq = {
-  collectionSlug: Collection["slug"];
-} & Pick<InsertInvitation, "permissionLevel" | "expiresAt">;
-
-export const generateInvitation = async (req: GenerateInvitationReq) => {
+export const generateInvitation = async (
+  collectionSlug: Collection["slug"],
+  value: Pick<InsertInvitation, "permissionLevel" | "expiresAt">,
+) => {
   const session = await getSession();
 
   if (!session) {
     return redirect(
-      buildAuthUrl(
-        "/sign-in",
-        `/collections/${req.collectionSlug}/collaborators`,
-      ),
+      buildAuthUrl("/sign-in", `/collections/${collectionSlug}/collaborators`),
     );
   }
 
   const collection = await selectOneCollectionWithMyPermissionLevelBySlug(
-    req.collectionSlug,
+    collectionSlug,
     session.id,
   );
 
@@ -45,8 +41,7 @@ export const generateInvitation = async (req: GenerateInvitationReq) => {
   const invitation = await insertOneInvitation({
     inviterId: session.id,
     collectionId: collection.id,
-    permissionLevel: req.permissionLevel,
-    expiresAt: req.expiresAt,
+    ...value,
   });
 
   if (!invitation) {
@@ -61,20 +56,23 @@ export type AcceptInvitationReq = {
   code: Invitation["code"];
 };
 
-export const acceptInvitation = async (req: AcceptInvitationReq) => {
+export const acceptInvitation = async (
+  collectionSlug: Collection["slug"],
+  code: Invitation["code"],
+) => {
   const session = await getSession();
 
   if (!session) {
     return redirect(
       buildAuthUrl(
         "/sign-in",
-        `/collections/${req.collectionSlug}/invite?code=${req.code}`,
+        `/collections/${collectionSlug}/invite?code=${code}`,
       ),
     );
   }
 
   const collection = await selectOneCollectionWithMyPermissionLevelBySlug(
-    req.collectionSlug,
+    collectionSlug,
     session.id,
   );
 
@@ -83,12 +81,12 @@ export const acceptInvitation = async (req: AcceptInvitationReq) => {
   }
 
   if (collection.myPermissionLevel !== null) {
-    return redirect(`/collections/${req.collectionSlug}`);
+    return redirect(`/collections/${collectionSlug}`);
   }
 
   const invitation = await selectOneInvitationByCollectionIdAndCode(
     collection.id,
-    req.code,
+    code,
   );
 
   if (!invitation) {
@@ -105,9 +103,9 @@ export const acceptInvitation = async (req: AcceptInvitationReq) => {
     permissionLevel: invitation.permissionLevel,
   });
 
-  revalidatePath(`/collections/${req.collectionSlug}`);
-  revalidatePath(`/collections/${req.collectionSlug}/collaborators`);
-  revalidatePath(`/collections/${req.collectionSlug}/invite`);
+  revalidatePath(`/collections/${collectionSlug}`);
+  revalidatePath(`/collections/${collectionSlug}/collaborators`);
+  revalidatePath(`/collections/${collectionSlug}/invite`);
 
-  return redirect(`/collections/${req.collectionSlug}`);
+  return redirect(`/collections/${collectionSlug}`);
 };

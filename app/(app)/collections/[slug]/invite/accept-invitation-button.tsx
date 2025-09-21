@@ -16,7 +16,7 @@ export const AcceptInvitationButton = () => {
 
   const handleClick = async () => {
     setPending(true);
-    const res = await acceptInvitation({ collectionSlug: slug, code });
+    const res = await acceptInvitation(slug, code);
     if (res.error) {
       toast.error(res.error);
     }

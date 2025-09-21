@@ -59,8 +59,7 @@ export const InvitationForm = ({ collection }: InvitationFormProps) => {
 
   const handleSubmit = form.handleSubmit(async (values) => {
     setPending(true);
-    const res = await generateInvitation({
-      collectionSlug: collection.slug,
+    const res = await generateInvitation(collection.slug, {
       permissionLevel: values.permissionLevel,
       expiresAt: new Date(Date.now() + values.expiresDay * 24 * 60 * 60 * 1000),
     });

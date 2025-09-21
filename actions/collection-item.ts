@@ -63,13 +63,13 @@ export const editCollectionItem = async (
   slug: CollectionItem["slug"],
   value: UpdateCollectionItem,
 ) => {
-  const session = await getSession();
-
   const collectionItem = await selectOneCollectionItemBySlug(slug);
 
   if (!collectionItem) {
     return { error: "作品不存在" };
   }
+
+  const session = await getSession();
 
   const collection = await selectOneCollectionWithMyPermissionLevelById(
     collectionItem.collectionId,
@@ -101,13 +101,13 @@ export const editCollectionItem = async (
 };
 
 export const removeCollectionItem = async (slug: CollectionItem["slug"]) => {
-  const session = await getSession();
-
   const collectionItem = await selectOneCollectionItemBySlug(slug);
 
   if (!collectionItem) {
     return { error: "作品不存在" };
   }
+
+  const session = await getSession();
 
   const collection = await selectOneCollectionWithMyPermissionLevelById(
     collectionItem.collectionId,

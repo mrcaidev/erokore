@@ -2,6 +2,7 @@
 
 import { ThumbsDownIcon, ThumbsUpIcon } from "lucide-react";
 import { startTransition, useOptimistic } from "react";
+import { toast } from "sonner";
 import { showAttitudeTowardsCollectionItem } from "@/actions/reaction";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/components/ui/utils";
@@ -26,7 +27,10 @@ export const AttitudeButtonGroup = ({ item }: AttitudeButtonGroupProps) => {
       setOptimisticAttitude(newAttitude);
     });
 
-    await showAttitudeTowardsCollectionItem(item.slug, newAttitude);
+    const res = await showAttitudeTowardsCollectionItem(item.slug, newAttitude);
+    if (res?.error) {
+      toast.error(res.error);
+    }
   };
 
   const handleClickDislike = async () => {
@@ -36,7 +40,10 @@ export const AttitudeButtonGroup = ({ item }: AttitudeButtonGroupProps) => {
       setOptimisticAttitude(newAttitude);
     });
 
-    await showAttitudeTowardsCollectionItem(item.slug, newAttitude);
+    const res = await showAttitudeTowardsCollectionItem(item.slug, newAttitude);
+    if (res?.error) {
+      toast.error(res.error);
+    }
   };
 
   return (

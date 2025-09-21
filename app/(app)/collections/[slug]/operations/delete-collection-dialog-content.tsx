@@ -2,6 +2,7 @@
 
 import { Loader2Icon, TrashIcon, XIcon } from "lucide-react";
 import { useState } from "react";
+import { toast } from "sonner";
 import { removeCollection } from "@/actions/collection";
 import { Button } from "@/components/ui/button";
 import {
@@ -25,7 +26,10 @@ export const DeleteCollectionDialogContent = ({
 
   const handleClick = async () => {
     setPending(true);
-    await removeCollection(collection.slug);
+    const res = await removeCollection(collection.slug);
+    if (res.error) {
+      toast.error(res.error);
+    }
     setPending(false);
   };
 

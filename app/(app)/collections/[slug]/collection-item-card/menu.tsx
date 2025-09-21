@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import { useParams } from "next/navigation";
 import { useState } from "react";
+import { toast } from "sonner";
 import { removeCollectionItem } from "@/actions/collection-item";
 import { CollectionItemFormDialogContent } from "@/components/collection-item-form-dialog-content";
 import { Button } from "@/components/ui/button";
@@ -43,9 +44,13 @@ const DeleteCollectionItemDialogContent = ({
 
   const handleClick = async () => {
     setPending(true);
-    await removeCollectionItem(item.slug);
+    const res = await removeCollectionItem(item.slug);
+    if (res?.error) {
+      toast.error(res.error);
+    } else {
+      closeDialog();
+    }
     setPending(false);
-    closeDialog();
   };
 
   return (

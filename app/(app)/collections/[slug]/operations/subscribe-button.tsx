@@ -2,6 +2,7 @@
 
 import { EyeIcon, EyeOffIcon } from "lucide-react";
 import { startTransition, useOptimistic } from "react";
+import { toast } from "sonner";
 import {
   subscribeToCollection,
   unsubscribeFromCollection,
@@ -29,7 +30,10 @@ export const SubscribeButton = ({ collection }: SubscribeButtonProps) => {
     const action = subscribed
       ? unsubscribeFromCollection
       : subscribeToCollection;
-    await action(collection.slug);
+    const res = await action(collection.slug);
+    if (res?.error) {
+      toast.error(res.error);
+    }
   };
 
   return (

@@ -1,5 +1,6 @@
 import { forbidden, notFound } from "next/navigation";
 import { cache } from "react";
+import { Paginator } from "@/components/paginator";
 import {
   Accordion,
   AccordionContent,
@@ -9,14 +10,18 @@ import {
 import { UserAvatar } from "@/components/user-avatar";
 import { selectManyCollaboratorEnrichedCollaborationsByCollectionId } from "@/database/collaboration";
 import { selectOnePersonalizedCollectionBySlug } from "@/database/collection";
-import { selectManyPersonalizedCollectionItemsByCollectionId } from "@/database/collection-item";
+import {
+  countCollectionItemsByCollectionId,
+  selectManyPersonalizedCollectionItemsByCollectionId,
+} from "@/database/collection-item";
 import { evaluatePermissionLevel, hasPermission } from "@/utils/permission";
 import { getSession } from "@/utils/session";
+import { normalizePage } from "@/utils/url";
 import { CollaboratorList } from "./collaborator-list";
 import { CollectionItemList } from "./collection-item-list";
 import { Operations } from "./operations";
 
-const fetchPageData = cache(async (slug: string) => {
+const fetchPageData = cache(async (slug: string, page: number) => {
   const session = await getSession();
 
   const collection = await selectOnePersonalizedCollectionBySlug(
@@ -32,28 +37,33 @@ const fetchPageData = cache(async (slug: string) => {
     return forbidden();
   }
 
-  const collectionItems =
-    await selectManyPersonalizedCollectionItemsByCollectionId(
-      collection.id,
-      session?.id,
-    );
+  const [collectionItemsTotal, collectionItems, collaborations] =
+    await Promise.all([
+      countCollectionItemsByCollectionId(collection.id),
+      selectManyPersonalizedCollectionItemsByCollectionId(
+        collection.id,
+        session?.id,
+        { limit: 2, offset: (page - 1) * 2 },
+      ),
+      selectManyCollaboratorEnrichedCollaborationsByCollectionId(collection.id),
+    ]);
 
-  const collaborations =
-    await selectManyCollaboratorEnrichedCollaborationsByCollectionId(
-      collection.id,
-    );
-
-  return { collection, collectionItems, collaborations };
+  return { collection, collectionItemsTotal, collectionItems, collaborations };
 });
 
 export type CollectionPageProps = {
   params: Promise<{ slug: string }>;
+  searchParams: Promise<{ page?: string }>;
 };
 
-const CollectionPage = async ({ params }: CollectionPageProps) => {
+const CollectionPage = async ({
+  params,
+  searchParams,
+}: CollectionPageProps) => {
   const { slug } = await params;
-  const { collection, collectionItems, collaborations } =
-    await fetchPageData(slug);
+  const { page } = await searchParams;
+  const { collection, collectionItemsTotal, collectionItems, collaborations } =
+    await fetchPageData(slug, normalizePage(page));
 
   if (!collection) {
     return notFound();
@@ -70,10 +80,15 @@ const CollectionPage = async ({ params }: CollectionPageProps) => {
         <Operations collection={collection} />
       </div>
       <div className="grid grid-cols-1 md:grid-cols-[1fr_280px] lg:grid-cols-[1fr_360px] gap-x-8">
-        <div className="order-2 md:order-1">
+        <div className="space-y-3 order-2 md:order-1">
           <CollectionItemList
             collectionItems={collectionItems}
             permissionLevel={evaluatePermissionLevel(collection)}
+          />
+          <Paginator
+            total={collectionItemsTotal}
+            page={normalizePage(page)}
+            pageSize={2}
           />
         </div>
         <Accordion

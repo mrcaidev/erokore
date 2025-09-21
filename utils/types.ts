@@ -86,6 +86,21 @@ export type CollectionItemEnrichedReaction = Reaction & {
   collectionItem: CollectionItem;
 };
 
+export type LimitOffsetOptions = {
+  limit?: number;
+  offset?: number;
+};
+
+export type SortOptions<T extends string> = {
+  sortBy?: T;
+  sortOrder?: "asc" | "desc";
+};
+
+export type PaginationOptions = {
+  page: number;
+  pageSize: number;
+};
+
 export type SourceConfig<T = unknown> = {
   source: string;
   name?: string;

@@ -1,16 +1,33 @@
-import { eq } from "drizzle-orm";
+import { and, count, eq, isNull } from "drizzle-orm";
 import type {
   CollectionItem,
   InsertCollectionItem,
+  LimitOffsetOptions,
   UpdateCollectionItem,
   User,
 } from "@/utils/types";
 import { db } from "./client";
 import { collectionItemsTable } from "./schema";
 
+export const countCollectionItemsByCollectionId = async (
+  collectionId: CollectionItem["collectionId"],
+) => {
+  const rows = await db
+    .select({ count: count() })
+    .from(collectionItemsTable)
+    .where(
+      and(
+        eq(collectionItemsTable.collectionId, collectionId),
+        isNull(collectionItemsTable.deletedAt),
+      ),
+    );
+  return rows[0]?.count ?? 0;
+};
+
 export const selectManyPersonalizedCollectionItemsByCollectionId = async (
   collectionId: CollectionItem["collectionId"],
   userId: User["id"] | undefined,
+  options: LimitOffsetOptions = {},
 ) => {
   const rows = await db.query.collectionItemsTable.findMany({
     with: {
@@ -49,6 +66,8 @@ export const selectManyPersonalizedCollectionItemsByCollectionId = async (
     orderBy: (collectionItemsTable, { desc }) => [
       desc(collectionItemsTable.createdAt),
     ],
+    limit: options.limit,
+    offset: options.offset,
   });
 
   return rows.map((row) => {

@@ -8,6 +8,7 @@ import {
   insertOneInvitation,
   selectOneInvitationByCollectionIdAndCode,
 } from "@/database/invitation";
+import { insertOneSubscription } from "@/database/subscription";
 import { hasPermission } from "@/utils/permission";
 import { getSession } from "@/utils/session";
 import type { Collection, InsertInvitation, Invitation } from "@/utils/types";
@@ -97,11 +98,17 @@ export const acceptInvitation = async (
     return { error: "邀请已过期" };
   }
 
-  await insertOneCollaboration({
-    collaboratorId: session.id,
-    collectionId: collection.id,
-    permissionLevel: invitation.permissionLevel,
-  });
+  await Promise.all([
+    insertOneCollaboration({
+      collaboratorId: session.id,
+      collectionId: collection.id,
+      permissionLevel: invitation.permissionLevel,
+    }),
+    insertOneSubscription({
+      subscriberId: session.id,
+      collectionId: collection.id,
+    }),
+  ]);
 
   revalidatePath(`/collections/${collectionSlug}`);
   revalidatePath(`/collections/${collectionSlug}/collaborators`);

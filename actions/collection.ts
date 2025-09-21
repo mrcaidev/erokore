@@ -16,6 +16,7 @@ import type {
   InsertCollection,
   UpdateCollection,
 } from "@/utils/types";
+import { buildAuthUrl } from "@/utils/url";
 
 export const createCollection = async (
   value: Pick<
@@ -29,9 +30,7 @@ export const createCollection = async (
   const session = await getSession();
 
   if (!session) {
-    return redirect(
-      `/sign-in?next=${encodeURIComponent("/collections/create")}`,
-    );
+    return redirect(buildAuthUrl("/sign-in", "/collections/create"));
   }
 
   const collection = await insertOneCollection({
@@ -68,9 +67,7 @@ export const editCollection = async (
   const session = await getSession();
 
   if (!session) {
-    return redirect(
-      `/sign-in?next=${encodeURIComponent(`/collections/${slug}/edit`)}`,
-    );
+    return redirect(buildAuthUrl("/sign-in", `/collections/${slug}/edit`));
   }
 
   const collection = await selectOneCollectionWithMyPermissionLevelBySlug(
@@ -100,9 +97,7 @@ export const removeCollection = async (slug: Collection["slug"]) => {
   const session = await getSession();
 
   if (!session) {
-    return redirect(
-      `/sign-in?next=${encodeURIComponent(`/collections/${slug}`)}`,
-    );
+    return redirect(buildAuthUrl("/sign-in", `/collections/${slug}`));
   }
 
   const collection = await selectOneCollectionWithMyPermissionLevelBySlug(

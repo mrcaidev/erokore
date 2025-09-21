@@ -2,14 +2,13 @@ import { redirect } from "next/navigation";
 import { cache } from "react";
 import { CollectionForm } from "@/components/collection-form";
 import { getSession } from "@/utils/session";
+import { buildAuthUrl } from "@/utils/url";
 
 const fetchPageData = cache(async () => {
   const session = await getSession();
 
   if (!session) {
-    return redirect(
-      `/sign-in?next=${encodeURIComponent(`/collections/create`)}`,
-    );
+    return redirect(buildAuthUrl("/sign-in", `/collections/create`));
   }
 
   return undefined;

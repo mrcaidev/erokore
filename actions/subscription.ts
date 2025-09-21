@@ -10,6 +10,7 @@ import {
 import { hasPermission } from "@/utils/permission";
 import { getSession } from "@/utils/session";
 import type { Collection } from "@/utils/types";
+import { buildAuthUrl } from "@/utils/url";
 
 export const subscribeToCollection = async (
   collectionSlug: Collection["slug"],
@@ -17,9 +18,7 @@ export const subscribeToCollection = async (
   const session = await getSession();
 
   if (!session) {
-    return redirect(
-      `/sign-in?next=${encodeURIComponent(`/collections/${collectionSlug}`)}`,
-    );
+    return redirect(buildAuthUrl("/sign-in", `/collections/${collectionSlug}`));
   }
 
   const collection = await selectOneCollectionWithMyPermissionLevelBySlug(
@@ -51,9 +50,7 @@ export const unsubscribeFromCollection = async (
   const session = await getSession();
 
   if (!session) {
-    return redirect(
-      `/sign-in?next=${encodeURIComponent(`/collections/${collectionSlug}`)}`,
-    );
+    return redirect(buildAuthUrl("/sign-in", `/collections/${collectionSlug}`));
   }
 
   const collection = await selectOneCollectionWithMyPermissionLevelBySlug(

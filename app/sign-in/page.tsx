@@ -1,5 +1,6 @@
 import type { Route } from "next";
 import Link from "next/link";
+import { buildAuthUrl } from "@/utils/url";
 import { SignInForm } from "./form";
 
 export type SignInPageProps = {
@@ -7,7 +8,7 @@ export type SignInPageProps = {
 };
 
 const SignInPage = async ({ searchParams }: SignInPageProps) => {
-  const { next = "/" } = await searchParams;
+  const { next } = await searchParams;
 
   return (
     <main className="grid place-items-center h-screen">
@@ -17,7 +18,7 @@ const SignInPage = async ({ searchParams }: SignInPageProps) => {
         <div className="text-sm text-muted-foreground text-center">
           还没有账号？
           <Link
-            href={`/sign-up?next=${encodeURIComponent(next)}`}
+            href={buildAuthUrl("/sign-up", next)}
             className="underline underline-offset-4"
           >
             注册

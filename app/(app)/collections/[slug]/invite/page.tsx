@@ -11,6 +11,7 @@ import {
   PERMISSION_LEVEL_LABEL_MAP,
 } from "@/utils/permission";
 import { getSession } from "@/utils/session";
+import { buildAuthUrl } from "@/utils/url";
 import { AcceptInvitationButton } from "./accept-invitation-button";
 
 const fetchPageData = cache(async (slug: string, code: string) => {
@@ -18,7 +19,7 @@ const fetchPageData = cache(async (slug: string, code: string) => {
 
   if (!session) {
     return redirect(
-      `/sign-in?next=${encodeURIComponent(`/collections/${slug}/invite?code=${code}`)}`,
+      buildAuthUrl("/sign-in", `/collections/${slug}/invite?code=${code}`),
     );
   }
 

@@ -11,6 +11,7 @@ import {
 import { hasPermission } from "@/utils/permission";
 import { getSession } from "@/utils/session";
 import type { Collection, InsertInvitation, Invitation } from "@/utils/types";
+import { buildAuthUrl } from "@/utils/url";
 
 export type GenerateInvitationReq = {
   collectionSlug: Collection["slug"];
@@ -21,7 +22,10 @@ export const generateInvitation = async (req: GenerateInvitationReq) => {
 
   if (!session) {
     return redirect(
-      `/sign-in?next=${encodeURIComponent(`/collections/${req.collectionSlug}/collaborators`)}`,
+      buildAuthUrl(
+        "/sign-in",
+        `/collections/${req.collectionSlug}/collaborators`,
+      ),
     );
   }
 
@@ -62,7 +66,10 @@ export const acceptInvitation = async (req: AcceptInvitationReq) => {
 
   if (!session) {
     return redirect(
-      `/sign-in?next=${encodeURIComponent(`/collections/${req.collectionSlug}/invite?code=${req.code}`)}`,
+      buildAuthUrl(
+        "/sign-in",
+        `/collections/${req.collectionSlug}/invite?code=${req.code}`,
+      ),
     );
   }
 

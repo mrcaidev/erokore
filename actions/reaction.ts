@@ -8,6 +8,7 @@ import { upsertOneReaction } from "@/database/reaction";
 import { hasPermission } from "@/utils/permission";
 import { getSession } from "@/utils/session";
 import type { CollectionItem, Reaction } from "@/utils/types";
+import { buildAuthUrl } from "@/utils/url";
 
 export const showAttitudeTowardsCollectionItem = async (
   collectionItemSlug: CollectionItem["slug"],
@@ -33,7 +34,7 @@ export const showAttitudeTowardsCollectionItem = async (
 
   if (!session) {
     return redirect(
-      `/sign-in?next=${encodeURIComponent(`/collections/${collection.slug}`)}`,
+      buildAuthUrl("/sign-in", `/collections/${collection.slug}`),
     );
   }
 

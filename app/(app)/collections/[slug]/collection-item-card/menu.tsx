@@ -7,8 +7,9 @@ import {
   TrashIcon,
   XIcon,
 } from "lucide-react";
+import { useParams } from "next/navigation";
 import { useState } from "react";
-import { deleteCollectionItem } from "@/actions/collection-item";
+import { removeCollectionItem } from "@/actions/collection-item";
 import { CollectionItemFormDialogContent } from "@/components/collection-item-form-dialog-content";
 import { Button } from "@/components/ui/button";
 import {
@@ -27,10 +28,10 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import type { FullCollectionItem } from "@/database/types";
+import type { PersonalizedCollectionItem } from "@/utils/types";
 
 export type DeleteCollectionItemDialogContentProps = {
-  item: FullCollectionItem;
+  item: PersonalizedCollectionItem;
   closeDialog: () => void;
 };
 
@@ -42,7 +43,7 @@ const DeleteCollectionItemDialogContent = ({
 
   const handleClick = async () => {
     setPending(true);
-    await deleteCollectionItem(item.id);
+    await removeCollectionItem(item.slug);
     setPending(false);
     closeDialog();
   };
@@ -72,12 +73,14 @@ const DeleteCollectionItemDialogContent = ({
 };
 
 export type CollectionItemCardMenuProps = {
-  item: FullCollectionItem;
+  item: PersonalizedCollectionItem;
 };
 
 export const CollectionItemCardMenu = ({
   item,
 }: CollectionItemCardMenuProps) => {
+  const { slug } = useParams<{ slug: string }>();
+
   const [dialogOpen, setDialogOpen] = useState(false);
   const [dialogType, setDialogType] = useState<"edit" | "delete">("edit");
 
@@ -110,7 +113,7 @@ export const CollectionItemCardMenu = ({
       </DropdownMenu>
       {dialogType === "edit" && (
         <CollectionItemFormDialogContent
-          collectionId={item.collectionId}
+          collectionSlug={slug}
           mode="edit"
           collectionItem={item}
           closeDialog={() => setDialogOpen(false)}

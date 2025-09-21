@@ -1,11 +1,16 @@
 import { eq } from "drizzle-orm";
-import { db } from "@/database/client";
-import { collaborationsTable } from "@/database/schema";
+import type {
+  Collaboration,
+  InsertCollaboration,
+  UpdateCollaboration,
+} from "@/utils/types";
+import { db } from "./client";
+import { collaborationsTable } from "./schema";
 
-export const selectManyEnrichedCollaborationsByCollectionId = async (
-  collectionId: number,
+export const selectManyCollaborationsWithCollaboratorByCollectionId = async (
+  collectionId: Collaboration["collectionId"],
 ) => {
-  const collaborators = await db.query.collaborationsTable.findMany({
+  const collaborations = await db.query.collaborationsTable.findMany({
     with: {
       collaborator: {
         columns: {
@@ -23,19 +28,17 @@ export const selectManyEnrichedCollaborationsByCollectionId = async (
       asc(collaborationsTable.createdAt),
     ],
   });
-  return collaborators;
+  return collaborations;
 };
 
-export const selectOneCollaborationById = async (id: number) => {
+export const selectOneCollaborationById = async (id: Collaboration["id"]) => {
   const collaboration = await db.query.collaborationsTable.findFirst({
     where: (collaborationsTable, { eq }) => eq(collaborationsTable.id, id),
   });
   return collaboration;
 };
 
-export const insertOneCollaboration = async (
-  value: typeof collaborationsTable.$inferInsert,
-) => {
+export const insertOneCollaboration = async (value: InsertCollaboration) => {
   const [collaboration] = await db
     .insert(collaborationsTable)
     .values(value)
@@ -44,17 +47,15 @@ export const insertOneCollaboration = async (
 };
 
 export const updateOneCollaborationById = async (
-  id: number,
-  value: Partial<typeof collaborationsTable.$inferInsert>,
+  id: Collaboration["id"],
+  value: UpdateCollaboration,
 ) => {
-  const [collaboration] = await db
+  await db
     .update(collaborationsTable)
     .set(value)
-    .where(eq(collaborationsTable.id, id))
-    .returning();
-  return collaboration;
+    .where(eq(collaborationsTable.id, id));
 };
 
-export const deleteOneCollaborationById = async (id: number) => {
+export const deleteOneCollaborationById = async (id: Collaboration["id"]) => {
   await db.delete(collaborationsTable).where(eq(collaborationsTable.id, id));
 };

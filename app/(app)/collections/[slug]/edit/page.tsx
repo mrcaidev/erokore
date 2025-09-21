@@ -1,14 +1,14 @@
 import { forbidden, notFound } from "next/navigation";
 import { cache } from "react";
 import { CollectionForm } from "@/components/collection-form";
-import { selectOnePersonalizedCollectionBySlug } from "@/repository/collection";
+import { selectOneCollectionWithMyPermissionLevelBySlug } from "@/database/collection";
 import { hasPermission } from "@/utils/permission";
 import { getSession } from "@/utils/session";
 
 const fetchPageData = cache(async (slug: string) => {
   const session = await getSession();
 
-  const collection = await selectOnePersonalizedCollectionBySlug(
+  const collection = await selectOneCollectionWithMyPermissionLevelBySlug(
     slug,
     session?.id,
   );

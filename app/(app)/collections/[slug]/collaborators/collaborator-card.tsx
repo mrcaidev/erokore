@@ -11,22 +11,22 @@ import { PermissionLevelBadge } from "@/components/permission-level-badge";
 import { PermissionLevelSelect } from "@/components/permission-level-select";
 import { Button } from "@/components/ui/button";
 import { UserAvatar } from "@/components/user-avatar";
-import type {
-  DefaultablePermissionLevel,
-  FullCollaboration,
-  FullCollection,
-} from "@/database/types";
 import {
   comparePermissionLevels,
   evaluatePermissionLevel,
   hasPermission,
   PERMISSION_LEVEL_LABEL_MAP,
 } from "@/utils/permission";
+import type {
+  CollaborationWithCollaborator,
+  DefaultablePermissionLevel,
+  PersonalizedCollection,
+} from "@/utils/types";
 
 export type CollaboratorCardProps = {
   currentUserId: number;
-  collection: FullCollection;
-  collaboration: FullCollaboration;
+  collection: PersonalizedCollection;
+  collaboration: CollaborationWithCollaborator;
 };
 
 export const CollaboratorCard = ({
@@ -35,10 +35,7 @@ export const CollaboratorCard = ({
   collaboration,
 }: CollaboratorCardProps) => {
   const handleChange = async (value: DefaultablePermissionLevel) => {
-    const res = await alterPermissionLevel({
-      collaborationId: collaboration.id,
-      permissionLevel: value,
-    });
+    const res = await alterPermissionLevel(collaboration.id, value);
     if (res?.error) {
       toast.error(res.error);
     }

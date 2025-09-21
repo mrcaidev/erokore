@@ -1,14 +1,17 @@
 import { ImageOffIcon } from "lucide-react";
 import Image from "next/image";
 import { UserAvatar } from "@/components/user-avatar";
-import type { FullCollectionItem, PermissionLevel } from "@/database/types";
 import { comparePermissionLevels } from "@/utils/permission";
+import type {
+  PermissionLevel,
+  PersonalizedCollectionItem,
+} from "@/utils/types";
 import { AttitudeButtonGroup } from "./attitude-button-group";
 import { CollectionItemCardMenu } from "./menu";
 import { SourceBadge } from "./source-badge";
 
 export type CollectionItemCardProps = {
-  item: FullCollectionItem;
+  item: PersonalizedCollectionItem;
   permissionLevel: PermissionLevel;
 };
 

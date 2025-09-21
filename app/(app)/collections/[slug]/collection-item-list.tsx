@@ -1,8 +1,11 @@
-import type { FullCollectionItem, PermissionLevel } from "@/database/types";
+import type {
+  PermissionLevel,
+  PersonalizedCollectionItem,
+} from "@/utils/types";
 import { CollectionItemCard } from "./collection-item-card";
 
 export type CollectionItemList = {
-  collectionItems: FullCollectionItem[];
+  collectionItems: PersonalizedCollectionItem[];
   permissionLevel: PermissionLevel;
 };
 

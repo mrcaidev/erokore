@@ -1,112 +1,84 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { forbidden, notFound, redirect } from "next/navigation";
-import { selectOnePersonalizedCollectionById } from "@/repository/collection";
+import { redirect } from "next/navigation";
+import {
+  selectOneCollectionWithMyPermissionLevelById,
+  selectOneCollectionWithMyPermissionLevelBySlug,
+} from "@/database/collection";
 import {
   insertOneCollectionItem,
-  selectOneCollectionItemById,
+  selectOneCollectionItemBySlug,
   updateOneCollectionItemById,
-} from "@/repository/collection-item";
+} from "@/database/collection-item";
 import { hasPermission } from "@/utils/permission";
 import { getSession } from "@/utils/session";
-
-export type CreateCollectionItemRequest = {
-  collectionId: number;
-  source: string;
-  title: string;
-  description: string;
-  url: string;
-  coverUrl: string;
-};
+import type {
+  Collection,
+  CollectionItem,
+  InsertCollectionItem,
+  UpdateCollectionItem,
+} from "@/utils/types";
 
 export const createCollectionItem = async (
-  req: CreateCollectionItemRequest,
+  collectionSlug: Collection["slug"],
+  value: Pick<
+    InsertCollectionItem,
+    "source" | "title" | "description" | "url" | "coverUrl"
+  >,
 ) => {
   const session = await getSession();
 
-  const collection = await selectOnePersonalizedCollectionById(
-    req.collectionId,
-    session?.id,
-  );
-
-  if (!collection) {
-    return notFound();
-  }
-
   if (!session) {
     return redirect(
-      `/sign-in?next=${encodeURIComponent(`/collections/${collection.slug}`)}`,
+      `/sign-in?next=${encodeURIComponent(`/collections/${collectionSlug}`)}`,
     );
   }
 
+  const collection = await selectOneCollectionWithMyPermissionLevelBySlug(
+    collectionSlug,
+    session.id,
+  );
+
+  if (!collection) {
+    return { error: "作品集不存在" };
+  }
+
   if (!hasPermission(collection, "contributor")) {
-    return forbidden();
+    return { error: "没有权限" };
   }
 
   await insertOneCollectionItem({
-    ...req,
+    collectionId: collection.id,
+    ...value,
     creatorId: session.id,
     updaterId: session.id,
   });
 
   revalidatePath(`/collections/${collection.slug}`);
+
+  return undefined;
 };
 
-export type EditCollectionItemRequest = CreateCollectionItemRequest & {
-  id: number;
-};
-
-export const editCollectionItem = async (req: EditCollectionItemRequest) => {
+export const editCollectionItem = async (
+  slug: CollectionItem["slug"],
+  value: UpdateCollectionItem,
+) => {
   const session = await getSession();
 
-  const collection = await selectOnePersonalizedCollectionById(
-    req.collectionId,
-    session?.id,
-  );
-
-  if (!collection) {
-    return notFound();
-  }
-
-  if (!session) {
-    return redirect(
-      `/sign-in?next=${encodeURIComponent(`/collections/${collection.slug}`)}`,
-    );
-  }
-
-  if (!hasPermission(collection, "contributor")) {
-    return forbidden();
-  }
-
-  await updateOneCollectionItemById(req.id, {
-    source: req.source,
-    title: req.title,
-    description: req.description,
-    url: req.url,
-    coverUrl: req.coverUrl,
-    updaterId: session.id,
-  });
-
-  revalidatePath(`/collections/${collection.slug}`);
-};
-
-export const deleteCollectionItem = async (id: number) => {
-  const session = await getSession();
-
-  const collectionItem = await selectOneCollectionItemById(id);
+  const collectionItem = await selectOneCollectionItemBySlug(slug);
 
   if (!collectionItem) {
-    return notFound();
+    return { error: "作品不存在" };
   }
 
-  const collection = await selectOnePersonalizedCollectionById(
+  const collection = await selectOneCollectionWithMyPermissionLevelById(
     collectionItem.collectionId,
     session?.id,
   );
 
   if (!collection) {
-    return notFound();
+    return { error: "作品集不存在" };
   }
 
   if (!session) {
@@ -116,13 +88,53 @@ export const deleteCollectionItem = async (id: number) => {
   }
 
   if (!hasPermission(collection, "contributor")) {
-    return forbidden();
+    return { error: "没有权限" };
   }
 
-  await updateOneCollectionItemById(id, {
+  await updateOneCollectionItemById(collectionItem.id, {
+    ...value,
+    updaterId: session.id,
+  });
+
+  revalidatePath(`/collections/${collection.slug}`);
+
+  return undefined;
+};
+
+export const removeCollectionItem = async (slug: CollectionItem["slug"]) => {
+  const session = await getSession();
+
+  const collectionItem = await selectOneCollectionItemBySlug(slug);
+
+  if (!collectionItem) {
+    return { error: "作品不存在" };
+  }
+
+  const collection = await selectOneCollectionWithMyPermissionLevelById(
+    collectionItem.collectionId,
+    session?.id,
+  );
+
+  if (!collection) {
+    return { error: "作品集不存在" };
+  }
+
+  if (!session) {
+    return redirect(
+      `/sign-in?next=${encodeURIComponent(`/collections/${collection.slug}`)}`,
+    );
+  }
+
+  if (!hasPermission(collection, "contributor")) {
+    return { error: "没有权限" };
+  }
+
+  await updateOneCollectionItemById(collectionItem.id, {
     deletedAt: new Date(),
     deleterId: session.id,
   });
 
   revalidatePath(`/collections/${collection.slug}`);
+
+  return undefined;
 };

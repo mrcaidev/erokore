@@ -1,91 +1,112 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { notFound } from "next/navigation";
-import type { DefaultablePermissionLevel } from "@/database/types";
+import { redirect } from "next/navigation";
 import {
   deleteOneCollaborationById,
   selectOneCollaborationById,
   updateOneCollaborationById,
-} from "@/repository/collaboration";
-import { selectOnePersonalizedCollectionById } from "@/repository/collection";
+} from "@/database/collaboration";
+import { selectOneCollectionWithMyPermissionLevelById } from "@/database/collection";
 import {
   comparePermissionLevels,
   evaluatePermissionLevel,
   hasPermission,
 } from "@/utils/permission";
 import { getSession } from "@/utils/session";
-
-export type AlterPermissionLevelRequest = {
-  collaborationId: number;
-  permissionLevel: DefaultablePermissionLevel;
-};
+import type { Collaboration, DefaultablePermissionLevel } from "@/utils/types";
 
 export const alterPermissionLevel = async (
-  req: AlterPermissionLevelRequest,
+  collaborationId: Collaboration["id"],
+  permissionLevel: DefaultablePermissionLevel,
 ) => {
-  const collaboration = await selectOneCollaborationById(req.collaborationId);
+  const collaboration = await selectOneCollaborationById(collaborationId);
 
   if (!collaboration) {
-    return { error: "该协作者已被移除" };
+    return { error: "协作者不存在" };
   }
 
   const session = await getSession();
-  const collection = await selectOnePersonalizedCollectionById(
+
+  const collection = await selectOneCollectionWithMyPermissionLevelById(
     collaboration.collectionId,
     session?.id,
   );
 
   if (!collection) {
-    return notFound();
+    return { error: "作品集不存在" };
+  }
+
+  if (!session) {
+    return redirect(
+      `/sign-in?next=${encodeURIComponent(`/collections/${collection.slug}`)}`,
+    );
   }
 
   if (!hasPermission(collection, "admin")) {
-    return { error: "没有权限更改" };
+    return { error: "没有权限" };
   }
 
-  await updateOneCollaborationById(req.collaborationId, {
-    permissionLevel: req.permissionLevel,
-  });
+  const myPermissionLevel = evaluatePermissionLevel(collection);
+  const theirPermissionLevel =
+    collaboration.permissionLevel === "default"
+      ? collection.collaboratorPermissionLevel
+      : collaboration.permissionLevel;
+
+  if (comparePermissionLevels(myPermissionLevel, theirPermissionLevel) <= 0) {
+    return { error: "没有权限" };
+  }
+
+  await updateOneCollaborationById(collaborationId, { permissionLevel });
 
   revalidatePath(`/collections/${collection.slug}/collaborators`);
 
   return undefined;
 };
 
-export const removeCollaboration = async (collaborationId: number) => {
+export const removeCollaboration = async (
+  collaborationId: Collaboration["id"],
+) => {
   const collaboration = await selectOneCollaborationById(collaborationId);
 
   if (!collaboration) {
-    return { error: "该协作者已被删除" };
+    return { error: "协作者不存在" };
   }
 
   const session = await getSession();
-  const collection = await selectOnePersonalizedCollectionById(
+
+  const collection = await selectOneCollectionWithMyPermissionLevelById(
     collaboration.collectionId,
     session?.id,
   );
 
   if (!collection) {
-    return notFound();
+    return { error: "作品集不存在" };
+  }
+
+  if (!session) {
+    return redirect(
+      `/sign-in?next=${encodeURIComponent(`/collections/${collection.slug}`)}`,
+    );
   }
 
   if (!hasPermission(collection, "admin")) {
-    return { error: "没有权限移除" };
+    return { error: "没有权限" };
   }
 
   const myPermissionLevel = evaluatePermissionLevel(collection);
-  const targetPermissionLevel =
+  const theirPermissionLevel =
     collaboration.permissionLevel === "default"
       ? collection.collaboratorPermissionLevel
       : collaboration.permissionLevel;
 
-  if (comparePermissionLevels(myPermissionLevel, targetPermissionLevel) <= 0) {
-    return { error: "没有权限移除" };
+  if (comparePermissionLevels(myPermissionLevel, theirPermissionLevel) <= 0) {
+    return { error: "没有权限" };
   }
 
-  await deleteOneCollaborationById(collaboration.id);
+  await deleteOneCollaborationById(collaborationId);
 
+  revalidatePath(`/collections/${collection.slug}`);
   revalidatePath(`/collections/${collection.slug}/collaborators`);
 
   return undefined;

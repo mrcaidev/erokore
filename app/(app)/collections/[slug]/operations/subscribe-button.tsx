@@ -7,14 +7,14 @@ import {
   unsubscribeFromCollection,
 } from "@/actions/subscription";
 import { Button } from "@/components/ui/button";
-import type { FullCollection } from "@/database/types";
+import type { PersonalizedCollection } from "@/utils/types";
 
 export type SubscribeButtonProps = {
-  collection: FullCollection;
+  collection: PersonalizedCollection;
 };
 
 export const SubscribeButton = ({ collection }: SubscribeButtonProps) => {
-  const subscribed = collection.my.subscribed;
+  const subscribed = collection.mySubscribed;
 
   const [optimisticSubscribed, toggleOptimisticSubscribed] = useOptimistic<
     boolean,
@@ -29,7 +29,7 @@ export const SubscribeButton = ({ collection }: SubscribeButtonProps) => {
     const action = subscribed
       ? unsubscribeFromCollection
       : subscribeToCollection;
-    await action(collection.id);
+    await action(collection.slug);
   };
 
   return (

@@ -2,17 +2,17 @@
 
 import { ThumbsDownIcon, ThumbsUpIcon } from "lucide-react";
 import { startTransition, useOptimistic } from "react";
-import { reactToCollectionItem } from "@/actions/reaction";
+import { showAttitudeTowardsCollectionItem } from "@/actions/reaction";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/components/ui/utils";
-import type { Attitude, FullCollectionItem } from "@/database/types";
+import type { Attitude, PersonalizedCollectionItem } from "@/utils/types";
 
 export type AttitudeButtonGroupProps = {
-  item: FullCollectionItem;
+  item: PersonalizedCollectionItem;
 };
 
 export const AttitudeButtonGroup = ({ item }: AttitudeButtonGroupProps) => {
-  const attitude = item.my.attitude;
+  const attitude = item.myAttitude;
 
   const [optimisticAttitude, setOptimisticAttitude] = useOptimistic<
     Attitude | null,
@@ -26,10 +26,7 @@ export const AttitudeButtonGroup = ({ item }: AttitudeButtonGroupProps) => {
       setOptimisticAttitude(newAttitude);
     });
 
-    await reactToCollectionItem({
-      collectionItemId: item.id,
-      attitude: newAttitude,
-    });
+    await showAttitudeTowardsCollectionItem(item.slug, newAttitude);
   };
 
   const handleClickDislike = async () => {
@@ -39,10 +36,7 @@ export const AttitudeButtonGroup = ({ item }: AttitudeButtonGroupProps) => {
       setOptimisticAttitude(newAttitude);
     });
 
-    await reactToCollectionItem({
-      collectionItemId: item.id,
-      attitude: newAttitude,
-    });
+    await showAttitudeTowardsCollectionItem(item.slug, newAttitude);
   };
 
   return (

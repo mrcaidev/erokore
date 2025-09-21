@@ -8,8 +8,10 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import * as v from "valibot";
 import { createCollection, editCollection } from "@/actions/collection";
-import { PermissionLevelSelect } from "@/components/permission-level-select";
-import { Button } from "@/components/ui/button";
+import { permissionLevels } from "@/constants/enums";
+import type { Collection } from "@/utils/types";
+import { PermissionLevelSelect } from "./permission-level-select";
+import { Button } from "./ui/button";
 import {
   Form,
   FormControl,
@@ -17,11 +19,9 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { permissionLevels } from "@/database/schema";
-import type { FullCollection } from "@/database/types";
+} from "./ui/form";
+import { Input } from "./ui/input";
+import { Textarea } from "./ui/textarea";
 
 const collectionFormSchema = v.object({
   title: v.pipe(
@@ -36,7 +36,7 @@ const collectionFormSchema = v.object({
 
 export type CollectionFormProps = {
   mode: "create" | "edit";
-  collection?: FullCollection;
+  collection?: Collection;
 };
 
 export const CollectionForm = ({ mode, collection }: CollectionFormProps) => {
@@ -58,10 +58,10 @@ export const CollectionForm = ({ mode, collection }: CollectionFormProps) => {
       mode === "create"
         ? await createCollection(values)
         : mode === "edit" && collection?.id
-          ? await editCollection({ id: collection.id, ...values })
+          ? await editCollection(collection.slug, values)
           : { error: "操作失败，请稍后重试" };
-    setPending(false);
     toast.error(res.error);
+    setPending(false);
   });
 
   return (

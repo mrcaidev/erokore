@@ -1,4 +1,4 @@
-import type { SourceConfig } from "./types";
+import type { SourceConfig } from "@/utils/types";
 
 export const customSourceConfig: SourceConfig<string> = {
   source: "custom",

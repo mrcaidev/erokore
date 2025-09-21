@@ -2,7 +2,7 @@
 
 import { Loader2Icon, TrashIcon, XIcon } from "lucide-react";
 import { useState } from "react";
-import { deleteCollection } from "@/actions/collection";
+import { removeCollection } from "@/actions/collection";
 import { Button } from "@/components/ui/button";
 import {
   DialogClose,
@@ -12,10 +12,10 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import type { FullCollection } from "@/database/types";
+import type { PersonalizedCollection } from "@/utils/types";
 
 export type DeleteCollectionDialogContentProps = {
-  collection: FullCollection;
+  collection: PersonalizedCollection;
 };
 
 export const DeleteCollectionDialogContent = ({
@@ -25,7 +25,7 @@ export const DeleteCollectionDialogContent = ({
 
   const handleClick = async () => {
     setPending(true);
-    await deleteCollection(collection.id);
+    await removeCollection(collection.slug);
     setPending(false);
   };
 

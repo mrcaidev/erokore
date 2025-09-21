@@ -1,14 +1,23 @@
-import { and, eq, isNull } from "drizzle-orm";
-import { db } from "@/database/client";
-import { collectionItemsTable } from "@/database/schema";
-import type { CollectionItem, FullCollectionItem } from "@/database/types";
+import { eq } from "drizzle-orm";
+import type {
+  CollectionItem,
+  InsertCollectionItem,
+  UpdateCollectionItem,
+  User,
+} from "@/utils/types";
+import { db } from "./client";
+import { collectionItemsTable } from "./schema";
 
 export const selectManyPersonalizedCollectionItemsByCollectionId = async (
-  collectionId: number,
-  userId: number | undefined,
+  collectionId: CollectionItem["collectionId"],
+  userId: User["id"] | undefined,
 ) => {
   const rows = await db.query.collectionItemsTable.findMany({
     with: {
+      reactions: {
+        where: (reactionsTable, { eq }) =>
+          eq(reactionsTable.reactorId, userId ?? -1),
+      },
       creator: {
         columns: {
           id: true,
@@ -27,16 +36,8 @@ export const selectManyPersonalizedCollectionItemsByCollectionId = async (
           avatarUrl: true,
         },
       },
-      reactions: {
-        columns: {
-          attitude: true,
-          comment: true,
-        },
-        where: (reactionsTable, { eq }) =>
-          eq(reactionsTable.reactorId, userId ?? -1),
-      },
     },
-    where: (collectionItemsTable, { eq }) =>
+    where: (collectionItemsTable, { and, eq, isNull }) =>
       and(
         eq(collectionItemsTable.collectionId, collectionId),
         isNull(collectionItemsTable.deletedAt),
@@ -48,20 +49,18 @@ export const selectManyPersonalizedCollectionItemsByCollectionId = async (
 
   return rows.map((row) => {
     const { reactions, ...rest } = row;
-    const collectionItem: FullCollectionItem = {
+    const collectionItem = {
       ...rest,
-      my: {
-        attitude: reactions[0]?.attitude ?? null,
-        comment: reactions[0]?.comment ?? "",
-      },
+      myAttitude: reactions[0]?.attitude ?? null,
+      myComment: reactions[0]?.comment ?? "",
     };
     return collectionItem;
   });
 };
 
-export const selectOneCollectionItemById = async (id: number) => {
+export const selectOneCollectionItemById = async (id: CollectionItem["id"]) => {
   const collectionItem = await db.query.collectionItemsTable.findFirst({
-    where: (collectionItemsTable, { eq }) =>
+    where: (collectionItemsTable, { and, eq, isNull }) =>
       and(
         eq(collectionItemsTable.id, id),
         isNull(collectionItemsTable.deletedAt),
@@ -70,9 +69,20 @@ export const selectOneCollectionItemById = async (id: number) => {
   return collectionItem;
 };
 
-export const insertOneCollectionItem = async (
-  value: typeof collectionItemsTable.$inferInsert,
+export const selectOneCollectionItemBySlug = async (
+  slug: CollectionItem["slug"],
 ) => {
+  const collectionItem = await db.query.collectionItemsTable.findFirst({
+    where: (collectionItemsTable, { and, eq, isNull }) =>
+      and(
+        eq(collectionItemsTable.slug, slug),
+        isNull(collectionItemsTable.deletedAt),
+      ),
+  });
+  return collectionItem;
+};
+
+export const insertOneCollectionItem = async (value: InsertCollectionItem) => {
   const [collectionItem] = await db
     .insert(collectionItemsTable)
     .values(value)
@@ -81,8 +91,8 @@ export const insertOneCollectionItem = async (
 };
 
 export const updateOneCollectionItemById = async (
-  id: number,
-  value: Partial<CollectionItem>,
+  id: CollectionItem["id"],
+  value: UpdateCollectionItem,
 ) => {
   await db
     .update(collectionItemsTable)

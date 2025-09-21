@@ -1,15 +1,22 @@
 import { redirect } from "next/navigation";
+import { cache } from "react";
 import { CollectionForm } from "@/components/collection-form";
 import { getSession } from "@/utils/session";
 
-const CreateCollectionPage = async () => {
-  const user = await getSession();
+const fetchPageData = cache(async () => {
+  const session = await getSession();
 
-  if (!user) {
+  if (!session) {
     return redirect(
       `/sign-in?next=${encodeURIComponent(`/collections/create`)}`,
     );
   }
+
+  return undefined;
+});
+
+const CreateCollectionPage = async () => {
+  await fetchPageData();
 
   return (
     <main className="grid place-items-center h-screen">

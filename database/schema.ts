@@ -8,6 +8,11 @@ import {
   uniqueIndex,
 } from "drizzle-orm/pg-core";
 import { nanoid } from "nanoid";
+import {
+  attitudes,
+  defaultablePermissionLevels,
+  permissionLevels,
+} from "@/constants/enums";
 
 // 物理 ID
 const id = integer().primaryKey().generatedAlwaysAsIdentity();
@@ -59,39 +64,6 @@ export const usersTable = pgTable(
   ],
 );
 
-export const usersRelations = relations(usersTable, ({ many }) => ({
-  createdCollections: many(collectionsTable, {
-    relationName: "user_create_collections",
-  }),
-  updatedCollections: many(collectionsTable, {
-    relationName: "user_update_collections",
-  }),
-  deletedCollections: many(collectionsTable, {
-    relationName: "user_delete_collections",
-  }),
-  createdCollectionItems: many(collectionItemsTable, {
-    relationName: "user_create_collectionItems",
-  }),
-  updatedCollectionItems: many(collectionItemsTable, {
-    relationName: "user_update_collectionItems",
-  }),
-  deletedCollectionItems: many(collectionItemsTable, {
-    relationName: "user_delete_collectionItems",
-  }),
-  collaborations: many(collaborationsTable, {
-    relationName: "user_have_collaborations",
-  }),
-  subscriptions: many(subscriptionsTable, {
-    relationName: "user_have_subscriptions",
-  }),
-  invitations: many(invitationsTable, {
-    relationName: "user_generate_invitations",
-  }),
-  reactions: many(reactionsTable, {
-    relationName: "user_make_reactions",
-  }),
-}));
-
 // 审计用户
 const auditUsers = {
   // 创建者 ID
@@ -106,28 +78,7 @@ const auditUsers = {
   deleterId: integer().references(() => usersTable.id),
 };
 
-export const permissionLevels = [
-  // 不可见：用户没有任何权限
-  "none",
-  // 可查看：用户可以查看、关注作品集，查看作品集中的作品，查看协作者
-  "viewer",
-  // 可评价：在可查看的基础上，用户还可以点赞、点踩、评论作品集中的作品
-  "rater",
-  // 可贡献：在可评价的基础上，用户还可以添加、编辑、删除作品集中的作品
-  "contributor",
-  // 可管理：在可贡献的基础上，用户还可以编辑作品集，邀请协作者，调整、移除权限等级低于自己的协作者
-  "admin",
-  // 创建者：在可管理的基础上，用户还可以删除作品集
-  "owner",
-] as const;
-
 export const permissionLevelEnum = pgEnum("permissionLevel", permissionLevels);
-
-export const defaultablePermissionLevels = [
-  ...permissionLevels,
-  // 默认：跟随另外某处指定的默认值
-  "default",
-] as const;
 
 export const defaultablePermissionLevelEnum = pgEnum(
   "defaultablePermissionLevel",
@@ -144,49 +95,14 @@ export const collectionsTable = pgTable("collections", {
   // 描述
   description: text().notNull(),
   // 协作者的默认权限等级
-  collaboratorPermissionLevel: permissionLevelEnum()
-    .notNull()
-    .default("contributor"),
+  collaboratorPermissionLevel: permissionLevelEnum().notNull(),
   // 获得链接的任何人的权限等级
-  anyonePermissionLevel: permissionLevelEnum().notNull().default("none"),
+  anyonePermissionLevel: permissionLevelEnum().notNull(),
   // 审计时间
   ...auditTimestamps,
   // 审计用户
   ...auditUsers,
 });
-
-export const collectionsRelations = relations(
-  collectionsTable,
-  ({ one, many }) => ({
-    collaborations: many(collaborationsTable, {
-      relationName: "collection_have_collaborations",
-    }),
-    subscriptions: many(subscriptionsTable, {
-      relationName: "collection_have_subscriptions",
-    }),
-    invitations: many(invitationsTable, {
-      relationName: "collection_have_invitations",
-    }),
-    items: many(collectionItemsTable, {
-      relationName: "collection_comprise_items",
-    }),
-    creator: one(usersTable, {
-      fields: [collectionsTable.creatorId],
-      references: [usersTable.id],
-      relationName: "user_create_collections",
-    }),
-    updater: one(usersTable, {
-      fields: [collectionsTable.updaterId],
-      references: [usersTable.id],
-      relationName: "user_update_collections",
-    }),
-    deleter: one(usersTable, {
-      fields: [collectionsTable.deleterId],
-      references: [usersTable.id],
-      relationName: "user_delete_collections",
-    }),
-  }),
-);
 
 export const collaborationsTable = pgTable(
   "collaborations",
@@ -207,25 +123,9 @@ export const collaborationsTable = pgTable(
     ...auditTimestamps,
   },
   (table) => [
-    // 用户-作品集对唯一
+    // 协作者-作品集对唯一
     uniqueIndex().on(table.collaboratorId, table.collectionId),
   ],
-);
-
-export const collaborationsRelations = relations(
-  collaborationsTable,
-  ({ one }) => ({
-    collaborator: one(usersTable, {
-      fields: [collaborationsTable.collaboratorId],
-      references: [usersTable.id],
-      relationName: "user_have_collaborations",
-    }),
-    collection: one(collectionsTable, {
-      fields: [collaborationsTable.collectionId],
-      references: [collectionsTable.id],
-      relationName: "collection_have_collaborations",
-    }),
-  }),
 );
 
 export const subscriptionsTable = pgTable(
@@ -245,25 +145,9 @@ export const subscriptionsTable = pgTable(
     ...auditTimestamps,
   },
   (table) => [
-    // 用户-作品集对唯一
+    // 订阅者-作品集对唯一
     uniqueIndex().on(table.subscriberId, table.collectionId),
   ],
-);
-
-export const subscriptionsRelations = relations(
-  subscriptionsTable,
-  ({ one }) => ({
-    subscriber: one(usersTable, {
-      fields: [subscriptionsTable.subscriberId],
-      references: [usersTable.id],
-      relationName: "user_have_subscriptions",
-    }),
-    collection: one(collectionsTable, {
-      fields: [subscriptionsTable.collectionId],
-      references: [collectionsTable.id],
-      relationName: "collection_have_subscriptions",
-    }),
-  }),
 );
 
 export const invitationsTable = pgTable(
@@ -296,19 +180,6 @@ export const invitationsTable = pgTable(
   ],
 );
 
-export const invitationsRelations = relations(invitationsTable, ({ one }) => ({
-  inviter: one(usersTable, {
-    fields: [invitationsTable.inviterId],
-    references: [usersTable.id],
-    relationName: "user_generate_invitations",
-  }),
-  collection: one(collectionsTable, {
-    fields: [invitationsTable.collectionId],
-    references: [collectionsTable.id],
-    relationName: "collection_have_invitations",
-  }),
-}));
-
 export const collectionItemsTable = pgTable("collectionItems", {
   // 物理 ID
   id,
@@ -334,37 +205,6 @@ export const collectionItemsTable = pgTable("collectionItems", {
   ...auditUsers,
 });
 
-export const collectionItemsRelations = relations(
-  collectionItemsTable,
-  ({ one, many }) => ({
-    reactions: many(reactionsTable, {
-      relationName: "collectionItem_receive_reactions",
-    }),
-    collection: one(collectionsTable, {
-      fields: [collectionItemsTable.collectionId],
-      references: [collectionsTable.id],
-      relationName: "collection_comprise_items",
-    }),
-    creator: one(usersTable, {
-      fields: [collectionItemsTable.creatorId],
-      references: [usersTable.id],
-      relationName: "user_create_collectionItems",
-    }),
-    updater: one(usersTable, {
-      fields: [collectionItemsTable.updaterId],
-      references: [usersTable.id],
-      relationName: "user_update_collectionItems",
-    }),
-    deleter: one(usersTable, {
-      fields: [collectionItemsTable.deleterId],
-      references: [usersTable.id],
-      relationName: "user_delete_collectionItems",
-    }),
-  }),
-);
-
-export const attitudes = ["liked", "disliked"] as const;
-
 export const attitudeEnum = pgEnum("attitude", attitudes);
 
 export const reactionsTable = pgTable(
@@ -388,20 +228,160 @@ export const reactionsTable = pgTable(
     ...auditTimestamps,
   },
   (table) => [
-    // 用户-作品对唯一
+    // 回应者-作品对唯一
     uniqueIndex().on(table.reactorId, table.collectionItemId),
   ],
+);
+
+export const usersRelations = relations(usersTable, ({ many }) => ({
+  createdCollections: many(collectionsTable, {
+    relationName: "user_create_collections",
+  }),
+  updatedCollections: many(collectionsTable, {
+    relationName: "user_update_collections",
+  }),
+  deletedCollections: many(collectionsTable, {
+    relationName: "user_delete_collections",
+  }),
+  createdCollectionItems: many(collectionItemsTable, {
+    relationName: "user_create_collectionItems",
+  }),
+  updatedCollectionItems: many(collectionItemsTable, {
+    relationName: "user_update_collectionItems",
+  }),
+  deletedCollectionItems: many(collectionItemsTable, {
+    relationName: "user_delete_collectionItems",
+  }),
+  collaborations: many(collaborationsTable, {
+    relationName: "user_have_collaborations",
+  }),
+  subscriptions: many(subscriptionsTable, {
+    relationName: "user_have_subscriptions",
+  }),
+  invitations: many(invitationsTable, {
+    relationName: "user_have_invitations",
+  }),
+  reactions: many(reactionsTable, {
+    relationName: "user_have_reactions",
+  }),
+}));
+
+export const collectionsRelations = relations(
+  collectionsTable,
+  ({ one, many }) => ({
+    items: many(collectionItemsTable, {
+      relationName: "collection_have_items",
+    }),
+    collaborations: many(collaborationsTable, {
+      relationName: "collection_have_collaborations",
+    }),
+    subscriptions: many(subscriptionsTable, {
+      relationName: "collection_have_subscriptions",
+    }),
+    invitations: many(invitationsTable, {
+      relationName: "collection_have_invitations",
+    }),
+    creator: one(usersTable, {
+      fields: [collectionsTable.creatorId],
+      references: [usersTable.id],
+      relationName: "user_create_collections",
+    }),
+    updater: one(usersTable, {
+      fields: [collectionsTable.updaterId],
+      references: [usersTable.id],
+      relationName: "user_update_collections",
+    }),
+    deleter: one(usersTable, {
+      fields: [collectionsTable.deleterId],
+      references: [usersTable.id],
+      relationName: "user_delete_collections",
+    }),
+  }),
+);
+
+export const collaborationsRelations = relations(
+  collaborationsTable,
+  ({ one }) => ({
+    collaborator: one(usersTable, {
+      fields: [collaborationsTable.collaboratorId],
+      references: [usersTable.id],
+      relationName: "user_have_collaborations",
+    }),
+    collection: one(collectionsTable, {
+      fields: [collaborationsTable.collectionId],
+      references: [collectionsTable.id],
+      relationName: "collection_have_collaborations",
+    }),
+  }),
+);
+
+export const subscriptionsRelations = relations(
+  subscriptionsTable,
+  ({ one }) => ({
+    subscriber: one(usersTable, {
+      fields: [subscriptionsTable.subscriberId],
+      references: [usersTable.id],
+      relationName: "user_have_subscriptions",
+    }),
+    collection: one(collectionsTable, {
+      fields: [subscriptionsTable.collectionId],
+      references: [collectionsTable.id],
+      relationName: "collection_have_subscriptions",
+    }),
+  }),
+);
+
+export const invitationsRelations = relations(invitationsTable, ({ one }) => ({
+  inviter: one(usersTable, {
+    fields: [invitationsTable.inviterId],
+    references: [usersTable.id],
+    relationName: "user_have_invitations",
+  }),
+  collection: one(collectionsTable, {
+    fields: [invitationsTable.collectionId],
+    references: [collectionsTable.id],
+    relationName: "collection_have_invitations",
+  }),
+}));
+
+export const collectionItemsRelations = relations(
+  collectionItemsTable,
+  ({ one, many }) => ({
+    reactions: many(reactionsTable, {
+      relationName: "collectionItem_have_reactions",
+    }),
+    collection: one(collectionsTable, {
+      fields: [collectionItemsTable.collectionId],
+      references: [collectionsTable.id],
+      relationName: "collection_have_items",
+    }),
+    creator: one(usersTable, {
+      fields: [collectionItemsTable.creatorId],
+      references: [usersTable.id],
+      relationName: "user_create_collectionItems",
+    }),
+    updater: one(usersTable, {
+      fields: [collectionItemsTable.updaterId],
+      references: [usersTable.id],
+      relationName: "user_update_collectionItems",
+    }),
+    deleter: one(usersTable, {
+      fields: [collectionItemsTable.deleterId],
+      references: [usersTable.id],
+      relationName: "user_delete_collectionItems",
+    }),
+  }),
 );
 
 export const reactionsRelations = relations(reactionsTable, ({ one }) => ({
   reactor: one(usersTable, {
     fields: [reactionsTable.reactorId],
     references: [usersTable.id],
-    relationName: "user_make_reactions",
+    relationName: "user_have_reactions",
   }),
   collectionItem: one(collectionItemsTable, {
     fields: [reactionsTable.collectionItemId],
     references: [collectionItemsTable.id],
-    relationName: "collectionItem_receive_reactions",
+    relationName: "collectionItem_have_reactions",
   }),
 }));

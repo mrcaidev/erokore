@@ -1,57 +1,80 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { forbidden, notFound, redirect } from "next/navigation";
-import { selectOnePersonalizedCollectionById } from "@/repository/collection";
+import { redirect } from "next/navigation";
+import { selectOneCollectionWithMyPermissionLevelBySlug } from "@/database/collection";
 import {
   deleteOneSubscriptionBySubscriberIdAndCollectionId,
   insertOneSubscription,
-} from "@/repository/subscription";
+} from "@/database/subscription";
 import { hasPermission } from "@/utils/permission";
 import { getSession } from "@/utils/session";
+import type { Collection } from "@/utils/types";
 
-export const subscribeToCollection = async (id: number) => {
+export const subscribeToCollection = async (
+  collectionSlug: Collection["slug"],
+) => {
   const session = await getSession();
-
-  const collection = await selectOnePersonalizedCollectionById(id, session?.id);
-
-  if (!collection) {
-    return notFound();
-  }
 
   if (!session) {
     return redirect(
-      `/sign-in?next=${encodeURIComponent(`/collections/${collection.slug}`)}`,
+      `/sign-in?next=${encodeURIComponent(`/collections/${collectionSlug}`)}`,
     );
   }
 
-  if (!hasPermission(collection, "viewer")) {
-    return forbidden();
-  }
-
-  await insertOneSubscription({ subscriberId: session.id, collectionId: id });
-
-  revalidatePath(`/collections/${collection.slug}`);
-};
-
-export const unsubscribeFromCollection = async (id: number) => {
-  const session = await getSession();
-
-  const collection = await selectOnePersonalizedCollectionById(id, session?.id);
+  const collection = await selectOneCollectionWithMyPermissionLevelBySlug(
+    collectionSlug,
+    session.id,
+  );
 
   if (!collection) {
-    return notFound();
-  }
-
-  if (!session) {
-    return redirect(`/collections/${collection.slug}`);
+    return { error: "作品集不存在" };
   }
 
   if (!hasPermission(collection, "viewer")) {
-    return forbidden();
+    return { error: "没有权限" };
   }
 
-  await deleteOneSubscriptionBySubscriberIdAndCollectionId(session.id, id);
+  await insertOneSubscription({
+    subscriberId: session.id,
+    collectionId: collection.id,
+  });
 
-  revalidatePath(`/collections/${collection.slug}`);
+  revalidatePath(`/collections/${collectionSlug}`);
+
+  return undefined;
+};
+
+export const unsubscribeFromCollection = async (
+  collectionSlug: Collection["slug"],
+) => {
+  const session = await getSession();
+
+  if (!session) {
+    return redirect(
+      `/sign-in?next=${encodeURIComponent(`/collections/${collectionSlug}`)}`,
+    );
+  }
+
+  const collection = await selectOneCollectionWithMyPermissionLevelBySlug(
+    collectionSlug,
+    session.id,
+  );
+
+  if (!collection) {
+    return { error: "作品集不存在" };
+  }
+
+  if (!hasPermission(collection, "viewer")) {
+    return { error: "没有权限" };
+  }
+
+  await deleteOneSubscriptionBySubscriberIdAndCollectionId(
+    session.id,
+    collection.id,
+  );
+
+  revalidatePath(`/collections/${collectionSlug}`);
+
+  return undefined;
 };

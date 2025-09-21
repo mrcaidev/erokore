@@ -1,31 +1,31 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { forbidden, notFound, redirect } from "next/navigation";
-import type { PermissionLevel } from "@/database/types";
-import { insertOneCollaboration } from "@/repository/collaboration";
+import { redirect } from "next/navigation";
+import { insertOneCollaboration } from "@/database/collaboration";
 import {
   insertOneCollection,
-  selectOnePersonalizedCollectionById,
+  selectOneCollectionWithMyPermissionLevelBySlug,
   updateOneCollectionById,
-} from "@/repository/collection";
-import { insertOneSubscription } from "@/repository/subscription";
+} from "@/database/collection";
+import { insertOneSubscription } from "@/database/subscription";
 import { hasPermission } from "@/utils/permission";
 import { getSession } from "@/utils/session";
+import type {
+  Collection,
+  InsertCollection,
+  UpdateCollection,
+} from "@/utils/types";
 
-type CreateCollectionRequest = {
-  title: string;
-  description: string;
-  collaboratorPermissionLevel: PermissionLevel;
-  anyonePermissionLevel: PermissionLevel;
-};
-
-export const createCollection = async ({
-  title,
-  description,
-  collaboratorPermissionLevel,
-  anyonePermissionLevel,
-}: CreateCollectionRequest) => {
+export const createCollection = async (
+  value: Pick<
+    InsertCollection,
+    | "title"
+    | "description"
+    | "collaboratorPermissionLevel"
+    | "anyonePermissionLevel"
+  >,
+) => {
   const session = await getSession();
 
   if (!session) {
@@ -35,10 +35,7 @@ export const createCollection = async ({
   }
 
   const collection = await insertOneCollection({
-    title,
-    description,
-    collaboratorPermissionLevel,
-    anyonePermissionLevel,
+    ...value,
     creatorId: session.id,
     updaterId: session.id,
   });
@@ -64,44 +61,33 @@ export const createCollection = async ({
   return redirect(`/collections/${collection.slug}`);
 };
 
-export type EditCollectionRequest = {
-  id: number;
-  title?: string;
-  description?: string;
-  collaboratorPermissionLevel?: PermissionLevel;
-  anyonePermissionLevel?: PermissionLevel;
-};
-
-export const editCollection = async ({
-  id,
-  title,
-  description,
-  collaboratorPermissionLevel,
-  anyonePermissionLevel,
-}: EditCollectionRequest) => {
+export const editCollection = async (
+  slug: Collection["slug"],
+  value: UpdateCollection,
+) => {
   const session = await getSession();
-
-  const collection = await selectOnePersonalizedCollectionById(id, session?.id);
-
-  if (!collection) {
-    return notFound();
-  }
 
   if (!session) {
     return redirect(
-      `/sign-in?next=${encodeURIComponent(`/collections/${collection.slug}/edit`)}`,
+      `/sign-in?next=${encodeURIComponent(`/collections/${slug}/edit`)}`,
     );
   }
 
-  if (!hasPermission(collection, "admin")) {
-    return forbidden();
+  const collection = await selectOneCollectionWithMyPermissionLevelBySlug(
+    slug,
+    session.id,
+  );
+
+  if (!collection) {
+    return { error: "作品集不存在" };
   }
 
-  await updateOneCollectionById(id, {
-    title,
-    description,
-    collaboratorPermissionLevel,
-    anyonePermissionLevel,
+  if (!hasPermission(collection, "admin")) {
+    return { error: "没有权限" };
+  }
+
+  await updateOneCollectionById(collection.id, {
+    ...value,
     updaterId: session.id,
   });
 
@@ -110,26 +96,29 @@ export const editCollection = async ({
   return redirect(`/collections/${collection.slug}`);
 };
 
-export const deleteCollection = async (id: number) => {
+export const removeCollection = async (slug: Collection["slug"]) => {
   const session = await getSession();
-
-  const collection = await selectOnePersonalizedCollectionById(id, session?.id);
-
-  if (!collection) {
-    return notFound();
-  }
 
   if (!session) {
     return redirect(
-      `/sign-in?next=${encodeURIComponent(`/collections/${collection.slug}`)}`,
+      `/sign-in?next=${encodeURIComponent(`/collections/${slug}`)}`,
     );
   }
 
-  if (!hasPermission(collection, "owner")) {
-    return forbidden();
+  const collection = await selectOneCollectionWithMyPermissionLevelBySlug(
+    slug,
+    session.id,
+  );
+
+  if (!collection) {
+    return { error: "作品集不存在" };
   }
 
-  await updateOneCollectionById(id, {
+  if (!hasPermission(collection, "owner")) {
+    return { error: "没有权限" };
+  }
+
+  await updateOneCollectionById(collection.id, {
     deletedAt: new Date(),
     deleterId: session.id,
   });

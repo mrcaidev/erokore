@@ -10,8 +10,10 @@ import {
   createCollectionItem,
   editCollectionItem,
 } from "@/actions/collection-item";
-import { inferSource } from "@/actions/infer";
-import { Button } from "@/components/ui/button";
+import { inferCollectionItem } from "@/actions/infer";
+import { sourceConfigs } from "@/sources";
+import type { CollectionItem } from "@/utils/types";
+import { Button } from "./ui/button";
 import {
   DialogClose,
   DialogContent,
@@ -19,7 +21,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
+} from "./ui/dialog";
 import {
   Form,
   FormControl,
@@ -27,18 +29,16 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
+} from "./ui/form";
+import { Input } from "./ui/input";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
-import type { CollectionItem } from "@/database/types";
-import { sourceConfigs } from "@/sources";
+} from "./ui/select";
+import { Textarea } from "./ui/textarea";
 
 const formSchema = v.object({
   source: v.picklist(
@@ -56,14 +56,14 @@ const formSchema = v.object({
 });
 
 export type CollectionItemFormDialogContentProps = {
-  collectionId: number;
+  collectionSlug: string;
   mode: "create" | "edit";
   collectionItem?: CollectionItem;
   closeDialog?: () => void;
 };
 
 export const CollectionItemFormDialogContent = ({
-  collectionId,
+  collectionSlug,
   mode,
   collectionItem,
   closeDialog,
@@ -88,7 +88,7 @@ export const CollectionItemFormDialogContent = ({
         return;
       }
       setInferring(true);
-      const res = await inferSource({ input });
+      const res = await inferCollectionItem(input);
       if (res.ok) {
         form.setValue("source", res.source);
         form.setValue("title", res.title ?? "");
@@ -109,9 +109,9 @@ export const CollectionItemFormDialogContent = ({
     setPending(true);
     const res =
       mode === "create"
-        ? await createCollectionItem({ ...values, collectionId })
+        ? await createCollectionItem(collectionSlug, values)
         : mode === "edit" && collectionItem
-          ? await editCollectionItem({ ...collectionItem, ...values })
+          ? await editCollectionItem(collectionItem.slug, values)
           : { error: "操作失败，请稍后重试" };
     if (res?.error) {
       toast.error(res.error);

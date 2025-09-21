@@ -59,8 +59,8 @@ export const SignUpForm = () => {
   const handleSubmit = form.handleSubmit(async (values) => {
     setPending(true);
     const res = await signUp(values);
-    setPending(false);
     toast.error(res.error);
+    setPending(false);
   });
 
   return (

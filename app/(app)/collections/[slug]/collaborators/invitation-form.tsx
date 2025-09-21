@@ -9,7 +9,7 @@ import {
   RotateCwIcon,
 } from "lucide-react";
 import { useParams } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import * as v from "valibot";
@@ -25,9 +25,9 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { defaultablePermissionLevels } from "@/database/schema";
-import type { FullCollection, Invitation } from "@/database/types";
+import { defaultablePermissionLevels } from "@/constants/enums";
 import { PERMISSION_LEVEL_LABEL_MAP } from "@/utils/permission";
+import type { Collection, Invitation } from "@/utils/types";
 
 const invitationFormSchema = v.object({
   permissionLevel: v.picklist(defaultablePermissionLevels, "权限等级无效"),
@@ -40,7 +40,7 @@ const invitationFormSchema = v.object({
 });
 
 export type InvitationFormProps = {
-  collection: FullCollection;
+  collection: Collection;
 };
 
 export const InvitationForm = ({ collection }: InvitationFormProps) => {
@@ -60,7 +60,7 @@ export const InvitationForm = ({ collection }: InvitationFormProps) => {
   const handleSubmit = form.handleSubmit(async (values) => {
     setPending(true);
     const res = await generateInvitation({
-      collectionId: collection.id,
+      collectionSlug: collection.slug,
       permissionLevel: values.permissionLevel,
       expiresAt: new Date(Date.now() + values.expiresDay * 24 * 60 * 60 * 1000),
     });
@@ -73,7 +73,13 @@ export const InvitationForm = ({ collection }: InvitationFormProps) => {
   });
 
   const { slug } = useParams<{ slug: string }>();
-  const invitationUrl = `${window.location.origin}/collections/${slug}/invite?code=${invitation?.code ?? ""}`;
+  const [invitationUrl, setInvitationUrl] = useState("");
+  useEffect(() => {
+    setInvitationUrl(
+      `${window.location.origin}/collections/${slug}/invite?code=${invitation?.code ?? ""}`,
+    );
+  }, [slug, invitation]);
+
   const [copied, setCopied] = useState(false);
   const handleCopy = async () => {
     try {

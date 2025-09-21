@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
-import type { User } from "../database/types";
 import { signJwt, verifyJwt } from "./jwt";
+import type { User } from "./types";
 
 const COOKIE_KEY = "session";
 

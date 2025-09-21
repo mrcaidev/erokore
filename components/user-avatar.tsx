@@ -1,5 +1,5 @@
 import type { AvatarProps } from "@radix-ui/react-avatar";
-import type { PublicUser } from "@/database/types";
+import type { PublicUser } from "@/utils/types";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "./ui/hover-card";
 

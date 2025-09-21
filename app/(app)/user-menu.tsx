@@ -11,7 +11,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { UserAvatar } from "@/components/user-avatar";
-import { selectOnePrivateUserById } from "@/repository/user";
+import { selectOnePrivateUserById } from "@/database/user";
 import { getSession } from "@/utils/session";
 
 const fetchCurrentUser = cache(async () => {

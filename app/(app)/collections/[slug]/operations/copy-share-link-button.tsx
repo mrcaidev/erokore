@@ -3,10 +3,10 @@
 import { CopyIcon } from "lucide-react";
 import { toast } from "sonner";
 import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
-import type { FullCollection } from "@/database/types";
+import type { PersonalizedCollection } from "@/utils/types";
 
 export type CopyShareLinkButtonProps = {
-  collection: FullCollection;
+  collection: PersonalizedCollection;
 };
 
 export const CopyShareLinkButton = ({

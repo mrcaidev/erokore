@@ -1,10 +1,9 @@
 import { and, eq } from "drizzle-orm";
-import { db } from "@/database/client";
-import { subscriptionsTable } from "@/database/schema";
+import type { InsertSubscription, Subscription } from "@/utils/types";
+import { db } from "./client";
+import { subscriptionsTable } from "./schema";
 
-export const insertOneSubscription = async (
-  value: typeof subscriptionsTable.$inferInsert,
-) => {
+export const insertOneSubscription = async (value: InsertSubscription) => {
   const [subscription] = await db
     .insert(subscriptionsTable)
     .values(value)
@@ -14,8 +13,8 @@ export const insertOneSubscription = async (
 };
 
 export const deleteOneSubscriptionBySubscriberIdAndCollectionId = async (
-  subscriberId: number,
-  collectionId: number,
+  subscriberId: Subscription["subscriberId"],
+  collectionId: Subscription["collectionId"],
 ) => {
   await db
     .delete(subscriptionsTable)

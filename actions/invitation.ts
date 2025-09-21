@@ -1,50 +1,46 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import type { DefaultablePermissionLevel } from "@/database/types";
-import { insertOneCollaboration } from "@/repository/collaboration";
-import {
-  selectOnePersonalizedCollectionById,
-  selectOnePersonalizedCollectionBySlug,
-} from "@/repository/collection";
+import { insertOneCollaboration } from "@/database/collaboration";
+import { selectOneCollectionWithMyPermissionLevelBySlug } from "@/database/collection";
 import {
   insertOneInvitation,
-  selectOneEnrichedInvitationByCollectionIdAndCode,
-} from "@/repository/invitation";
+  selectOneInvitationByCollectionIdAndCode,
+} from "@/database/invitation";
 import { hasPermission } from "@/utils/permission";
 import { getSession } from "@/utils/session";
+import type { Collection, InsertInvitation, Invitation } from "@/utils/types";
 
-export type GenerateInvitationRequest = {
-  collectionId: number;
-  permissionLevel: DefaultablePermissionLevel;
-  expiresAt: Date;
-};
+export type GenerateInvitationReq = {
+  collectionSlug: Collection["slug"];
+} & Pick<InsertInvitation, "permissionLevel" | "expiresAt">;
 
-export const generateInvitation = async (req: GenerateInvitationRequest) => {
+export const generateInvitation = async (req: GenerateInvitationReq) => {
   const session = await getSession();
-
-  const collection = await selectOnePersonalizedCollectionById(
-    req.collectionId,
-    session?.id,
-  );
-
-  if (!collection) {
-    return { ok: false, error: "作品集可能被删掉了" } as const;
-  }
 
   if (!session) {
     return redirect(
-      `/sign-in?next=${encodeURIComponent(`/collections/${collection.slug}/collaborators`)}`,
+      `/sign-in?next=${encodeURIComponent(`/collections/${req.collectionSlug}/collaborators`)}`,
     );
   }
 
+  const collection = await selectOneCollectionWithMyPermissionLevelBySlug(
+    req.collectionSlug,
+    session.id,
+  );
+
+  if (!collection) {
+    return { ok: false, error: "作品集不存在" } as const;
+  }
+
   if (!hasPermission(collection, "admin")) {
-    return { ok: false, error: "没有权限邀请" } as const;
+    return { ok: false, error: "没有权限" } as const;
   }
 
   const invitation = await insertOneInvitation({
     inviterId: session.id,
-    collectionId: req.collectionId,
+    collectionId: collection.id,
     permissionLevel: req.permissionLevel,
     expiresAt: req.expiresAt,
   });
@@ -56,51 +52,55 @@ export const generateInvitation = async (req: GenerateInvitationRequest) => {
   return { ok: true, invitation } as const;
 };
 
-export type AcceptInvitationRequest = {
-  collectionSlug: string;
-  code: string;
+export type AcceptInvitationReq = {
+  collectionSlug: Collection["slug"];
+  code: Invitation["code"];
 };
 
-export const acceptInvitation = async (req: AcceptInvitationRequest) => {
+export const acceptInvitation = async (req: AcceptInvitationReq) => {
   const session = await getSession();
-
-  const collection = await selectOnePersonalizedCollectionBySlug(
-    req.collectionSlug,
-    session?.id,
-  );
-
-  if (!collection) {
-    return { ok: false, error: "作品集可能被删掉了" };
-  }
 
   if (!session) {
     return redirect(
-      `/sign-in?next=${encodeURIComponent(`/collections/${collection.slug}/invite?code=${req.code}`)}`,
+      `/sign-in?next=${encodeURIComponent(`/collections/${req.collectionSlug}/invite?code=${req.code}`)}`,
     );
   }
 
-  if (collection.my.permissionLevel !== null) {
-    return redirect(`/collections/${collection.slug}`);
+  const collection = await selectOneCollectionWithMyPermissionLevelBySlug(
+    req.collectionSlug,
+    session.id,
+  );
+
+  if (!collection) {
+    return { error: "作品集不存在" };
   }
 
-  const invitation = await selectOneEnrichedInvitationByCollectionIdAndCode(
+  if (collection.myPermissionLevel !== null) {
+    return redirect(`/collections/${req.collectionSlug}`);
+  }
+
+  const invitation = await selectOneInvitationByCollectionIdAndCode(
     collection.id,
     req.code,
   );
 
   if (!invitation) {
-    return { ok: false, error: "邀请不存在" };
+    return { error: "邀请码错误" };
   }
 
   if (Date.now() >= invitation.expiresAt.getTime()) {
-    return { ok: false, error: "邀请已过期" };
+    return { error: "邀请已过期" };
   }
 
   await insertOneCollaboration({
-    collectionId: collection.id,
     collaboratorId: session.id,
+    collectionId: collection.id,
     permissionLevel: invitation.permissionLevel,
   });
 
-  return redirect(`/collections/${collection.slug}`);
+  revalidatePath(`/collections/${req.collectionSlug}`);
+  revalidatePath(`/collections/${req.collectionSlug}/collaborators`);
+  revalidatePath(`/collections/${req.collectionSlug}/invite`);
+
+  return redirect(`/collections/${req.collectionSlug}`);
 };

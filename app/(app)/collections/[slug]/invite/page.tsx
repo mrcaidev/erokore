@@ -4,8 +4,8 @@ import { notFound, redirect } from "next/navigation";
 import { cache } from "react";
 import { Button } from "@/components/ui/button";
 import { UserAvatar } from "@/components/user-avatar";
-import { selectOnePersonalizedCollectionBySlug } from "@/repository/collection";
-import { selectOneEnrichedInvitationByCollectionIdAndCode } from "@/repository/invitation";
+import { selectOnePersonalizedCollectionBySlug } from "@/database/collection";
+import { selectOneInvitationWithInviterByCollectionIdAndCode } from "@/database/invitation";
 import {
   comparePermissionLevels,
   PERMISSION_LEVEL_LABEL_MAP,
@@ -31,11 +31,11 @@ const fetchPageData = cache(async (slug: string, code: string) => {
     return notFound();
   }
 
-  if (collection.my.permissionLevel !== null) {
+  if (collection.myPermissionLevel !== null) {
     return redirect(`/collections/${slug}`);
   }
 
-  const invitation = await selectOneEnrichedInvitationByCollectionIdAndCode(
+  const invitation = await selectOneInvitationWithInviterByCollectionIdAndCode(
     collection.id,
     code,
   );

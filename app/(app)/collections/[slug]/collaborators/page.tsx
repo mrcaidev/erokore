@@ -9,8 +9,8 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import { selectManyEnrichedCollaborationsByCollectionId } from "@/repository/collaboration";
-import { selectOnePersonalizedCollectionBySlug } from "@/repository/collection";
+import { selectManyCollaborationsWithCollaboratorByCollectionId } from "@/database/collaboration";
+import { selectOnePersonalizedCollectionBySlug } from "@/database/collection";
 import { hasPermission } from "@/utils/permission";
 import { getSession } from "@/utils/session";
 import { CollaboratorCard } from "./collaborator-card";
@@ -32,9 +32,9 @@ const fetchPageData = cache(async (slug: string) => {
     return forbidden();
   }
 
-  const collaborations = await selectManyEnrichedCollaborationsByCollectionId(
-    collection.id,
-  );
+  const collaborations =
+    await selectManyCollaborationsWithCollaboratorByCollectionId(collection.id);
+
   return { session, collection, collaborations };
 });
 

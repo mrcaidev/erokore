@@ -2,11 +2,11 @@ import Link from "next/link";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { UserAvatar } from "@/components/user-avatar";
-import type { FullCollaboration } from "@/database/types";
+import type { CollaborationWithCollaborator } from "@/utils/types";
 
 export type CollaboratorListProps = {
   collectionSlug: string;
-  collaborations: FullCollaboration[];
+  collaborations: CollaborationWithCollaborator[];
   limit?: number;
 };
 

@@ -1,4 +1,4 @@
-import type { FullCollection, PermissionLevel } from "../database/types";
+import type { DefaultablePermissionLevel, PermissionLevel } from "./types";
 
 export const PERMISSION_LEVEL_LABEL_MAP: Record<PermissionLevel, string> = {
   none: "不可见",
@@ -9,7 +9,7 @@ export const PERMISSION_LEVEL_LABEL_MAP: Record<PermissionLevel, string> = {
   owner: "创建者",
 };
 
-export const PERMISSION_LEVEL_WEIGHT: Record<PermissionLevel, number> = {
+export const PERMISSION_LEVEL_WEIGHT_MAP: Record<PermissionLevel, number> = {
   none: 0,
   viewer: 1,
   rater: 2,
@@ -22,29 +22,35 @@ export const comparePermissionLevels = (
   a: PermissionLevel,
   b: PermissionLevel,
 ) => {
-  return PERMISSION_LEVEL_WEIGHT[a] - PERMISSION_LEVEL_WEIGHT[b];
+  return PERMISSION_LEVEL_WEIGHT_MAP[a] - PERMISSION_LEVEL_WEIGHT_MAP[b];
 };
 
-export const evaluatePermissionLevel = (collection: FullCollection) => {
+type Criteria = {
+  anyonePermissionLevel: PermissionLevel;
+  collaboratorPermissionLevel: PermissionLevel;
+  myPermissionLevel: DefaultablePermissionLevel | null;
+};
+
+export const evaluatePermissionLevel = (criteria: Criteria) => {
   // 未登录 / 获得链接的任何人
-  if (collection.my.permissionLevel === null) {
-    return collection.anyonePermissionLevel;
+  if (criteria.myPermissionLevel === null) {
+    return criteria.anyonePermissionLevel;
   }
   // 默认权限等级的协作者
-  if (collection.my.permissionLevel === "default") {
-    return collection.collaboratorPermissionLevel;
+  if (criteria.myPermissionLevel === "default") {
+    return criteria.collaboratorPermissionLevel;
   }
   // 明确权限等级的协作者
-  return collection.my.permissionLevel;
+  return criteria.myPermissionLevel;
 };
 
 export const hasPermission = (
-  collection: FullCollection,
+  criteria: Criteria,
   permissionLevel: PermissionLevel,
 ) => {
   return (
     comparePermissionLevels(
-      evaluatePermissionLevel(collection),
+      evaluatePermissionLevel(criteria),
       permissionLevel,
     ) >= 0
   );

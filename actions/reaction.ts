@@ -1,40 +1,34 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { notFound, redirect } from "next/navigation";
-import type { Attitude } from "@/database/types";
-import { selectOnePersonalizedCollectionById } from "@/repository/collection";
-import { selectOneCollectionItemById } from "@/repository/collection-item";
-import { upsertOneReaction } from "@/repository/reaction";
+import { redirect } from "next/navigation";
+import { selectOneCollectionWithMyPermissionLevelById } from "@/database/collection";
+import { selectOneCollectionItemBySlug } from "@/database/collection-item";
+import { upsertOneReaction } from "@/database/reaction";
 import { hasPermission } from "@/utils/permission";
 import { getSession } from "@/utils/session";
+import type { CollectionItem, Reaction } from "@/utils/types";
 
-export type ReactToCollectionItemRequest = {
-  collectionItemId: number;
-  attitude?: Attitude | null;
-  comment?: string;
-};
-
-export const reactToCollectionItem = async (
-  req: ReactToCollectionItemRequest,
+export const showAttitudeTowardsCollectionItem = async (
+  collectionItemSlug: CollectionItem["slug"],
+  attitude: Reaction["attitude"],
 ) => {
-  const session = await getSession();
-
-  const collectionItem = await selectOneCollectionItemById(
-    req.collectionItemId,
-  );
+  const collectionItem =
+    await selectOneCollectionItemBySlug(collectionItemSlug);
 
   if (!collectionItem) {
-    return { error: "作品不存在，可能刚刚被删掉了" };
+    return { error: "作品不存在" };
   }
 
-  const collection = await selectOnePersonalizedCollectionById(
+  const session = await getSession();
+
+  const collection = await selectOneCollectionWithMyPermissionLevelById(
     collectionItem.collectionId,
     session?.id,
   );
 
   if (!collection) {
-    return notFound();
+    return { error: "作品集不存在" };
   }
 
   if (!session) {
@@ -44,14 +38,13 @@ export const reactToCollectionItem = async (
   }
 
   if (!hasPermission(collection, "rater")) {
-    return { error: "当前身份没法评价作品哦" };
+    return { error: "没有权限" };
   }
 
   await upsertOneReaction({
     reactorId: session.id,
-    collectionItemId: req.collectionItemId,
-    ...(req.attitude !== undefined ? { attitude: req.attitude } : {}),
-    ...(req.comment !== undefined ? { comment: req.comment } : {}),
+    collectionItemId: collectionItem.id,
+    attitude,
   });
 
   revalidatePath(`/collections/${collection.slug}`);

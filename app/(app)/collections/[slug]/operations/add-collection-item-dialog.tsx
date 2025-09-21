@@ -5,10 +5,10 @@ import { useState } from "react";
 import { CollectionItemFormDialogContent } from "@/components/collection-item-form-dialog-content";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
-import type { FullCollection } from "@/database/types";
+import type { PersonalizedCollection } from "@/utils/types";
 
 export type AddCollectionItemDialogProps = {
-  collection: FullCollection;
+  collection: PersonalizedCollection;
 };
 
 export const AddCollectionItemDialog = ({
@@ -25,7 +25,7 @@ export const AddCollectionItemDialog = ({
         </Button>
       </DialogTrigger>
       <CollectionItemFormDialogContent
-        collectionId={collection.id}
+        collectionSlug={collection.slug}
         mode="create"
         closeDialog={() => {
           setOpen(false);

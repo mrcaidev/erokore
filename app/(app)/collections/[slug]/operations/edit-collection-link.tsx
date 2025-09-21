@@ -1,10 +1,10 @@
 import { SquarePenIcon } from "lucide-react";
 import Link from "next/link";
 import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
-import type { FullCollection } from "@/database/types";
+import type { PersonalizedCollection } from "@/utils/types";
 
 export type EditCollectionLinkProps = {
-  collection: FullCollection;
+  collection: PersonalizedCollection;
 };
 
 export const EditCollectionLink = ({ collection }: EditCollectionLinkProps) => {

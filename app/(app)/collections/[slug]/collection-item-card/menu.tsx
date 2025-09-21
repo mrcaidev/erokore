@@ -96,7 +96,7 @@ export const CollectionItemCardMenu = ({
           <Button
             variant="secondary"
             size="icon"
-            className="opacity-50 hover:opacity-100"
+            className="opacity-50 hover:opacity-100 z-10"
           >
             <EllipsisIcon />
           </Button>

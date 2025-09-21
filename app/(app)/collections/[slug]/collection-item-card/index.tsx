@@ -21,9 +21,11 @@ export const CollectionItemCard = ({
 }: CollectionItemCardProps) => {
   return (
     <div className="flex flex-col relative h-full border rounded-md overflow-hidden">
-      {/* <a href={item.url} target="_blank" className="absolute inset-0">
-        <span className="sr-only">前往链接</span>
-      </a> */}
+      {item.url && (
+        <a href={item.url} target="_blank" className="absolute inset-0">
+          <span className="sr-only">前往链接</span>
+        </a>
+      )}
       <div className="aspect-video bg-muted overflow-hidden">
         {item.coverUrl ? (
           <Image src={item.coverUrl} alt="封面" width={1920} height={1080} />

@@ -47,7 +47,7 @@ export const AttitudeButtonGroup = ({ item }: AttitudeButtonGroupProps) => {
   };
 
   return (
-    <div className="flex items-center">
+    <div className="flex items-center z-10">
       <Button
         variant="ghost"
         size="icon"

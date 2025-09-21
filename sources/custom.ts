@@ -1,11 +1,11 @@
 import type { SourceConfig } from "@/utils/types";
 
-export const customSourceConfig: SourceConfig<string> = {
+export const customSourceConfig: SourceConfig<boolean> = {
   source: "custom",
   name: "自定义",
   rules: [
     {
-      match: () => "true",
+      match: () => true,
       priority: -1,
     },
   ],

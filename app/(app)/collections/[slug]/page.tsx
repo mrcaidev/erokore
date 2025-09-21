@@ -50,7 +50,7 @@ const fetchPageData = cache(async (slug: string, page: number) => {
     selectManyPersonalizedCollectionItemsByCollectionId(
       collection.id,
       session?.id,
-      { limit: 2, offset: (page - 1) * 2 },
+      { limit: 4, offset: (page - 1) * 4 },
     ),
     countCollaborationsByCollectionId(collection.id),
     selectManyCollaboratorEnrichedCollaborationsByCollectionId(collection.id, {
@@ -101,7 +101,7 @@ const CollectionPage = async ({
           <Paginator
             total={collectionItemsTotal}
             page={normalizePage(page)}
-            pageSize={2}
+            pageSize={4}
           />
         </div>
         <Accordion

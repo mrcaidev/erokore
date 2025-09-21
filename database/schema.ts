@@ -14,15 +14,6 @@ import {
   permissionLevels,
 } from "@/constants/enums";
 
-// 物理 ID
-const id = integer().primaryKey().generatedAlwaysAsIdentity();
-
-// 业务 ID
-const slug = text()
-  .notNull()
-  .unique()
-  .$default(() => nanoid(10));
-
 // 审计时间
 const auditTimestamps = {
   // 创建时间
@@ -40,9 +31,12 @@ export const usersTable = pgTable(
   "users",
   {
     // 物理 ID
-    id,
+    id: integer().primaryKey().generatedAlwaysAsIdentity(),
     // 业务 ID
-    slug,
+    slug: text()
+      .notNull()
+      .unique()
+      .$default(() => nanoid(10)),
     // 邮箱
     email: text().notNull(),
     // 昵称
@@ -87,9 +81,12 @@ export const defaultablePermissionLevelEnum = pgEnum(
 
 export const collectionsTable = pgTable("collections", {
   // 物理 ID
-  id,
+  id: integer().primaryKey().generatedAlwaysAsIdentity(),
   // 业务 ID
-  slug,
+  slug: text()
+    .notNull()
+    .unique()
+    .$default(() => nanoid(10)),
   // 标题
   title: text().notNull(),
   // 描述
@@ -108,7 +105,7 @@ export const collaborationsTable = pgTable(
   "collaborations",
   {
     // 物理 ID
-    id,
+    id: integer().primaryKey().generatedAlwaysAsIdentity(),
     // 协作者 ID
     collaboratorId: integer()
       .notNull()
@@ -132,7 +129,7 @@ export const subscriptionsTable = pgTable(
   "subscriptions",
   {
     // 物理 ID
-    id,
+    id: integer().primaryKey().generatedAlwaysAsIdentity(),
     // 订阅者 ID
     subscriberId: integer()
       .notNull()
@@ -154,7 +151,7 @@ export const invitationsTable = pgTable(
   "invitations",
   {
     // 物理 ID
-    id,
+    id: integer().primaryKey().generatedAlwaysAsIdentity(),
     // 邀请者 ID
     inviterId: integer()
       .notNull()
@@ -182,9 +179,12 @@ export const invitationsTable = pgTable(
 
 export const collectionItemsTable = pgTable("collectionItems", {
   // 物理 ID
-  id,
+  id: integer().primaryKey().generatedAlwaysAsIdentity(),
   // 业务 ID
-  slug,
+  slug: text()
+    .notNull()
+    .unique()
+    .$default(() => nanoid(10)),
   // 来源
   source: text().notNull(),
   // 标题
@@ -211,7 +211,7 @@ export const reactionsTable = pgTable(
   "reactions",
   {
     // 物理 ID
-    id,
+    id: integer().primaryKey().generatedAlwaysAsIdentity(),
     // 回应者 ID
     reactorId: integer()
       .notNull()

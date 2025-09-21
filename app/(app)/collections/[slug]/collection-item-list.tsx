@@ -13,6 +13,10 @@ export const CollectionItemList = async ({
   collectionItems,
   permissionLevel,
 }: CollectionItemList) => {
+  if (collectionItems.length === 0) {
+    return <div className="py-4 text-muted-foreground">这里还什么都没有……</div>;
+  }
+
   return (
     <ul className="grid grid-cols-[repeat(auto-fit,minmax(320px,1fr))] gap-4 py-4">
       {collectionItems.map((item) => (

@@ -131,7 +131,7 @@ const CollectionPage = async ({
               <div className="flex items-center gap-2">
                 <UserAvatar user={collection.updater} hoverable />
                 <div className="text-muted-foreground">
-                  最后更新于 {collection.updatedAt.toLocaleString("zh")}
+                  最后编辑于 {collection.updatedAt.toLocaleString("zh")}
                 </div>
               </div>
               <div className="flex items-center gap-2">

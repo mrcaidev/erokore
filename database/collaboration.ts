@@ -1,14 +1,28 @@
-import { eq } from "drizzle-orm";
+import { count, eq } from "drizzle-orm";
 import type {
   Collaboration,
   InsertCollaboration,
+  LimitOffsetOptions,
   UpdateCollaboration,
 } from "@/utils/types";
 import { db } from "./client";
 import { collaborationsTable } from "./schema";
 
+export const countCollaborationsByCollectionId = async (
+  collectionId: Collaboration["collectionId"],
+) => {
+  const rows = await db
+    .select({ count: count() })
+    .from(collaborationsTable)
+    .where(eq(collaborationsTable.collectionId, collectionId));
+  return rows[0]?.count ?? 0;
+};
+
 export const selectManyCollaboratorEnrichedCollaborationsByCollectionId =
-  async (collectionId: Collaboration["collectionId"]) => {
+  async (
+    collectionId: Collaboration["collectionId"],
+    options: LimitOffsetOptions = {},
+  ) => {
     const collaborations = await db.query.collaborationsTable.findMany({
       with: {
         collaborator: {
@@ -26,6 +40,8 @@ export const selectManyCollaboratorEnrichedCollaborationsByCollectionId =
       orderBy: (collaborationsTable, { asc }) => [
         asc(collaborationsTable.createdAt),
       ],
+      limit: options.limit,
+      offset: options.offset,
     });
     return collaborations;
   };

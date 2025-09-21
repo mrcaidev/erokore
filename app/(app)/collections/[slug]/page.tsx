@@ -8,7 +8,10 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { UserAvatar } from "@/components/user-avatar";
-import { selectManyCollaboratorEnrichedCollaborationsByCollectionId } from "@/database/collaboration";
+import {
+  countCollaborationsByCollectionId,
+  selectManyCollaboratorEnrichedCollaborationsByCollectionId,
+} from "@/database/collaboration";
 import { selectOnePersonalizedCollectionBySlug } from "@/database/collection";
 import {
   countCollectionItemsByCollectionId,
@@ -37,18 +40,31 @@ const fetchPageData = cache(async (slug: string, page: number) => {
     return forbidden();
   }
 
-  const [collectionItemsTotal, collectionItems, collaborations] =
-    await Promise.all([
-      countCollectionItemsByCollectionId(collection.id),
-      selectManyPersonalizedCollectionItemsByCollectionId(
-        collection.id,
-        session?.id,
-        { limit: 2, offset: (page - 1) * 2 },
-      ),
-      selectManyCollaboratorEnrichedCollaborationsByCollectionId(collection.id),
-    ]);
+  const [
+    collectionItemsTotal,
+    collectionItems,
+    collaborationsTotal,
+    collaborations,
+  ] = await Promise.all([
+    countCollectionItemsByCollectionId(collection.id),
+    selectManyPersonalizedCollectionItemsByCollectionId(
+      collection.id,
+      session?.id,
+      { limit: 2, offset: (page - 1) * 2 },
+    ),
+    countCollaborationsByCollectionId(collection.id),
+    selectManyCollaboratorEnrichedCollaborationsByCollectionId(collection.id, {
+      limit: 3,
+    }),
+  ]);
 
-  return { collection, collectionItemsTotal, collectionItems, collaborations };
+  return {
+    collection,
+    collectionItemsTotal,
+    collectionItems,
+    collaborationsTotal,
+    collaborations,
+  };
 });
 
 export type CollectionPageProps = {
@@ -62,16 +78,13 @@ const CollectionPage = async ({
 }: CollectionPageProps) => {
   const { slug } = await params;
   const { page } = await searchParams;
-  const { collection, collectionItemsTotal, collectionItems, collaborations } =
-    await fetchPageData(slug, normalizePage(page));
-
-  if (!collection) {
-    return notFound();
-  }
-
-  if (!hasPermission(collection, "viewer")) {
-    return forbidden();
-  }
+  const {
+    collection,
+    collectionItemsTotal,
+    collectionItems,
+    collaborationsTotal,
+    collaborations,
+  } = await fetchPageData(slug, normalizePage(page));
 
   return (
     <main className="max-w-7xl px-8 py-24 mx-auto">
@@ -108,6 +121,7 @@ const CollectionPage = async ({
               <CollaboratorList
                 collectionSlug={collection.slug}
                 collaborations={collaborations}
+                total={collaborationsTotal}
               />
             </AccordionContent>
           </AccordionItem>

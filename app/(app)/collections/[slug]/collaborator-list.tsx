@@ -7,18 +7,18 @@ import type { CollaboratorEnrichedCollaboration } from "@/utils/types";
 export type CollaboratorListProps = {
   collectionSlug: string;
   collaborations: CollaboratorEnrichedCollaboration[];
-  limit?: number;
+  total: number;
 };
 
 export const CollaboratorList = async ({
   collectionSlug,
   collaborations,
-  limit = 5,
+  total,
 }: CollaboratorListProps) => {
   return (
     <div className="flex justify-between items-center">
       <ul className="flex items-center gap-1">
-        {collaborations.slice(0, limit).map((collaboration) => (
+        {collaborations.map((collaboration) => (
           <li key={collaboration.id}>
             <UserAvatar
               user={collaboration.collaborator}
@@ -27,11 +27,11 @@ export const CollaboratorList = async ({
             />
           </li>
         ))}
-        {collaborations.length > limit && (
+        {collaborations.length < total && (
           <li>
             <Avatar className="size-10">
               <AvatarFallback className="text-muted-foreground">
-                +{collaborations.length - limit}
+                +{total - collaborations.length}
               </AvatarFallback>
             </Avatar>
           </li>

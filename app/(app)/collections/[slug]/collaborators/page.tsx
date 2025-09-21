@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { forbidden, notFound } from "next/navigation";
 import { cache } from "react";
+import { Paginator } from "@/components/paginator";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -9,14 +10,18 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import { selectManyCollaboratorEnrichedCollaborationsByCollectionId } from "@/database/collaboration";
+import {
+  countCollaborationsByCollectionId,
+  selectManyCollaboratorEnrichedCollaborationsByCollectionId,
+} from "@/database/collaboration";
 import { selectOnePersonalizedCollectionBySlug } from "@/database/collection";
 import { hasPermission } from "@/utils/permission";
 import { getSession } from "@/utils/session";
+import { normalizePage } from "@/utils/url";
 import { CollaboratorCard } from "./collaborator-card";
 import { InvitationForm } from "./invitation-form";
 
-const fetchPageData = cache(async (slug: string) => {
+const fetchPageData = cache(async (slug: string, page: number) => {
   const session = await getSession();
 
   const collection = await selectOnePersonalizedCollectionBySlug(
@@ -32,23 +37,30 @@ const fetchPageData = cache(async (slug: string) => {
     return forbidden();
   }
 
-  const collaborations =
-    await selectManyCollaboratorEnrichedCollaborationsByCollectionId(
-      collection.id,
-    );
+  const [collaborationsTotal, collaborations] = await Promise.all([
+    countCollaborationsByCollectionId(collection.id),
+    selectManyCollaboratorEnrichedCollaborationsByCollectionId(collection.id, {
+      limit: 10,
+      offset: (page - 1) * 10,
+    }),
+  ]);
 
-  return { session, collection, collaborations };
+  return { session, collection, collaborationsTotal, collaborations };
 });
 
 export type CollectionCollaboratorsPageProps = {
   params: Promise<{ slug: string }>;
+  searchParams: Promise<{ page?: string }>;
 };
 
 const CollectionCollaboratorsPage = async ({
   params,
+  searchParams,
 }: CollectionCollaboratorsPageProps) => {
   const { slug } = await params;
-  const { session, collection, collaborations } = await fetchPageData(slug);
+  const { page } = await searchParams;
+  const { session, collection, collaborationsTotal, collaborations } =
+    await fetchPageData(slug, normalizePage(page));
 
   return (
     <main className="max-w-7xl px-8 py-24 mx-auto">
@@ -68,7 +80,7 @@ const CollectionCollaboratorsPage = async ({
         </Breadcrumb>
         <h1 className="mb-4 text-3xl font-bold">协作者</h1>
         <div className="grid grid-cols-1 md:grid-cols-[1fr_280px] lg:grid-cols-[1fr_360px] gap-8">
-          <div className="order-2 md:order-1">
+          <div className="space-y-3 order-2 md:order-1">
             <ul className="divide-y">
               {collaborations.map((collaboration) => (
                 <CollaboratorCard
@@ -79,6 +91,11 @@ const CollectionCollaboratorsPage = async ({
                 />
               ))}
             </ul>
+            <Paginator
+              total={collaborationsTotal}
+              page={normalizePage(page)}
+              pageSize={10}
+            />
           </div>
           {hasPermission(collection, "admin") && (
             <div className="order-1 md:order-2">

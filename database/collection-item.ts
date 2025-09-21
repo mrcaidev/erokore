@@ -14,10 +14,14 @@ export const selectManyPersonalizedCollectionItemsByCollectionId = async (
 ) => {
   const rows = await db.query.collectionItemsTable.findMany({
     with: {
-      reactions: {
-        where: (reactionsTable, { eq }) =>
-          eq(reactionsTable.reactorId, userId ?? -1),
-      },
+      ...(userId
+        ? {
+            reactions: {
+              where: (reactionsTable, { eq }) =>
+                eq(reactionsTable.reactorId, userId),
+            },
+          }
+        : {}),
       creator: {
         columns: {
           id: true,
@@ -51,8 +55,8 @@ export const selectManyPersonalizedCollectionItemsByCollectionId = async (
     const { reactions, ...rest } = row;
     const collectionItem = {
       ...rest,
-      myAttitude: reactions[0]?.attitude ?? null,
-      myComment: reactions[0]?.comment ?? "",
+      myAttitude: reactions?.[0]?.attitude ?? null,
+      myComment: reactions?.[0]?.comment ?? "",
     };
     return collectionItem;
   });

@@ -7,29 +7,28 @@ import type {
 import { db } from "./client";
 import { collaborationsTable } from "./schema";
 
-export const selectManyCollaborationsWithCollaboratorByCollectionId = async (
-  collectionId: Collaboration["collectionId"],
-) => {
-  const collaborations = await db.query.collaborationsTable.findMany({
-    with: {
-      collaborator: {
-        columns: {
-          id: true,
-          slug: true,
-          email: true,
-          nickname: true,
-          avatarUrl: true,
+export const selectManyCollaboratorEnrichedCollaborationsByCollectionId =
+  async (collectionId: Collaboration["collectionId"]) => {
+    const collaborations = await db.query.collaborationsTable.findMany({
+      with: {
+        collaborator: {
+          columns: {
+            id: true,
+            slug: true,
+            email: true,
+            nickname: true,
+            avatarUrl: true,
+          },
         },
       },
-    },
-    where: (collaborationsTable, { eq }) =>
-      eq(collaborationsTable.collectionId, collectionId),
-    orderBy: (collaborationsTable, { asc }) => [
-      asc(collaborationsTable.createdAt),
-    ],
-  });
-  return collaborations;
-};
+      where: (collaborationsTable, { eq }) =>
+        eq(collaborationsTable.collectionId, collectionId),
+      orderBy: (collaborationsTable, { asc }) => [
+        asc(collaborationsTable.createdAt),
+      ],
+    });
+    return collaborations;
+  };
 
 export const selectOneCollaborationById = async (id: Collaboration["id"]) => {
   const collaboration = await db.query.collaborationsTable.findFirst({

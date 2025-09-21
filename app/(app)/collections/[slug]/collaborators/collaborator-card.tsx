@@ -18,7 +18,7 @@ import {
   PERMISSION_LEVEL_LABEL_MAP,
 } from "@/utils/permission";
 import type {
-  CollaborationWithCollaborator,
+  CollaboratorEnrichedCollaboration,
   DefaultablePermissionLevel,
   PersonalizedCollection,
 } from "@/utils/types";
@@ -26,7 +26,7 @@ import type {
 export type CollaboratorCardProps = {
   currentUserId: number;
   collection: PersonalizedCollection;
-  collaboration: CollaborationWithCollaborator;
+  collaboration: CollaboratorEnrichedCollaboration;
 };
 
 export const CollaboratorCard = ({

@@ -2,21 +2,7 @@ import type { InsertInvitation, Invitation } from "@/utils/types";
 import { db } from "./client";
 import { invitationsTable } from "./schema";
 
-export const selectOneInvitationByCollectionIdAndCode = async (
-  collectionId: Invitation["collectionId"],
-  code: Invitation["code"],
-) => {
-  const invitation = await db.query.invitationsTable.findFirst({
-    where: (invitationsTable, { and, eq }) =>
-      and(
-        eq(invitationsTable.collectionId, collectionId),
-        eq(invitationsTable.code, code),
-      ),
-  });
-  return invitation;
-};
-
-export const selectOneInvitationWithInviterByCollectionIdAndCode = async (
+export const selectOneInviterEnrichedInvitationByCollectionIdAndCode = async (
   collectionId: Invitation["collectionId"],
   code: Invitation["code"],
 ) => {
@@ -32,6 +18,20 @@ export const selectOneInvitationWithInviterByCollectionIdAndCode = async (
         },
       },
     },
+    where: (invitationsTable, { and, eq }) =>
+      and(
+        eq(invitationsTable.collectionId, collectionId),
+        eq(invitationsTable.code, code),
+      ),
+  });
+  return invitation;
+};
+
+export const selectOneInvitationByCollectionIdAndCode = async (
+  collectionId: Invitation["collectionId"],
+  code: Invitation["code"],
+) => {
+  const invitation = await db.query.invitationsTable.findFirst({
     where: (invitationsTable, { and, eq }) =>
       and(
         eq(invitationsTable.collectionId, collectionId),

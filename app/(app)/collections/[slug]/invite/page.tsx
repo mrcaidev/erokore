@@ -5,7 +5,7 @@ import { cache } from "react";
 import { Button } from "@/components/ui/button";
 import { UserAvatar } from "@/components/user-avatar";
 import { selectOnePersonalizedCollectionBySlug } from "@/database/collection";
-import { selectOneInvitationWithInviterByCollectionIdAndCode } from "@/database/invitation";
+import { selectOneInviterEnrichedInvitationByCollectionIdAndCode } from "@/database/invitation";
 import {
   comparePermissionLevels,
   PERMISSION_LEVEL_LABEL_MAP,
@@ -35,10 +35,11 @@ const fetchPageData = cache(async (slug: string, code: string) => {
     return redirect(`/collections/${slug}`);
   }
 
-  const invitation = await selectOneInvitationWithInviterByCollectionIdAndCode(
-    collection.id,
-    code,
-  );
+  const invitation =
+    await selectOneInviterEnrichedInvitationByCollectionIdAndCode(
+      collection.id,
+      code,
+    );
 
   if (!invitation) {
     return notFound();

@@ -7,7 +7,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { UserAvatar } from "@/components/user-avatar";
-import { selectManyCollaborationsWithCollaboratorByCollectionId } from "@/database/collaboration";
+import { selectManyCollaboratorEnrichedCollaborationsByCollectionId } from "@/database/collaboration";
 import { selectOnePersonalizedCollectionBySlug } from "@/database/collection";
 import { selectManyPersonalizedCollectionItemsByCollectionId } from "@/database/collection-item";
 import { evaluatePermissionLevel, hasPermission } from "@/utils/permission";
@@ -39,7 +39,9 @@ const fetchPageData = cache(async (slug: string) => {
     );
 
   const collaborations =
-    await selectManyCollaborationsWithCollaboratorByCollectionId(collection.id);
+    await selectManyCollaboratorEnrichedCollaborationsByCollectionId(
+      collection.id,
+    );
 
   return { collection, collectionItems, collaborations };
 });

@@ -9,7 +9,7 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import { selectManyCollaborationsWithCollaboratorByCollectionId } from "@/database/collaboration";
+import { selectManyCollaboratorEnrichedCollaborationsByCollectionId } from "@/database/collaboration";
 import { selectOnePersonalizedCollectionBySlug } from "@/database/collection";
 import { hasPermission } from "@/utils/permission";
 import { getSession } from "@/utils/session";
@@ -33,7 +33,9 @@ const fetchPageData = cache(async (slug: string) => {
   }
 
   const collaborations =
-    await selectManyCollaborationsWithCollaboratorByCollectionId(collection.id);
+    await selectManyCollaboratorEnrichedCollaborationsByCollectionId(
+      collection.id,
+    );
 
   return { session, collection, collaborations };
 });

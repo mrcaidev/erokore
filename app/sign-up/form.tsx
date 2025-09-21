@@ -2,6 +2,8 @@
 
 import { valibotResolver } from "@hookform/resolvers/valibot";
 import { Loader2Icon, UserRoundPlusIcon } from "lucide-react";
+import type { Route } from "next";
+import { useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -44,6 +46,9 @@ const signUpFormSchema = v.pipe(
 );
 
 export const SignUpForm = () => {
+  const searchParams = useSearchParams();
+  const next = (searchParams.get("next") || "/") as Route;
+
   const form = useForm({
     resolver: valibotResolver(signUpFormSchema),
     defaultValues: {
@@ -58,7 +63,7 @@ export const SignUpForm = () => {
 
   const handleSubmit = form.handleSubmit(async (values) => {
     setPending(true);
-    const res = await signUp(values);
+    const res = await signUp({ ...values, next });
     toast.error(res.error);
     setPending(false);
   });

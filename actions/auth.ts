@@ -11,6 +11,7 @@ type SignUpReq = {
   email: string;
   password: string;
   nickname: string;
+  next: Route;
 };
 
 export const signUp = async (req: SignUpReq) => {
@@ -38,7 +39,7 @@ export const signUp = async (req: SignUpReq) => {
 
   revalidatePath("/", "layout");
 
-  return redirect("/");
+  return redirect(req.next);
 };
 
 type SignInReq = {

@@ -18,6 +18,6 @@
     }
   },
   "formatter": {
-    "indentStyle": "space"
+    "useEditorconfig": true
   }
 }

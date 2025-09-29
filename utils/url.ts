@@ -11,7 +11,7 @@ export const buildRelativeUrl = (
   return `${base}?${queryString}`;
 };
 
-export const normalizePage = (page: string | undefined) => {
+export const normalizePage = (page: unknown) => {
   const pageNumber = Number(page);
   if (Number.isNaN(pageNumber) || pageNumber < 1) {
     return 1;

@@ -101,7 +101,7 @@ export type PaginationOptions = {
   pageSize: number;
 };
 
-export type SourceConfig<T = unknown> = {
+export type SourceConfig<T> = {
   source: string;
   name?: string;
   rules?: {

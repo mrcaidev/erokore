@@ -1,13 +1,14 @@
 import type { Route } from "next";
 
-export const buildAuthUrl = (
-  base: "/sign-in" | "/sign-up",
-  next?: string,
+export const buildRelativeUrl = (
+  base: Route,
+  query?: ConstructorParameters<typeof URLSearchParams>[0],
 ): Route => {
-  if (!next) {
+  const queryString = new URLSearchParams(query).toString();
+  if (!queryString) {
     return base;
   }
-  return `${base}?next=${encodeURIComponent(next)}`;
+  return `${base}?${queryString}`;
 };
 
 export const normalizePage = (page: string | undefined) => {

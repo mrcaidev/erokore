@@ -6,13 +6,13 @@ import {
   selectManyCollectionEnrichedSubscriptionsBySubscriberId,
 } from "@/database/subscription";
 import { getSession } from "@/utils/session";
-import { buildAuthUrl, normalizePage } from "@/utils/url";
+import { buildRelativeUrl, normalizePage } from "@/utils/url";
 
 const fetchPageData = async (page: number) => {
   const session = await getSession();
 
   if (!session) {
-    return redirect(buildAuthUrl("/sign-in", "/subscriptions"));
+    return redirect(buildRelativeUrl("/sign-in", { next: "/subscriptions" }));
   }
 
   const [subscriptionsTotal, subscriptions] = await Promise.all([

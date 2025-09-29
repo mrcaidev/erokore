@@ -2,13 +2,15 @@ import { redirect } from "next/navigation";
 import { cache } from "react";
 import { CollectionForm } from "@/components/collection-form";
 import { getSession } from "@/utils/session";
-import { buildAuthUrl } from "@/utils/url";
+import { buildRelativeUrl } from "@/utils/url";
 
 const fetchPageData = cache(async () => {
   const session = await getSession();
 
   if (!session) {
-    return redirect(buildAuthUrl("/sign-in", `/collections/create`));
+    return redirect(
+      buildRelativeUrl("/sign-in", { next: "/collections/create" }),
+    );
   }
 
   return undefined;

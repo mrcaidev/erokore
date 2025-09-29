@@ -15,7 +15,7 @@ import {
 } from "@/utils/permission";
 import { getSession } from "@/utils/session";
 import type { Collaboration, DefaultablePermissionLevel } from "@/utils/types";
-import { buildAuthUrl } from "@/utils/url";
+import { buildRelativeUrl } from "@/utils/url";
 
 export const alterPermissionLevel = async (
   collaborationId: Collaboration["id"],
@@ -40,7 +40,7 @@ export const alterPermissionLevel = async (
 
   if (!session) {
     return redirect(
-      buildAuthUrl("/sign-in", `/collections/${collection.slug}`),
+      buildRelativeUrl("/sign-in", { next: `/collections/${collection.slug}` }),
     );
   }
 
@@ -87,7 +87,7 @@ export const removeCollaboration = async (
 
   if (!session) {
     return redirect(
-      buildAuthUrl("/sign-in", `/collections/${collection.slug}`),
+      buildRelativeUrl("/sign-in", { next: `/collections/${collection.slug}` }),
     );
   }
 

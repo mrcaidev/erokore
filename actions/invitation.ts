@@ -12,7 +12,7 @@ import { insertOneSubscription } from "@/database/subscription";
 import { hasPermission } from "@/utils/permission";
 import { getSession } from "@/utils/session";
 import type { Collection, InsertInvitation, Invitation } from "@/utils/types";
-import { buildAuthUrl } from "@/utils/url";
+import { buildRelativeUrl } from "@/utils/url";
 
 export const generateInvitation = async (
   collectionSlug: Collection["slug"],
@@ -22,7 +22,9 @@ export const generateInvitation = async (
 
   if (!session) {
     return redirect(
-      buildAuthUrl("/sign-in", `/collections/${collectionSlug}/collaborators`),
+      buildRelativeUrl("/sign-in", {
+        next: `/collections/${collectionSlug}/collaborators`,
+      }),
     );
   }
 
@@ -65,10 +67,9 @@ export const acceptInvitation = async (
 
   if (!session) {
     return redirect(
-      buildAuthUrl(
-        "/sign-in",
-        `/collections/${collectionSlug}/invite?code=${code}`,
-      ),
+      buildRelativeUrl("/sign-in", {
+        next: `/collections/${collectionSlug}/invite?code=${code}`,
+      }),
     );
   }
 

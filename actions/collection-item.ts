@@ -19,7 +19,7 @@ import type {
   InsertCollectionItem,
   UpdateCollectionItem,
 } from "@/utils/types";
-import { buildAuthUrl } from "@/utils/url";
+import { buildRelativeUrl } from "@/utils/url";
 
 export const createCollectionItem = async (
   collectionSlug: Collection["slug"],
@@ -31,7 +31,9 @@ export const createCollectionItem = async (
   const session = await getSession();
 
   if (!session) {
-    return redirect(buildAuthUrl("/sign-in", `/collections/${collectionSlug}`));
+    return redirect(
+      buildRelativeUrl("/sign-in", { next: `/collections/${collectionSlug}` }),
+    );
   }
 
   const collection = await selectOneCollectionWithMyPermissionLevelBySlug(
@@ -82,7 +84,7 @@ export const editCollectionItem = async (
 
   if (!session) {
     return redirect(
-      buildAuthUrl("/sign-in", `/collections/${collection.slug}`),
+      buildRelativeUrl("/sign-in", { next: `/collections/${collection.slug}` }),
     );
   }
 
@@ -120,7 +122,7 @@ export const removeCollectionItem = async (slug: CollectionItem["slug"]) => {
 
   if (!session) {
     return redirect(
-      buildAuthUrl("/sign-in", `/collections/${collection.slug}`),
+      buildRelativeUrl("/sign-in", { next: `/collections/${collection.slug}` }),
     );
   }
 

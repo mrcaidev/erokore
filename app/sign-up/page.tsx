@@ -1,6 +1,6 @@
 import type { Route } from "next";
 import Link from "next/link";
-import { buildAuthUrl } from "@/utils/url";
+import { buildRelativeUrl } from "@/utils/url";
 import { SignUpForm } from "./form";
 
 export type SignUpPageProps = {
@@ -18,7 +18,7 @@ const SignUpPage = async ({ searchParams }: SignUpPageProps) => {
         <div className="text-sm text-muted-foreground text-center">
           已经有账号？
           <Link
-            href={buildAuthUrl("/sign-in", next)}
+            href={buildRelativeUrl("/sign-in", next ? { next } : undefined)}
             className="underline underline-offset-4"
           >
             登录

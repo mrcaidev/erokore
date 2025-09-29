@@ -25,12 +25,12 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { defaultablePermissionLevels } from "@/constants/enums";
+import { DEFAULTABLE_PERMISSION_LEVELS } from "@/constants/enums";
 import { PERMISSION_LEVEL_LABEL_MAP } from "@/utils/permission";
 import type { Collection, Invitation } from "@/utils/types";
 
 const invitationFormSchema = v.object({
-  permissionLevel: v.picklist(defaultablePermissionLevels, "权限等级无效"),
+  permissionLevel: v.picklist(DEFAULTABLE_PERMISSION_LEVELS, "权限等级无效"),
   expiresDay: v.pipe(
     v.number(),
     v.integer("天数必须是整数"),

@@ -8,7 +8,7 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import * as v from "valibot";
 import { createCollection, editCollection } from "@/actions/collection";
-import { permissionLevels } from "@/constants/enums";
+import { PERMISSION_LEVELS } from "@/constants/enums";
 import type { Collection } from "@/utils/types";
 import { PermissionLevelSelect } from "./permission-level-select";
 import { Button } from "./ui/button";
@@ -30,8 +30,8 @@ const collectionFormSchema = v.object({
     v.maxLength(20, "最长 20 个字符"),
   ),
   description: v.pipe(v.string(), v.maxLength(200, "最长 200 个字符")),
-  collaboratorPermissionLevel: v.picklist(permissionLevels, "权限等级无效"),
-  anyonePermissionLevel: v.picklist(permissionLevels, "权限等级无效"),
+  collaboratorPermissionLevel: v.picklist(PERMISSION_LEVELS, "权限等级无效"),
+  anyonePermissionLevel: v.picklist(PERMISSION_LEVELS, "权限等级无效"),
 });
 
 export type CollectionFormProps = {

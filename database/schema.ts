@@ -9,9 +9,9 @@ import {
 } from "drizzle-orm/pg-core";
 import { nanoid } from "nanoid";
 import {
-  attitudes,
-  defaultablePermissionLevels,
-  permissionLevels,
+  ATTITUDES,
+  DEFAULTABLE_PERMISSION_LEVELS,
+  PERMISSION_LEVELS,
 } from "@/constants/enums";
 
 // 审计时间
@@ -72,11 +72,11 @@ const auditUsers = {
   deleterId: integer().references(() => usersTable.id),
 };
 
-export const permissionLevelEnum = pgEnum("permissionLevel", permissionLevels);
+export const permissionLevelEnum = pgEnum("permissionLevel", PERMISSION_LEVELS);
 
 export const defaultablePermissionLevelEnum = pgEnum(
   "defaultablePermissionLevel",
-  defaultablePermissionLevels,
+  DEFAULTABLE_PERMISSION_LEVELS,
 );
 
 export const collectionsTable = pgTable("collections", {
@@ -205,7 +205,7 @@ export const collectionItemsTable = pgTable("collectionItems", {
   ...auditUsers,
 });
 
-export const attitudeEnum = pgEnum("attitude", attitudes);
+export const attitudeEnum = pgEnum("attitude", ATTITUDES);
 
 export const reactionsTable = pgTable(
   "reactions",

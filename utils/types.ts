@@ -17,7 +17,7 @@ export type UpdateUser = Partial<InsertUser>;
 export type PrivateUser = Omit<User, "passwordSalt" | "passwordHash">;
 export type PublicUser = Omit<
   PrivateUser,
-  "createdAt" | "updatedAt" | "deletedAt"
+  "qq" | "createdAt" | "updatedAt" | "deletedAt"
 >;
 
 export type PermissionLevel = (typeof permissionLevelEnum.enumValues)[number];
@@ -86,19 +86,11 @@ export type CollectionItemEnrichedReaction = Reaction & {
   collectionItem: CollectionItem;
 };
 
-export type LimitOffsetOptions = {
+export type ListOptions<SortBy extends string = string> = {
   limit?: number;
   offset?: number;
-};
-
-export type SortOptions<T extends string> = {
-  sortBy?: T;
+  sortBy?: SortBy;
   sortOrder?: "asc" | "desc";
-};
-
-export type PaginationOptions = {
-  page: number;
-  pageSize: number;
 };
 
 export type SourceConfig<T> = {

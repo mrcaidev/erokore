@@ -1,11 +1,11 @@
 import { relations, sql } from "drizzle-orm";
 import {
-  integer,
   pgEnum,
   pgTable,
   text,
   timestamp,
   uniqueIndex,
+  uuid,
 } from "drizzle-orm/pg-core";
 import { nanoid } from "nanoid";
 import {
@@ -14,7 +14,6 @@ import {
   PERMISSION_LEVELS,
 } from "@/constants/enums";
 
-// 审计时间
 const auditTimestamps = {
   // 创建时间
   createdAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
@@ -30,46 +29,40 @@ const auditTimestamps = {
 export const usersTable = pgTable(
   "users",
   {
-    // 物理 ID
-    id: integer().primaryKey().generatedAlwaysAsIdentity(),
-    // 业务 ID
-    slug: text()
-      .notNull()
-      .unique()
-      .$default(() => nanoid(10)),
-    // 邮箱
-    email: text().notNull(),
+    // ID
+    id: uuid().primaryKey().defaultRandom(),
+    // QQ
+    qq: text().notNull(),
     // 昵称
     nickname: text().notNull(),
     // 头像 URL
     avatarUrl: text().notNull().default(""),
     // 密码盐
-    passwordSalt: text().notNull(),
+    passwordSalt: text().notNull().default(""),
     // 密码加盐哈希
-    passwordHash: text().notNull(),
+    passwordHash: text().notNull().default(""),
     // 审计时间
     ...auditTimestamps,
   },
   (table) => [
-    // 对于未删除的用户，邮箱唯一
+    // 对于未删除的用户，QQ 唯一
     uniqueIndex()
-      .on(table.email)
+      .on(table.qq)
       .where(sql`${table.deletedAt} is null`),
   ],
 );
 
-// 审计用户
 const auditUsers = {
   // 创建者 ID
-  creatorId: integer()
+  creatorId: uuid()
     .notNull()
     .references(() => usersTable.id),
   // 最后更新者 ID
-  updaterId: integer()
+  updaterId: uuid()
     .notNull()
     .references(() => usersTable.id),
   // 删除者 ID
-  deleterId: integer().references(() => usersTable.id),
+  deleterId: uuid().references(() => usersTable.id),
 };
 
 export const permissionLevelEnum = pgEnum("permissionLevel", PERMISSION_LEVELS);
@@ -80,13 +73,8 @@ export const defaultablePermissionLevelEnum = pgEnum(
 );
 
 export const collectionsTable = pgTable("collections", {
-  // 物理 ID
-  id: integer().primaryKey().generatedAlwaysAsIdentity(),
-  // 业务 ID
-  slug: text()
-    .notNull()
-    .unique()
-    .$default(() => nanoid(10)),
+  // ID
+  id: uuid().primaryKey().defaultRandom(),
   // 标题
   title: text().notNull(),
   // 描述
@@ -104,14 +92,14 @@ export const collectionsTable = pgTable("collections", {
 export const collaborationsTable = pgTable(
   "collaborations",
   {
-    // 物理 ID
-    id: integer().primaryKey().generatedAlwaysAsIdentity(),
+    // ID
+    id: uuid().primaryKey().defaultRandom(),
     // 协作者 ID
-    collaboratorId: integer()
+    collaboratorId: uuid()
       .notNull()
       .references(() => usersTable.id),
     // 作品集 ID
-    collectionId: integer()
+    collectionId: uuid()
       .notNull()
       .references(() => collectionsTable.id),
     // 权限等级
@@ -128,14 +116,14 @@ export const collaborationsTable = pgTable(
 export const subscriptionsTable = pgTable(
   "subscriptions",
   {
-    // 物理 ID
-    id: integer().primaryKey().generatedAlwaysAsIdentity(),
+    // ID
+    id: uuid().primaryKey().defaultRandom(),
     // 订阅者 ID
-    subscriberId: integer()
+    subscriberId: uuid()
       .notNull()
       .references(() => usersTable.id),
     // 作品集 ID
-    collectionId: integer()
+    collectionId: uuid()
       .notNull()
       .references(() => collectionsTable.id),
     // 审计时间
@@ -150,14 +138,14 @@ export const subscriptionsTable = pgTable(
 export const invitationsTable = pgTable(
   "invitations",
   {
-    // 物理 ID
-    id: integer().primaryKey().generatedAlwaysAsIdentity(),
+    // ID
+    id: uuid().primaryKey().defaultRandom(),
     // 邀请者 ID
-    inviterId: integer()
+    inviterId: uuid()
       .notNull()
       .references(() => usersTable.id),
     // 作品集 ID
-    collectionId: integer()
+    collectionId: uuid()
       .notNull()
       .references(() => collectionsTable.id),
     // 邀请码
@@ -178,13 +166,8 @@ export const invitationsTable = pgTable(
 );
 
 export const collectionItemsTable = pgTable("collectionItems", {
-  // 物理 ID
-  id: integer().primaryKey().generatedAlwaysAsIdentity(),
-  // 业务 ID
-  slug: text()
-    .notNull()
-    .unique()
-    .$default(() => nanoid(10)),
+  // ID
+  id: uuid().primaryKey().defaultRandom(),
   // 来源
   source: text().notNull(),
   // 标题
@@ -196,7 +179,7 @@ export const collectionItemsTable = pgTable("collectionItems", {
   // 封面 URL
   coverUrl: text().notNull(),
   // 作品集 ID
-  collectionId: integer()
+  collectionId: uuid()
     .notNull()
     .references(() => collectionsTable.id),
   // 审计时间
@@ -210,14 +193,14 @@ export const attitudeEnum = pgEnum("attitude", ATTITUDES);
 export const reactionsTable = pgTable(
   "reactions",
   {
-    // 物理 ID
-    id: integer().primaryKey().generatedAlwaysAsIdentity(),
+    // ID
+    id: uuid().primaryKey().defaultRandom(),
     // 回应者 ID
-    reactorId: integer()
+    reactorId: uuid()
       .notNull()
       .references(() => usersTable.id),
     // 作品 ID
-    collectionItemId: integer()
+    collectionItemId: uuid()
       .notNull()
       .references(() => collectionItemsTable.id),
     // 点赞/无/点踩

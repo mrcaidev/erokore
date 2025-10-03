@@ -1,7 +1,7 @@
 import type { DefaultablePermissionLevel, PermissionLevel } from "./types";
 
 export const PERMISSION_LEVEL_LABEL_MAP: Record<PermissionLevel, string> = {
-  none: "不可见",
+  none: "无权限",
   viewer: "可查看",
   rater: "可评价",
   contributor: "可贡献",

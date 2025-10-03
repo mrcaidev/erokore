@@ -1,5 +1,5 @@
 export const PERMISSION_LEVELS = [
-  // 不可见：没有任何权限
+  // 无权限
   "none",
   // 可查看：可以查看、关注作品集，查看作品，查看协作者
   "viewer",
